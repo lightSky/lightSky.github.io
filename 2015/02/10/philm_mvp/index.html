@@ -1,0 +1,997 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，原理解析," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> 开源项目Philm的MVP架构分析 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              开源项目Philm的MVP架构分析
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-02-09
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/优秀项目原理解析/">优秀项目原理解析</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/02/10/philm_mvp/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/02/10/philm_mvp/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>#前言#<br>最近一直在研究ChrisBannes的开源项目<a href="https://github.com/chrisbanes/philm" target="_blank" rel="external">Philm</a>，其整体架构是一套MVP的实现，因为自己也确实没有遇到过整个项目利用MVP搭建的架构，看到的更多是一些代码片段，这里就探讨Philm是如何结合Android实际问题来实现一种MVP架构，如有分析不准确的地方，欢迎指出，大家一起探讨。<br><a id="more"></a></p>
+<p>#1.简单谈一谈MVP#</p>
+<p>在无任何模式下的开发时，Activity与Model层的关系太紧密了，做了所有的操作，不易维护，扩展性较差。比如我们后期的需求可能不是从数据库获取数据了，而是从网络，又或者有一个版本要对所有的UI进行大改版，（随着MaterialDesign的出现，我觉得这个还是有可能的），如果所有的逻辑都在Activity中，那么如此臃肿的代码，怎么修改都费劲吧，又或者你要适应多套UI，比如平板，维护起来也很麻烦吧。  </p>
+<p>##1.2 MVP##  </p>
+<p><img src="/img/philm_mvp/mvp.png">  </p>
+<p>MVP是MVC的一种衍生，MVP模式中不容许View直接访问Model，这是MVP与MVC最大的不同之处。View中应该只有UI逻辑，捕捉用户输入以及视图的渲染。这样将其它复杂的逻辑抽离出来放到Presenter中去，这样就出现了MVP。这种模式和传统的软件工程思想一样，降低了耦合度，模块化，更方便维护。Presenter通常是通过定义好的接口与View进行交互，那么开发的时候，只要写一个测试类去实现该接口即可模拟用户的各种操作进行测试，而不需要使用自动化测试工具。甚至可以不用再每次在手机上重新运行应用了，测试也更有效率。</p>
+<p>简单的说，就是将View中的复杂工作抽取到Presenter中，降低了耦合度，便于维护和测试，也增强了复用性。</p>
+<p><strong>在MVP模式里通常包含4个要素</strong><br>     (1) <strong>View</strong>: 负责绘制UI元素、与用户进行交互(Activity或Fragment);<br>     (2) <strong>View interface</strong>: View需要实现的接口，View通过View interface与Presenter进行交互，降低耦合，方便进行单元测试<br>     (3) <strong>Model</strong>: 负责业务Bean的操作。<br>     (4) <strong>Presenter</strong>: 作为View与Model交互的纽带，承载了大部分的复杂逻辑。</p>
+<p><strong>MVP的优点</strong><br>1、Model与View完全分离，它们通过接口进行交互，便于维护和测试。<br>2、可以更高效地使用Model，因为所有对Model的操作都在Presenter内部。<br>3、我们可以将一个Presener用于多个视图，只需要在Presenter中为不同的View定义View Interface即可，具体的View实现自己的View Interface，即可使用Presenter中的Model操作等。</p>
+<p><strong>关于MVP的更多资料和讨论可以看文章结尾的相关链接</strong></p>
+<p>#2. MVP架构的实现#<br>MVP的具体实现是没有标准的，因为一个项目要考虑的因素很多，你可以按照自己的习惯和需求进行具体的实现。下面我们来分析Philm中实现的MVP架构。</p>
+<p>##2.1 Philm的总体设计##<br>Philm使用了Controller来统一管理Model、View，按照上面的MVP理解以及Controller实际所做的工作，这个Controller其实相当于上面的Presenter，但这个Controller更加复杂，在Controller内部，直接定义了MVP中View与Presenter的交互接口Callback，另外该项目中引入了State的概念（具体见下面的介绍），统一管理了Model和业务中所需的Event，所有的Activity和Fragment的跳转以及TitleBar和Drawer的管理使用了一个Display来实现。</p>
+<p><img src="/img/philm_mvp/philm_mvp_structure.png"> </p>
+<p>#类关系图#<br><img src="/img/philm_mvp/philm_mvp_uml.png"> </p>
+<p>#基本调用流程图#<br><img src="/img/philm_mvp/mvp_method_flow.png"> </p>
+<p>##2.2 核心概念##</p>
+<p>###2.2.1 Controller###<br>控制中心，简单的可认为是MVP中的Presenter，但是其更复杂。统一管理界面状态的初始化和状态清理，为所有的UI进行渲染并添加CallBack，统一调度业务相关的后台任务线程，订阅State中定义的Event，进行视图的更新。并统一定义了View与Presenter的View Interface，一个Controller可以为多个View定义View Interface，因此Controller可以被多个View所共用。</p>
+<p>###2.2.2 State###<br>保存界面使用到的业Bean，定义业务中所用到Event事件。</p>
+<p>每一个界面拥有自己的State接口，ApplicationState负责统一实现所有State接口，ApplicationState扮演了UI和后台线程的通信者，实现保存业务Bean的分发和事件的分发。</p>
+<p>使用Controller进行populate时，会从state中获取业务Bean，如果State中没有，Controller则会启动后台线程请求数据，成功获取数据后通过state.set()分发保存到State中，同时会post一个Event通知Controller进行相应的处理。</p>
+<p><strong>State中定义的事件类型</strong><br>异步请求完成的通知、数据变更、NetWork的状态变化、LoadingProgress的展示与隐藏，这也是State被单独抽离出来的原因吧，统一存储了Model并定义了各种State，注意State并不对Model做复杂的操作，只是简单的Set和Get，复杂的操作全部由Controller处理。</p>
+<p>###2.2.3 Display###<br>统一控制TitleBar、Drawer以及所有Activity和Fragment跳转，没有业务逻辑操作。</p>
+<p>#3. 核心类分析#</p>
+<p>###3.1 BaseController###</p>
+<h3 id="3-1-1-核心方法"><a href="#3-1-1-核心方法" class="headerlink" title="3.1.1  核心方法"></a>3.1.1  核心方法</h3><p><strong>(1) init()</strong><br>所有Controller初始化发起的方法，在BasePhilmActivity中通过<code>mMainController.init()</code>发起，所有的Controller由MainCtroller统一控制。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</div><div class="line">       Preconditions.checkState(mInited == <span class="keyword">false</span>, <span class="string">"Already inited"</span>);</div><div class="line">       mInited = <span class="keyword">true</span>;</div><div class="line">       onInited();</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p><strong>(2) suspend</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public final void suspend() &#123;</div><div class="line">       Preconditions.checkState(mInited == true, &quot;Not inited&quot;);</div><div class="line">       onSuspended();</div><div class="line">       mInited = false;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>###3.2 BaseUiController###<br>统一定义管理某个界面的所有的UI，事件，接口。<br>在View(这里是Activity或Fragment)中使用的时候获取相应的Controller，然后在<code>onResume</code>中调用<code>getController().attachUI()</code>，为View设置CallBack，然后进行populate，在onPause中调用 getController().detachUi(this)清空UI的所有CallBack以及其它状态的清理。</p>
+<p>每一个Controller都拥有一个自己的UiCallBacks，以及一个继承自BaseUiController.Ui<callbacks>的UI。  </callbacks></p>
+<p><strong>Controller是可以共用的</strong><br>在Controller内部也可同时为不同的View定义相应的UICallBack，因为不同的View可能会使用到相同的Model，State等事件，不同的View只需实现Controller中定义的与自己相关的CallBack即可。当然该UICallBack需要继承已实现BaseUiController.Ui<uc>的UI，因为最终都会传入到BaseUIController中进行setCallbacks(UC)。  </uc></p>
+<p>###3.2.1 重要成员变量###<br><code>mUis</code>：用于存储所有的UI<br><code>mUnmodifiableUis</code>：mUis的拷贝，但不可修改<br><code>UI&lt;UC&gt;</code>接口<br>所有Controller的子类的UI都需要实现该UI<uc>接口，拥有CallBack的能力，在Controller attachUi的时候会为传入的UI设置CallBack<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Ui</span>&lt;<span class="title">UC</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">       <span class="function"><span class="keyword">void</span> <span class="title">setCallbacks</span><span class="params">(UC callbacks)</span></span>;</div><div class="line"></div><div class="line">       <span class="function"><span class="keyword">boolean</span> <span class="title">isModal</span><span class="params">()</span></span>;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></uc></p>
+<p>###3.2.2 重要方法###</p>
+<p>####3.2.2.1 attachUi(U ui)####<br>在Activity或者Fragment的<code>onResume</code>中调用，进行添加回调，视图渲染等工作。<br>final 类型，不可复写，只是为了Controller的实现类进行状态的管理，如果需要更多的操作，可以实现<code>onUiAttached(UI)</code>方法，该方法会在<code>attachUI</code>中调用。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">attachUi</span><span class="params">(U ui)</span> </span>&#123;</div><div class="line">        Preconditions.checkArgument(ui != <span class="keyword">null</span>, <span class="string">"ui cannot be null"</span>);</div><div class="line">        Preconditions.checkState(!mUis.contains(ui), <span class="string">"UI is already attached"</span>);</div><div class="line"></div><div class="line">        mUis.add(ui);</div><div class="line"></div><div class="line">        ui.setCallbacks(createUiCallbacks(ui));</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (isInited()) &#123;</div><div class="line">            <span class="keyword">if</span> (!ui.isModal() &amp;&amp; !(ui <span class="keyword">instanceof</span> SubUi)) &#123;</div><div class="line">                updateDisplayTitle(getUiTitle(ui));</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            onUiAttached(ui);</div><div class="line">            populateUi(ui);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>####3.2.2.2 detachUI(U ui)####<br>在Activity或者Fragment的<code>onResume</code>中调用，清空CallBack。<br>final 类型，不可复写，只是为了实现类进行状态的管理，同上如果有更多的操作，可以实现<code>onUiDetached(ui)</code>方法。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">detachUi</span><span class="params">(U ui)</span> </span>&#123;</div><div class="line">       Preconditions.checkArgument(ui != <span class="keyword">null</span>, <span class="string">"ui cannot be null"</span>);</div><div class="line">       Preconditions.checkState(mUis.contains(ui), <span class="string">"ui is not attached"</span>);</div><div class="line">       onUiDetached(ui);</div><div class="line">       ui.setCallbacks(<span class="keyword">null</span>);</div><div class="line"></div><div class="line">       mUis.remove(ui);</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>####3.2.2.3 onInited()####<br>各个Controller进行初始化的时候调用，不用明确的调用，因为MainController统一管理了所有的Controller，在BasePhilmActivity的onResume中通过调用MainController.init()方法统一初始化。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onInited</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!mUis.isEmpty()) &#123;</div><div class="line">            <span class="keyword">for</span> (U ui : mUis) &#123;</div><div class="line">                onUiAttached(ui);</div><div class="line">                populateUi(ui);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>各个Controller自身的onInited方法做一些事件的注册等简单的初始化。</p>
+<p>####3.2.2.4 onSuspended()####<br>清理CallBacks并取消所有注册事件 unregisterForEvents。<br>也是由MainController统一在BasePhilmActivity的onPause中管理。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123;</div><div class="line">     mMainController.suspend();        		  </div><div class="line">     mMainController.setHostCallbacks(<span class="keyword">null</span>);</div><div class="line">     mMainController.detachDisplay(mDisplay);</div><div class="line">     <span class="keyword">super</span>.onPause();</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>####3.2.2.5 populate(UI)####<br>对View进行渲染。</p>
+<p>####3.2.2.6 createUiCallbacks(U ui)####<br>abstract类型，用于Controller创建自己的UICallBack，该方法已经在<code>attachUi(U ui)</code>的时候调用ui.setCallbacks(createUiCallbacks(ui))，为所有UI设置自己的UI回调事件。</p>
+<p>####3.2.2.7 getId(U ui)####<br>为每一个后台线程和Event设置一个ID。当需要渲染的时候，遍历所有的UI，通过findUi找到目标UI，进行更新。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">(U ui)</span> </span>&#123;</div><div class="line">       <span class="keyword">return</span> ui.hashCode();</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>####3.2.2.8 findUi(final int id)####<br>与getId(U ui)相对应，获取后台线程或者事件的ID。</p>
+<p>####3.2.2.9 populateUiFromEvent####<br>populateUiFromEvent(BaseState.UiCausedEvent event)<br>当某些数据更新的时候，需要更新视图时，调用该方法，发送一个事件，通知Controller进行UI更新。</p>
+<p>##3.3 MainController##</p>
+<p>###3.3.1 onInited()###<br>对所有Controller的CallBack和状态进行初始化<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onInited</span><span class="params">()</span> </span>&#123;</div><div class="line">     <span class="keyword">super</span>.onInited();</div><div class="line">     mState.registerForEvents(<span class="keyword">this</span>);</div><div class="line">     mUserController.init();</div><div class="line">     mMovieController.init();</div><div class="line">     mAboutController.init();</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p>###3.3.2 onSuspended###<br>对所有Controller的CallBack和状态进行清理<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onSuspended</span><span class="params">()</span> </span>&#123;</div><div class="line">        mAboutController.suspend();</div><div class="line">        mUserController.suspend();</div><div class="line">        mMovieController.suspend();</div><div class="line">        mDbHelper.close();</div><div class="line">        mState.unregisterForEvents(<span class="keyword">this</span>);</div><div class="line"></div><div class="line">        <span class="keyword">super</span>.onSuspended();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>##3.4 BasePhilmActivity##<br>整个项目的MainController的初始化的发起：</p>
+<p>###3.4.1 重要方法###</p>
+<p>####3.3.1.1 onCreate####<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mMainController = PhilmApplication.from(<span class="keyword">this</span>).getMainController();</div><div class="line">AndroidDisplay  mDisplay = <span class="keyword">new</span> AndroidDisplay(<span class="keyword">this</span>, mDrawerLayout);</div></pre></td></tr></table></figure></p>
+<p>####3.4.1.2 onResume####<br>初始化所有的状态<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"> <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="keyword">super</span>.onResume();</div><div class="line">       mMainController.attachDisplay(mDisplay);</div><div class="line">       mMainController.setHostCallbacks(<span class="keyword">this</span>);</div><div class="line">       mMainController.init();</div><div class="line">   &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">attachDisplay</span><span class="params">(Display display)</span> </span>&#123;</div><div class="line">       Preconditions.checkNotNull(display, <span class="string">"display is null"</span>);</div><div class="line">       Preconditions.checkState(getDisplay() == <span class="keyword">null</span>, <span class="string">"we currently have a display"</span>);</div><div class="line">       setDisplay(display);</div><div class="line">   &#125;</div><div class="line"></div><div class="line"> <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setDisplay</span><span class="params">(Display display)</span> </span>&#123;</div><div class="line">       <span class="keyword">super</span>.setDisplay(display);</div><div class="line">       mMovieController.setDisplay(display);</div><div class="line">       mUserController.setDisplay(display);</div><div class="line">       mAboutController.setDisplay(display);</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>#####3.4.1.5  onPause() #####<br>清空所有的状态<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123;</div><div class="line">      mMainController.suspend();</div><div class="line">      mMainController.setHostCallbacks(<span class="keyword">null</span>);</div><div class="line">      mMainController.detachDisplay(mDisplay);</div><div class="line">      <span class="keyword">super</span>.onPause();</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>##3.5 实现特定Controller的UI的Fragment##  </p>
+<p>###3.5.1 onResume###<br>获取到自己的Controller进行初始化<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span> </span>&#123;</div><div class="line">       <span class="keyword">super</span>.onResume();</div><div class="line">       getController().attachUi(<span class="keyword">this</span>);</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>###3.5.2 onPause###<br>获取到相应的Controller进行状态清理<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123;</div><div class="line">      saveListViewPosition();</div><div class="line">      cancelToast();</div><div class="line">      getController().detachUi(<span class="keyword">this</span>);</div><div class="line">      <span class="keyword">super</span>.onPause();</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>#总结#<br>Philm中实现的MVP的架构，遵循了MVP的关键原则：将View和Model隔离。因为整个项目是基于该架构的，所以考虑的更全面，比如状态的统一管理，所有Controller的统一管理，统一的CallBack的管理，使用Otto驱动事件实现组件间的解耦等。当你希望自己的整个项目完全使用MVP的架构时，Philm的框架无疑是一种非常值得参考的实现，你也可以根据自己的需求进行扩展。<br>另外Philm也使用了最新的MaterialDesign设计，有一些自定义的View，也是不错的学习资料。</p>
+<p>#相关文章#<br><a href="http://blog.csdn.net/vector_yi/article/details/24719873" target="_blank" rel="external">http://blog.csdn.net/vector_yi/article/details/24719873</a></p>
+<p><a href="http://antonioleiva.com/mvp-android/" target="_blank" rel="external">http://antonioleiva.com/mvp-android/</a><br><a href="https://github.com/antoniolg/androidmvp" target="_blank" rel="external">https://github.com/antoniolg/androidmvp</a></p>
+<p><a href="http://fernandocejas.com/2014/09/03/architecting-android-the-clean-way/" target="_blank" rel="external">http://fernandocejas.com/2014/09/03/architecting-android-the-clean-way/</a><br><a href="https://github.com/android10/Android-CleanArchitecture" target="_blank" rel="external">https://github.com/android10/Android-CleanArchitecture</a></p>
+<p><a href="http://magenic.com/BlogArchive/AnMVPPatternforAndroid" target="_blank" rel="external">http://magenic.com/BlogArchive/AnMVPPatternforAndroid</a></p>
+<p><a href="http://blog.8thlight.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank" rel="external">http://blog.8thlight.com/uncle-bob/2012/08/13/the-clean-architecture.html</a></p>
+<p><a href="http://blog.csdn.net/xijiaohuangcao/article/details/7925641" target="_blank" rel="external">http://blog.csdn.net/xijiaohuangcao/article/details/7925641</a></p>
+<p><a href="https://github.com/pedrovgs/EffectiveAndroidUI/" target="_blank" rel="external">https://github.com/pedrovgs/EffectiveAndroidUI/</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，原理解析/"> #Android，原理解析 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/05/23/anim_basic_knowledge/">Android 动画基础</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/02/04/android_screen_ajust/">Android屏幕适配笔记</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/02/10/philm_mvp/"
+               data-title="开源项目Philm的MVP架构分析" data-url="http://www.lightskystreet.com/2015/02/10/philm_mvp/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-核心方法"><span class="nav-number">1.</span> <span class="nav-text">3.1.1  核心方法</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

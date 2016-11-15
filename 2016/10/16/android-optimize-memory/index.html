@@ -1,0 +1,991 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，性能优化," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Android性能优化-内存优化 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Android性能优化-内存优化
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-10-15
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/性能优化/">性能优化</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/10/16/android-optimize-memory/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/16/android-optimize-memory/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>原文链接 <a href="https://developer.android.com/topic/performance/memory.html#remove" target="_blank" rel="external">Manage Your App’s Memory</a>  </p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a><strong>前言</strong></h3><p>在任何软件开发环境中，RAM都是比较珍贵的资源。在移动操作系统上更是这样，因为它们的物理内存通常受限。尽管在ART和Dalvik虚拟机都会进行垃圾回收的巡航，但这并不意味着你可以忽略何时，何地分配和释放内存。你应该避免内存泄露，通常此后又一些静态成员变量导致，也应该在恰当的时间（定义的一些生命周期回调的方法里）释放所有<code>Reference</code> 对象。</p>
+<p>这里见识了你如何减少app内存的使用。因为android是基于java的，所以对于内存的管理，可以参考java相关的书籍，下面章节中也会有所讲解。关于如何分析app运行中的内存使用，可以参考 <a href="https://developer.android.com/topic/performance/memory.html#AnalyzeRam" target="_blank" rel="external">Tools for analyzing RAM usage</a>。关于ART和Dalvik虚拟机管理内存的更多细节，可以参考 <a href="https://developer.android.com/training/articles/memory-overview.html" target="_blank" rel="external">Overview of Android Memory Management</a>.</p>
+<h2 id="一-监测可用内存和内存使用"><a href="#一-监测可用内存和内存使用" class="headerlink" title="一 监测可用内存和内存使用"></a><strong>一 监测可用内存和内存使用</strong></h2><p>Android 框架，AndrStudio和Android SDK都提供了分析app内存使用的途径。Android框架暴露了几个API，允许你的app动态的减少内存使用、AndroidStudio和Android SDK提供了几种工具帮你分析app的内存使用情况。</p>
+<h3 id="分析RAM使用的工具"><a href="#分析RAM使用的工具" class="headerlink" title="分析RAM使用的工具"></a>分析RAM使用的工具</h3><ol>
+<li><p>Device Monitor 拥有一个 Dalvik Debug Monitor Server (DDMS) 工具，可以帮助你检测app进程中内存的分配。你可以通过该信息去分析app的总体内存使用情况。比如，先执行垃圾回收事件然后再去看那些仍然保留在内存中的对象。通过这种方式去定位app中所进行的内存分配或者遗留在内存中的对象。</p>
+<p>更多关于DDMS的使用请参考 <a href="https://developer.android.com/studio/profile/ddms.html" target="_blank" rel="external">Using DDMS</a></p>
+</li>
+<li><p>Android Studio中的Memory Monitor 可以向你展示某一个过程中的内存分配情况。该工具以图形化的方式展示了某一时段可用的和已经分配的java内存，以及发送的垃圾回收事件。也可以触发垃圾回收事件并获取app运行期间java堆内存的快照。Memory Monitor tool 的输出信息也可以帮你定位到app密集发生垃圾回收事件的点，这些点会降低了app速度。</p>
+<p>关于如何使用Memory Monitor tool的更多信息可以参考 <a href="https://developer.android.com/tools/debugging/debugging-memory.html#ViewHeap" target="_blank" rel="external">Viewing Heap Updates</a>.</p>
+</li>
+<li><p>垃圾回收事件也会展示在 Traceview viewer中。 Traceview 允许你以时间线的方式查看trace log文件，并可以分析一个事件段内都发生了什么。你可以使用该工具确定在你的代码在垃圾回收事件发生时都做了什么操作。</p>
+<p>更多信息关于如何使用Traceview viewer, 可以参考 <a href="https://developer.android.com/studio/profile/traceview.html" target="_blank" rel="external">Profiling with Traceview and dmtracedump</a>.</p>
+<p>​</p>
+</li>
+<li><p>Android Studio中的Allocation Tracker tool可以帮助你分析app是如何分配内存的。Allocation Tracker 记录了app内存的分配并在快照中列出了所有的分配对象。可以使用该工具追踪哪些地方分配了过多的对象。</p>
+<p>更多关于如何使用Allocation Tracker tool，可以参考  <a href="https://developer.android.com/topic/performance/%7BdocRoot%7Dstudio/profile/allocation-tracker-walkthru.html" target="_blank" rel="external">Allocation Tracker Walkthrough</a>.</p>
+</li>
+</ol>
+<h3 id="依据事件释放内存"><a href="#依据事件释放内存" class="headerlink" title="依据事件释放内存"></a>依据事件释放内存</h3><p>根据RAM的物理内存和设备的操作行为，Android设备可以在变化的可用内存中运行。在内存压力的情况下，系统的广播信号会提示，app可以监听这些信号然后对内存的使用做恰当的处理。</p>
+<p>可以使用 <a href="https://developer.android.com/reference/android/content/ComponentCallbacks2.html" target="_blank" rel="external">ComponentCallbacks2</a> 来监听内存信号响应app生命周期或者设备的事件。<code>onTrimMemory()</code> 方法可以帮助你监听app在前台或者后台时内存相关的事件。</p>
+<p>在Activity中实现<code>onTrimMemory()</code> 回调，如下：</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line">import android.content.ComponentCallbacks2;</div><div class="line">// Other import statements ...</div><div class="line"></div><div class="line">public class MainActivity extends AppCompatActivity</div><div class="line">    implements ComponentCallbacks2 &#123;</div><div class="line"></div><div class="line">    // Other activity code ...</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Release memory when the UI becomes hidden or when system resources become low.</div><div class="line">     * @param level the memory-related event that was raised.</div><div class="line">     */</div><div class="line">    public void onTrimMemory(int level) &#123;</div><div class="line"></div><div class="line">        // Determine which lifecycle or system event was raised.</div><div class="line">        switch (level) &#123;</div><div class="line"></div><div class="line">            case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:</div><div class="line"></div><div class="line">                /*</div><div class="line">                   Release any UI objects that currently hold memory.</div><div class="line"></div><div class="line">                   The user interface has moved to the background.</div><div class="line">                */</div><div class="line"></div><div class="line">                break;</div><div class="line"></div><div class="line">            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:</div><div class="line">            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:</div><div class="line">            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:</div><div class="line"></div><div class="line">                /*</div><div class="line">                   Release any memory that your app doesn&apos;t need to run.</div><div class="line"></div><div class="line">                   The device is running low on memory while the app is running.</div><div class="line">                   The event raised indicates the severity of the memory-related event.</div><div class="line">                   If the event is TRIM_MEMORY_RUNNING_CRITICAL, then the system will</div><div class="line">                   begin killing background processes.</div><div class="line">                */</div><div class="line"></div><div class="line">                break;</div><div class="line"></div><div class="line">            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:</div><div class="line">            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:</div><div class="line">            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:</div><div class="line"></div><div class="line">                /*</div><div class="line">                   Release as much memory as the process can.</div><div class="line"></div><div class="line">                   The app is on the LRU list and the system is running low on memory.</div><div class="line">                   The event raised indicates where the app sits within the LRU list.</div><div class="line">                   If the event is TRIM_MEMORY_COMPLETE, the process will be one of</div><div class="line">                   the first to be terminated.</div><div class="line">                */</div><div class="line"></div><div class="line">                break;</div><div class="line"></div><div class="line">            default:</div><div class="line">                /*</div><div class="line">                  Release any non-critical data structures.</div><div class="line"></div><div class="line">                  The app received an unrecognized memory level value</div><div class="line">                  from the system. Treat this as a generic low-memory message.</div><div class="line">                */</div><div class="line">                break;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="https://developer.android.com/reference/android/content/ComponentCallbacks2.html#onTrimMemory" target="_blank" rel="external"> onTrimMemory()</a>方法是在Android 4.0（API 14）中加入的，你可以使用在其它的低版本中使用 <code>onLowMemory()</code>回调，相当于<a href="https://developer.android.com/reference/android/content/ComponentCallbacks2.html#TRIM_MEMORY_COMPLETE" target="_blank" rel="external"> TRIM_MEMORY_COMPLETE</a>事件。</p>
+<h3 id="确定你应该使用多少内存"><a href="#确定你应该使用多少内存" class="headerlink" title="确定你应该使用多少内存"></a>确定你应该使用多少内存</h3><p>为了允许多进程，Android对每个app在堆内存的大小上设置了严格的限制。由于不同的设备的总的可用RAM内存不同，准确的堆内存的大小限制也不同。如果你的app达到了堆的内存限制，并且尝试分配更多内存，系统就会抛出OOM。</p>
+<p>为了避免OOM，可以通过调用<code>getMemoryInfo()</code>方法去查询当前设备的可用内存堆内存空间。该方法会返回一个 <code>ActivityManager.MemoryInfo</code> 对象，该对象提供了设备的内存状态信息，包括可用内存，总内存和内存阀值（当内存低于该值得时候，系统将会杀死进程）。<code>ActivityManager.MemoryInfo</code> 类也暴露了一些简单的boolean字段， <code>lowMemory</code> 就直接告诉你你的设备是否运行在低内存环境。下面的代码片段展示了如何使用在你的应用中使用 <code>getMemoryInfo()</code>方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public void doSomethingMemoryIntensive() &#123;</div><div class="line"></div><div class="line">    // Before doing something that requires a lot of memory,</div><div class="line">    // check to see whether the device is in a low memory state.</div><div class="line">    ActivityManager.MemoryInfo memoryInfo = getAvailableMemory();</div><div class="line"></div><div class="line">    if (!memoryInfo.lowMemory) &#123;</div><div class="line">        // Do memory intensive work ...</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// Get a MemoryInfo object for the device&apos;s current memory status.</div><div class="line">private ActivityManager.MemoryInfo getAvailableMemory() &#123;</div><div class="line">    ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);</div><div class="line">    ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();</div><div class="line">    activityManager.getMemoryInfo(memoryInfo);</div><div class="line">    return memoryInfo;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="二-从代码角度优化内存"><a href="#二-从代码角度优化内存" class="headerlink" title="二 从代码角度优化内存"></a>二 从代码角度优化内存</h2><p>一些android的特性，java classes ，以及代码结构有时候会占用更多内存，我们应该通过选择更高效的方案来减少内存的使用。</p>
+<h3 id="节省的使用Service"><a href="#节省的使用Service" class="headerlink" title="节省的使用Service"></a>节省的使用Service</h3><p>在后台保留一个不需要的service，是最糟糕的内存管理方式之一。如果你需要通过service在后台去执行任务，除非当它将要去执行一个任务的时候，否则不应该一直在后台驻留。在完成任务后记得将service停掉，否则可能在不经意间导致了内存泄露（这里应该是指service占用了无用的资源）。</p>
+<p>当你启动一个service的时候，系统会更好的保留service所运行的进程。这样会导致service 进程非常的消耗资源，因为被一个service占用的RAM部分，其它Servie就不可用了。这样会减少系统在LRU cache中缓存的进程数量，降低了app的切换效率。当内存紧张时，甚至会导致内存抖动，并且系统无法维护足够的进程来托管当前运行的所有服务。。</p>
+<p>尽量避免使用持久化的service，因为它持有占有了可用内存。建议使用其它替代方案，比如 <code>JobScheduler</code>。关于<code>JobScheduler</code>如何调度后台进程，可以参考<a href="https://developer.android.com/topic/performance/background-optimization.html" target="_blank" rel="external">Background Optimizations</a>。</p>
+<p>如果必须使用service，最好是使用 <code>IntentService</code>来限制service的生命周期，一旦处理完启动它的Intent，该IntentService就会将自己停掉。更多信息可以参考<a href="https://developer.android.com/training/run-background-service/index.html" target="_blank" rel="external">Running in a Background Service</a>.</p>
+<h3 id="使用内存更高效的代码结构"><a href="#使用内存更高效的代码结构" class="headerlink" title="使用内存更高效的代码结构"></a>使用内存更高效的代码结构</h3><p>一些编程语言中的类没有针对移动设备进行优化。比如，通用HashMap实现可能是相当的内存低效，因为它需要为每个映射关系创建单独的对象。</p>
+<p>Android框架中提供了几种优化过的数据结构，比如<a href="https://developer.android.com/reference/android/util/SparseArray.html" target="_blank" rel="external">SparseArray</a>, <a href="https://developer.android.com/reference/android/util/SparseBooleanArray.html" target="_blank" rel="external">SparseBooleanArray</a> 和 <a href="https://developer.android.com/reference/android/support/v4/util/LongSparseArray.html" target="_blank" rel="external">LongSparseArray</a>,比如<code>SparseArray</code> 避免了对key的自动装箱（导致每个实体会多创建对象），所以更高效。</p>
+<h3 id="小心的使用代码抽象"><a href="#小心的使用代码抽象" class="headerlink" title="小心的使用代码抽象"></a><strong>小心的使用代码抽象</strong></h3><p>开发人员经常简单地使用抽象作为一个好的编程实践，因为抽象可以提高代码的灵活性和维护性。但是抽象会带来严重的开销：通常它们需要额外执行相当多的更多代码，需要更多的时间和RAM将代码映射到内存中。因此，如果你的抽象不能带来比较大的好处，那么请避免使用抽象。</p>
+<p>比如，枚举相对于静态通常需要两倍甚至更多的内存。你应该严格避免在android中使用枚举。</p>
+<h3 id="使用nano-protobufs进行序列化"><a href="#使用nano-protobufs进行序列化" class="headerlink" title="使用nano protobufs进行序列化"></a><strong>使用nano protobufs进行序列化</strong></h3><p><a href="https://developers.google.com/protocol-buffers/docs/overview" target="_blank" rel="external">Protocol buffers</a>是由Google研发，跨语言、跨平台，扩展性非常好的序列化数据结构，类似XML，但是更小更快，更简单。如果你决定使用protobufs进行序列化，你应该在客户端代码中使用nano protobufs。因为一般的protobufs会生成冗余的代码，导致各种问题，比如增加RAM的使用，APK大小，比较低的执行效率。</p>
+<p>更多信息可以参考 <a href="https://android.googlesource.com/platform/external/protobuf/+/master/java/README.txt" target="_blank" rel="external">protobuf readme</a> “Nano version”部分</p>
+<h3 id="避免内存抖动"><a href="#避免内存抖动" class="headerlink" title="避免内存抖动"></a><strong>避免内存抖动</strong></h3><p>上面提到，通常垃圾回收事件不会影响到你的app性能。但是，在短时间内突然发生很多的垃圾回收事件就会占用了帧的时间。系统花费在垃圾回收上的时间越多，那么用于渲染或者音频的时间就越少。</p>
+<p>通常，内存抖动会导致大量的垃圾收集事件发生。在实践中，内存抖动是指在在一个特定时间内分配了很多临时对象。</p>
+<p>比如，你可能在for 循环中分配了多个临时对象。或者在onDraw中创建了新的Paint或者Bitmap对象。这两种情况下，app都会快速创建大量的对象。这样会快速消耗掉young generation中的可用内存，强制垃圾回收器触发回收事件。</p>
+<p>通过  <a href="https://developer.android.com/topic/performance/memory.html#AnalyzeRam" target="_blank" rel="external">Analyze your RAM usage</a> 可以帮你找到代码中哪些地方导致了内存抖动。</p>
+<p>一旦定位到了问题，就应该试着在性能问题严重的地方减少对象的分配。考虑将他们移到内部循环外面，可能的话，也可以通过 <a href="https://en.wikipedia.org/wiki/Factory_method_pattern" target="_blank" rel="external">Factory模式</a>来实现。</p>
+<h2 id="三-移除内存敏感的资源和库"><a href="#三-移除内存敏感的资源和库" class="headerlink" title="三 移除内存敏感的资源和库"></a>三 移除内存敏感的资源和库</h2><p>一些资源和库会在你不知道的情况下占用掉很多内存。总览下apk的大小，包含了哪些可能导致内存浪费的第三方的库和内嵌资源。通过移除冗余的。不必要的资源和库来提高内存的使用。</p>
+<h3 id="减小总体的APK大小"><a href="#减小总体的APK大小" class="headerlink" title="减小总体的APK大小"></a><strong>减小总体的APK大小</strong></h3><p>您可以通过减少应用程序的整体大小来显着降低应用程序的内存使用量。Bitmap 大小、资源、动画帧数，和第三方库都可能增大了APK的大小。Android Studio 和 Android SDK 提供了一些工具可以帮你减少资源和外部依赖。</p>
+<p>如何如何减少APK的大小，可以参考<a href="https://developer.android.com/topic/performance/reduce-apk-size.html" target="_blank" rel="external">Reduce APK Size</a>.</p>
+<h3 id="小心的使用注解框架"><a href="#小心的使用注解框架" class="headerlink" title="小心的使用注解框架"></a><strong>小心的使用注解框架</strong></h3><p>比如Guice或者RoboGuice的依赖注解框架虽然简化了你的代码书写，并为测试或者其它的可能变化配置信息提供了适配。但是这些依赖框架并没有针对移动设备做优化。</p>
+<p>比如，这些框架通常会通过扫描你的代码或者注解来进行初始化。系统会将这些映射页面分配到内存中，以便Android可以删除它们; 但这些映射页面所占用的内存会在很长一段时间之后才会被删除。</p>
+<p>如果你需要使用注解框架，考虑使用<a href="http://google.github.io/dagger/" target="_blank" rel="external">Dagger</a>。比如，Dagger不会使用反射扫描代码。Dagger的严格实现意味着它可以用于Android应用中而不会增加不必要的内存使用。</p>
+<h3 id="小心的使用外部库"><a href="#小心的使用外部库" class="headerlink" title="小心的使用外部库"></a><strong>小心的使用外部库</strong></h3><p>外部库的代码通常不会为移动环境而写，执行在移动设备上也更低效。当你决定使用一个外部库的时候，可能需要为移动设备做优化。在你决定使用之前，先考虑代码量的大小和RAM占用空间。</p>
+<p>有时一些针对移动设备优化的库由于不同的实现也会产生问题。比如，某个库可能使用了nano版本的protobufs，然而另一个使用了micro protobufs，就会导致两个版本的实现。这样就会导致两份</p>
+<p>logging，analytics，Image loading框架、缓存以及其它一些不期望的问题。</p>
+<p>尽管 <a href="https://developer.android.com/tools/help/proguard.html" target="_blank" rel="external">ProGuard</a> 会帮助你移除API和资源，但是不会移除一个库的内部依赖。如果你使用了依赖库中的Activity子类（会导致比较宽泛的依赖关系，和你现有的Activity就会有很大冲突），问题将尤为严重。又或者，如果这个库中使用了反射等技术，你还要花大量时间去处理混淆。所以在你决定使用一个库的时候，需要慎重的考虑它是否非常匹配你的需求，否则你应该考虑自己实现一套。</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，性能优化/"> #Android，性能优化 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/16/android-optimize-background/">Android性能优化-App后台优化</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/15/android-optimize-start/">Android性能优化-App启动优化</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/10/16/android-optimize-memory/"
+               data-title="Android性能优化-内存优化" data-url="http://www.lightskystreet.com/2016/10/16/android-optimize-memory/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一-监测可用内存和内存使用"><span class="nav-number"></span> <span class="nav-text">一 监测可用内存和内存使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分析RAM使用的工具"><span class="nav-number">1.</span> <span class="nav-text">分析RAM使用的工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依据事件释放内存"><span class="nav-number">2.</span> <span class="nav-text">依据事件释放内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#确定你应该使用多少内存"><span class="nav-number">3.</span> <span class="nav-text">确定你应该使用多少内存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-从代码角度优化内存"><span class="nav-number"></span> <span class="nav-text">二 从代码角度优化内存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#节省的使用Service"><span class="nav-number">1.</span> <span class="nav-text">节省的使用Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用内存更高效的代码结构"><span class="nav-number">2.</span> <span class="nav-text">使用内存更高效的代码结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小心的使用代码抽象"><span class="nav-number">3.</span> <span class="nav-text">小心的使用代码抽象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用nano-protobufs进行序列化"><span class="nav-number">4.</span> <span class="nav-text">使用nano protobufs进行序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免内存抖动"><span class="nav-number">5.</span> <span class="nav-text">避免内存抖动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-移除内存敏感的资源和库"><span class="nav-number"></span> <span class="nav-text">三 移除内存敏感的资源和库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#减小总体的APK大小"><span class="nav-number">1.</span> <span class="nav-text">减小总体的APK大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小心的使用注解框架"><span class="nav-number">2.</span> <span class="nav-text">小心的使用注解框架</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小心的使用外部库"><span class="nav-number">3.</span> <span class="nav-text">小心的使用外部库</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

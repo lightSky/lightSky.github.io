@@ -1,0 +1,1060 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="优秀项目原理解析,View绘制机制," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> ViewPagerindicator 源码解析 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              ViewPagerindicator 源码解析
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2014-12-08
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/优秀项目原理解析/">优秀项目原理解析</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2014/12/09/viewpagerindicator-analysis/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2014/12/09/viewpagerindicator-analysis/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <blockquote>
+<p>本文为 <a href="https://github.com/android-cn/android-open-project-analysis" target="_blank" rel="external">Android 开源项目实现原理解析</a> 中ViewPagerindicator部分，项目地址：<a href="http://viewpagerindicator.com" target="_blank" rel="external">viewpagerindicator</a> 分析的版本：<a href="https://github.com/JakeWharton/Android-ViewPagerIndicator/commit/8cd549f23f3d20ff920e19a2345c54983f65e26b" title="Commit id is 8cd549f23f3d20ff920e19a2345c54983f65e26b" target="_blank" rel="external">8cd549</a>，分析者：<a href="https://github.com/lightSky" target="_blank" rel="external">lightSky</a> 校对者：<a href="https://github.com/AaronPlay" target="_blank" rel="external">aaronplay</a> 校对状态：未完成   </p>
+</blockquote>
+<a id="more"></a>
+<h3 id="1-功能介绍"><a href="#1-功能介绍" class="headerlink" title="1. 功能介绍"></a>1. 功能介绍</h3><h3 id="1-1-ViewPagerIndicator"><a href="#1-1-ViewPagerIndicator" class="headerlink" title="1.1 ViewPagerIndicator"></a>1.1 ViewPagerIndicator</h3><p>ViewPagerIndicator用于各种基于AndroidSupportLibrary中ViewPager的界面导航。主要特点：使用简单、效果好、样式全。</p>
+<h3 id="2-总体设计"><a href="#2-总体设计" class="headerlink" title="2. 总体设计"></a>2. 总体设计</h3><p>该项目总体设计非常简单，一个pageIndicator接口类，具体样式的导航类实现该接口，然后根据具体样式去实现相应的逻辑。<br>IcsLinearLayout：LinearLayout的扩展，支持了4.0以上的divider特性。<br>CirclePageIndicator、LinePageIndicator、UnderlinePageIndicator、TitlePagerIndicator继承自View。<br>TabPageIndicator、IconPageIndicator 继承自HorizontalScrollView。  </p>
+<h3 id="3-详细设计"><a href="#3-详细设计" class="headerlink" title="3. 详细设计"></a>3. 详细设计</h3><p>####3.1类关系图<br>![viewpagerindicator img](<img src="/img/viewpagerindicator-analysis/view-mechanism-class.png">   </p>
+<p>####3.2 自定义控件相关知识<br>由于ViewPagerIndicator项目全部都是自定义View，因此对于其原理的分析，就是对自定义View的分析，自定义View涉及到的核心部分有：View的绘制机制和Touch事件传递机制。对于View的绘制机制，这里做了详细的阐述，而对于Touch事件，由于该项目只是Indicator，因此没有涉及到复杂的Touch传递机制，该项目中与Touch机制相关只有onTouch(Event)方法，因此只对该方法涉及到的相关知识进行介绍。</p>
+<p>####3.2.1 自定义控件步骤<br>以下直接引用了其中的一些篇章前言，具体内容大家直接点击链接进入正文</p>
+<ol>
+<li><p><a href="http://hukai.me/android-training-course-in-chinese/ui/custom-view/index.html" target="_blank" rel="external">自定义控件创建步骤</a> ：  </p>
+<ul>
+<li>继承一个View。</li>
+<li>定义自定义的属性（外观与行为）。</li>
+<li>应用自定义的属性。</li>
+<li>添加属性和事件。</li>
+</ul>
+</li>
+<li><p><a href="http://hukai.me/android-training-course-in-chinese/ui/custom-view/custom-draw.html" target="_blank" rel="external">自定义View的绘制</a><br>自定义view的最重要的一个部分是自定义它的外观。根据你的程序的需求，自定义绘制动作可能简单也可能很复杂。<br>重绘一个自定义的view的最重要的步骤是重写onDraw()方法。onDraw()的参数是一个Canvas对象。Canvas类定义了绘制文本，线条，图像与许多其他图形的方法。你可以在onDraw方法里面使用那些方法来创建你的UI。</p>
+</li>
+<li><p><a href="http://hukai.me/android-training-course-in-chinese/ui/custom-view/make-interactive.html" target="_blank" rel="external">使View可交互</a><br>绘制UI仅仅是创建自定义View的一部分。你还需要使得你的View能够以模拟现实世界的方式来进行反馈。Objects应该总是与现实情景能够保持一致。用户应该可以感受到UI上的微小变化，并对这些变化反馈到现实世界中。例如，当用户做fling(迅速滑动)的动作，应该在滑动开始与结束的时候给用户一定的反馈。像许多其他UI框架一样，Android提供一个输入事件模型。在Android中最常用的输入事件是touch，它会触发onTouchEvent(android.view.MotionEvent))的回调。重写这个方法来处理touch事件：</p>
+</li>
+<li><p><a href="http://hukai.me/android-training-course-in-chinese/best-user-input.html" target="_blank" rel="external">Android的用户输入</a><br>这里着重要看一下拖拽与缩放这一部分。因为在ViewPagerIndicator的几种实现：Circle，Title，UnderLine的onTouchEvent里的处理逻辑是一样的，而且和官方文档中的代码逻辑也是一样的，看了讲解之后，相信大家就会有所了解了：<a href="http://hukai.me/android-training-course-in-chinese/input/gestures/scale.html" target="_blank" rel="external">http://hukai.me/android-training-course-in-chinese/input/gestures/scale.html</a></p>
+</li>
+</ol>
+<p>####3.2.2 View绘制机制  </p>
+<p>#####3.2.2.1 View树的绘图流程<br>整个View树的绘图流程是由ViewRoot.java类的performTraversals()函数发起的，整个流程如下</p>
+<p>![view_mechanism_flow img]<img src="/img/viewpagerindicator-analysis/view_mechanism_flow.png">   </p>
+<p>#####3.2.2.2  概念<br>参考文献：<a href="http://developer.android.com/guide/topics/ui/how-android-draws.html" target="_blank" rel="external">http://developer.android.com/guide/topics/ui/how-android-draws.html</a>  </p>
+<p>当Activity接收到焦点的时候，它会被请求绘制布局。Android framework将会处理绘制的流程，但Activity必须提供View层级的根节点。绘制是从根节点开始的，需要measure和draw布局树。绘制会遍历和渲染每一个与无效区域相交的view。相反，每一个ViewGroup负责绘制它所有的子视图，而最底层的View会负责绘制自身。树的遍历是有序的，父视图会先于子视图被绘制，</p>
+<p><strong>measure和layout</strong><br>measure过程的发起是在measure(int,int)方法中，而且是从上到下有序的绘制view。在递归的过程中，每一个父视图将尺寸规格向下传递给子视图，在measure过程的最后，每个视图存储了自己的尺寸。<br>layout过程从layout(int, int, int, int)方法开始，也是自上而下进行遍历。在这个过程中，每个父视图会根据measure过程得到的尺寸确定所有的子视图的具体位置。  </p>
+<p>注意：Android框架不会绘制无效区域之外的部分,但会考虑绘制视图的背景。你可以使用invalidate()去强制对一个view进行重绘。  </p>
+<p>当一个View的measure过程进行完的时候，它自己及其所有子节点的getMeasuredWidth()和getMeasuredHeight()方法的值就必须被设置了。一个视图的测量宽度和测量高度值必须在父视图约束范围之内，这可以保证在measure的最后,所有的父母都接收所有孩子的测量。<br>一个父视图，可以在其子视图上多次的调用measure()方法。比如，父视图可以先根据未给定的dimension调用measure方法去测量每一个<br>子视图的尺寸，如果所有子视图的未约束尺寸太大或者太小的时候，则会使用一个确切的大小，然后在每一个子视图上再次调用measure方法去测量每一个view的大小。（也就是说，如果子视图对于Measure得到的大小不满意的时候，父视图会介入并设置测量规则进行第二次measure）</p>
+<p><strong>measure过程传递传递尺寸的两个类</strong>  </p>
+<ul>
+<li>ViewGroup.LayoutParams类（View自身的布局参数）  </li>
+<li>MeasureSpecs类（父视图对子视图的测量要求）</li>
+</ul>
+<p>ViewGroup.LayoutParams<br>用于子视图告诉其父视图它们应该怎样被测量和放置（就是子视图自身的布局参数）。一个基本的LayoutParams只用来描述视图的高度和宽度。对于每一方面的尺寸（height和width），你可以指定下列方式之一：  </p>
+<ul>
+<li>具体数值   </li>
+<li>MATCH_PARENT 表示子视图希望和父视图一样大(不含padding)   </li>
+<li>WRAP_CONTENT 表示视图为正好能包裹其内容大小(包含padding)    </li>
+</ul>
+<p>ViewGroup的子类，也有相应的ViewGroup.LayoutParams的子类，例如RelativeLayout有相应的ViewGroup.LayoutParams的子类,拥有设置子视图水平和垂直的能力。</p>
+<p>MeasureSpecs<br>其包含的信息有测量要求和尺寸，有三种模式:      </p>
+<ul>
+<li><p>UNSPECIFIED<br>父视图不对子视图有任何约束，它可以达到所期望的任意尺寸。</p>
+</li>
+<li><p>EXACTLY<br>父视图为子视图指定一个确切的尺寸，而且无论子视图期望多大，它都必须在该指定大小的边界内。</p>
+</li>
+<li><p>AT_MOST<br>父视图为子视图指定一个最大尺寸。子视图必须确保它自己的所有子视图可以适应在该尺寸范围内。</p>
+</li>
+</ul>
+<p>#####3.2.2.3 measure核心方法  </p>
+<ul>
+<li><p>measure(int widthMeasureSpec, int heightMeasureSpec)<br>该方法定义在View.java类中，final修饰符修饰，因此不能被重载，但measure调用链会回调View/ViewGroup对象的onMeasure()方法，因此我们只需要复写onMeasure()方法去根据需求计算自己的控件尺寸即可。</p>
+</li>
+<li><p>onMeasure(int widthMeasureSpec, int heightMeasureSpec)<br>该方法的两个参数是父视图提供的测量要求。当父视图调用子视图的measure函数对子视图进行测量时，会传入这两个参数。通过这两个参数以及子视图本身的LayoutParams来共同决定子视图的测量要求MeasureSpec。其实整个measure过程就是从上到下遍历，不断的根据父视图的宽高要求MeasureSpec和子视图自身的LayotuParams获取子视图自己的宽高测量要求MeasureSpec，最终调用子视图的measure(int widthMeasureSpec, int heightMeasureSpec)方法（内部调用setMeasuredDimension）确定自己的mMeasuredWidth和mMeasuredHeight。ViewGroup的measureChildren和measureChildWithMargins方法体现了该过程，下面对该过程做了分析。  </p>
+</li>
+<li><p>setMeasuredDimension()<br>View在测量阶段的最终尺寸是由setMeasuredDimension()方法决定的,该方法最终会对每个View的mMeasuredWidth和mMeasuredHeight进行赋值，一旦这两个变量被赋值，就意味着该View的整个测量过程结束了，setMeasuredDimension()也是必须要调用的方法，否则会报异常。通常我们在自定义的时候，是不需要管上述的Measure过程的，只需要在setMeasuredDimension()方法内部，根据需求，去计算自己View的尺寸即可，你可以在ViewPagerIndicator项目的自定义Viwe的尺寸计算看到。  </p>
+</li>
+</ul>
+<p>下面三个和MeasureSpec相关方法的返回的值都是在getChildMeasureSpec()中确定的，后面的源码有详细分析</p>
+<ul>
+<li><p>makeMeasureSpec(int size, int mode)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">        <span class="comment">/**</span></div><div class="line">         * 根据提供的size和mode创建一个measure specification，包含了View的尺寸和测量要求</div><div class="line">         * 返回的mode必须为以下枚举值之一：</div><div class="line">         * </div><div class="line">         *  View.MeasureSpec#UNSPECIFIED&#125;</div><div class="line">         *  View.MeasureSpec#EXACTLY&#125;</div><div class="line">         *  View.MeasureSpec#AT_MOST&#125;</div><div class="line">         * </div><div class="line">         * 在API17以及之前，makeMeasureSpec的实现是：参数的顺序是不重要的，而且任何值的</div><div class="line">         * 溢出都可能会影响到MeasureSpec的结果，RelativeLayout就受此bug影响。在API 17之后，</div><div class="line">         * 修复了此bug，使行为更加严谨。</div><div class="line">         *</div><div class="line">         * <span class="doctag">@param</span> size the size of the measure specification</div><div class="line">         * <span class="doctag">@param</span> mode the mode of the measure specification</div><div class="line">         * <span class="doctag">@return</span> the measure specification based on size and mode</div><div class="line">         */</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">makeMeasureSpec</span><span class="params">(<span class="keyword">int</span> size, <span class="keyword">int</span> mode)</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span> (sUseBrokenMakeMeasureSpec) &#123;</div><div class="line">                <span class="keyword">return</span> size + mode;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">return</span> (size &amp; ~MODE_MASK) | (mode &amp; MODE_MASK);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">```        </div><div class="line">- getMode(<span class="keyword">int</span> measureSpec)</div><div class="line">```java </div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 从提供的measure specification中抽取Mode，在确定View的尺寸时，需要根据该Mode来决定如何确定最终值</div><div class="line">         */</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getMode</span><span class="params">(<span class="keyword">int</span> measureSpec)</span> </span>&#123;</div><div class="line">            <span class="keyword">return</span> (measureSpec &amp; MODE_MASK);</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>getSize(int measureSpec)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 从提供的measure specification中抽取尺寸，在确定自定义View的尺寸时，使用该方法获取到系统Measure的值，</div><div class="line"> * 然后根据getMode方法得到的测绘要求，在Measure值和自己计算的值中确定最终值。</div><div class="line"> *</div><div class="line"> * <span class="doctag">@return</span> 根据给定的measure specification得到的以pixels为单位的尺寸</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getSize</span><span class="params">(<span class="keyword">int</span> measureSpec)</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> (measureSpec &amp; ~MODE_MASK);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>下面对整个Measure流程做一个分析，在ViewGroup中，含有两个对子视图Measure的方法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">   <span class="comment">/**</span></div><div class="line">    * 只包含子View的padding   </div><div class="line">    */</div><div class="line">measureChildren(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">    <span class="comment">/**</span></div><div class="line">     * 包含子View的padding和margin  </div><div class="line">     */</div><div class="line">measureChildWithMargins(View child,</div><div class="line">            <span class="keyword">int</span> parentWidthMeasureSpec, <span class="keyword">int</span> widthUsed,</div><div class="line">            <span class="keyword">int</span> parentHeightMeasureSpec, <span class="keyword">int</span> heightUsed)</div></pre></td></tr></table></figure>
+<p>我们取measureChildren（int widthMeasureSpec, int heightMeasureSpec)方法进行分析：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">/**</span></div><div class="line">  * 请求所有子View去measure自己，要考虑的部分有对子View的测绘要求MeasureSpec以及其自身的padding</div><div class="line">  * 这里跳过所有为GONE状态的子View，最繁重的工作是在getChildMeasureSpec方法中处理的</div><div class="line">  *</div><div class="line">  * <span class="doctag">@param</span> widthMeasureSpec  对该View的width测绘要求</div><div class="line">  * <span class="doctag">@param</span> heightMeasureSpec 对该View的height测绘要求</div><div class="line">  */</div><div class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">measureChildren</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">     <span class="keyword">final</span> <span class="keyword">int</span> size = mChildrenCount;</div><div class="line">     <span class="keyword">final</span> View[] children = mChildren;</div><div class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</div><div class="line">         <span class="keyword">final</span> View child = children[i];</div><div class="line">         <span class="keyword">if</span> ((child.mViewFlags &amp; VISIBILITY_MASK) != GONE) &#123;</div><div class="line">             measureChild(child, widthMeasureSpec, heightMeasureSpec);</div><div class="line">         &#125;</div><div class="line">     &#125;</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">measureChild</span><span class="params">(View child, <span class="keyword">int</span> parentWidthMeasureSpec,</span></span></div><div class="line">         <span class="keyword">int</span> parentHeightMeasureSpec) &#123;</div><div class="line">     <span class="keyword">final</span> LayoutParams lp = child.getLayoutParams();</div><div class="line"></div><div class="line">     <span class="keyword">final</span> <span class="keyword">int</span> childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,<span class="comment">//获取ChildView的widthMeasureSpec</span></div><div class="line">             mPaddingLeft + mPaddingRight, lp.width);</div><div class="line">     <span class="keyword">final</span> <span class="keyword">int</span> childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,<span class="comment">//获取ChildView的heightMeasureSpec</span></div><div class="line">             mPaddingTop + mPaddingBottom, lp.height);</div><div class="line"></div><div class="line">     child.measure(childWidthMeasureSpec, childHeightMeasureSpec);</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"><span class="comment">/**</span></div><div class="line"> *	getChildMeasureSpec()的分析有点多，只为了分析系统如何确定子视图的MeasureSpec和size的</div><div class="line"> */</div><div class="line">  </div><div class="line"><span class="comment">/** </span></div><div class="line">  * 该方法是measureChildren中最繁重的部分，为每一个ChildView计算出自己的MeasureSpec。</div><div class="line">  * 目标是将ChildView的MeasureSpec和LayoutParams结合起来去得到一个最合适的结果。</div><div class="line">  * 比如，如果该View知道自己的尺寸（假设它的MeasureSpec Mode为EXACTLY），并且该Child已经在它的</div><div class="line">  * LayoutParams中表明了想获得一个和父视图相同的大小（MatchParent），那么parent应该请求该Child</div><div class="line">  * 以一个给定的尺寸放置</div><div class="line">  *</div><div class="line">  * <span class="doctag">@param</span> spec 对该view的测绘要求</div><div class="line">  * <span class="doctag">@param</span> padding 当前View在当前唯独上的paddingand，也有可能含有margins</div><div class="line">  *</div><div class="line">  * <span class="doctag">@param</span> childDimension 在当前维度上（height或width）的具体指</div><div class="line">  * <span class="doctag">@return</span> a MeasureSpec integer for the child</div><div class="line">  */</div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getChildMeasureSpec</span><span class="params">(<span class="keyword">int</span> spec, <span class="keyword">int</span> padding, <span class="keyword">int</span> childDimension)</span> </span>&#123;</div><div class="line"> </div><div class="line">  <span class="keyword">int</span> specMode = MeasureSpec.getMode(spec);  <span class="comment">//获得父视图的测量要求  </span></div><div class="line">  <span class="keyword">int</span> specSize = MeasureSpec.getSize(spec);  <span class="comment">//获得父视图的实际值  </span></div><div class="line"></div><div class="line">  <span class="keyword">int</span> size = Math.max(<span class="number">0</span>, specSize - padding); <span class="comment">//父视图的大小减去边距值</span></div><div class="line"></div><div class="line">  <span class="keyword">int</span> resultSize = <span class="number">0</span>;    <span class="comment">//子视图的实际值</span></div><div class="line">  <span class="keyword">int</span> resultMode = <span class="number">0</span>;    <span class="comment">//子视图的测量要求 </span></div><div class="line"></div><div class="line">  <span class="keyword">switch</span> (specMode) &#123;  </div><div class="line">  <span class="comment">// Parent has imposed an exact size on us  </span></div><div class="line">  <span class="comment">//父视图的测量要求为EXACTLY：为子视图指定了一个明确值</span></div><div class="line">  <span class="keyword">case</span> MeasureSpec.EXACTLY:   </div><div class="line">      <span class="comment">//子视图的width或height是个精确值，则直接使用该精确值</span></div><div class="line">      <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;            </div><div class="line">          resultSize = childDimension;         </div><div class="line">          resultMode = MeasureSpec.EXACTLY;    <span class="comment">//子视图的Mode设置为EXACTLY</span></div><div class="line">      &#125;   </div><div class="line">      <span class="comment">//子视图的width或height的属性为MATCH_PARENT，</span></div><div class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;  </div><div class="line">          <span class="comment">// Child wants to be our size. So be it.  </span></div><div class="line">          resultSize = size;                   <span class="comment">//则为子View设置父视图的大小（减去padding后）</span></div><div class="line">          resultMode = MeasureSpec.EXACTLY;    <span class="comment">//子视图测量要求设置为EXACTLY</span></div><div class="line">      &#125;   </div><div class="line">      <span class="comment">//子视图的width或height的属性为WRAP_CONTENT：</span></div><div class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;  </div><div class="line">          <span class="comment">// 子视图希望自己确定大小，但不能比父视图大</span></div><div class="line">          resultSize = size;                  <span class="comment">//为子视图指定了一个最大值</span></div><div class="line">          resultMode = MeasureSpec.AT_MOST;  <span class="comment">//子视图测量要求设置为AT_MOST</span></div><div class="line">      &#125;  </div><div class="line">      <span class="keyword">break</span>;  </div><div class="line"></div><div class="line">  <span class="comment">//父视图的测绘要求为AT_MOST</span></div><div class="line">  <span class="keyword">case</span> MeasureSpec.AT_MOST:  </div><div class="line">      <span class="comment">//子视图的width或height是个精确值</span></div><div class="line">      <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;  </div><div class="line">          resultSize = childDimension;        <span class="comment">//则直接使用该值</span></div><div class="line">          resultMode = MeasureSpec.EXACTLY;   <span class="comment">//子视图测量要求为 EXACTLY   </span></div><div class="line">      &#125;  </div><div class="line">      <span class="comment">//子视图的width或height的属性为 MATCH_PARENT</span></div><div class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;  </div><div class="line">          <span class="comment">//子视图希望和父视图相同大小，但是父视图的大小没有指定，</span></div><div class="line">          <span class="comment">//只能约束子视图大小不能比父视图大</span></div><div class="line">          resultSize = size;                  <span class="comment">//子视图尺寸为父视图大小  </span></div><div class="line">          resultMode = MeasureSpec.AT_MOST;   <span class="comment">//子视图测量要求为AT_MOST  </span></div><div class="line">      &#125;  </div><div class="line">      <span class="comment">//子视图的width或height属性为 WRAP_CONTENT  </span></div><div class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;  </div><div class="line">           <span class="comment">//子视图希望和父视图相同大小，其大小不能比父视图大</span></div><div class="line">          resultSize = size;                  <span class="comment">//子视图尺寸为父视图大小  </span></div><div class="line">          resultMode = MeasureSpec.AT_MOST;   <span class="comment">//子视图测量要求为AT_MOST  </span></div><div class="line">      &#125;  </div><div class="line">      <span class="keyword">break</span>;  </div><div class="line"></div><div class="line">  <span class="comment">//父视图的测绘要求为UNSPECIFIED，大小没有约束</span></div><div class="line">  <span class="keyword">case</span> MeasureSpec.UNSPECIFIED:  </div><div class="line">      <span class="comment">//子视图的width或height的属性是精确值,则直接使用该值</span></div><div class="line">      <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;  </div><div class="line">          resultSize = childDimension;      </div><div class="line">          resultMode = MeasureSpec.EXACTLY;   <span class="comment">//子视图测量要求为 EXACTLY  </span></div><div class="line">      &#125;  </div><div class="line">      <span class="comment">//子视图的width或height的属性为 MATCH_PARENT</span></div><div class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;  </div><div class="line">          <span class="comment">//子视图希望和父视图一样大，由于父视图没指定，则这里也无法确定子视图大小</span></div><div class="line">          <span class="comment">//设置为0，后续处理</span></div><div class="line">          resultSize = <span class="number">0</span>;                        </div><div class="line">          resultMode = MeasureSpec.UNSPECIFIED;  <span class="comment">//子视图测量要求为 UNSPECIFIED  </span></div><div class="line">      &#125;   </div><div class="line">      <span class="comment">//子视图的width或height的属性为 WRAP_CONTENT，子视图大小也无法确定</span></div><div class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;  </div><div class="line">          resultSize = <span class="number">0</span>;                        </div><div class="line">          resultMode = MeasureSpec.UNSPECIFIED;  <span class="comment">//子视图测量要求为 UNSPECIFIED  </span></div><div class="line">      &#125;  </div><div class="line">      <span class="keyword">break</span>;  </div><div class="line">  &#125;  </div><div class="line">  <span class="comment">//根据获取到的子视图的测量要求和大小创建子视图的MeasureSpec</span></div><div class="line">  <span class="keyword">return</span> MeasureSpec.makeMeasureSpec(resultSize, resultMode);  </div><div class="line"> &#125;</div><div class="line"> </div><div class="line"><span class="comment">/**</span></div><div class="line">  *</div><div class="line">  * 用于获取View最终的大小，父视图提供了宽、高的约束信息</div><div class="line">  * 一个View的真正的测量工作是在onMeasure(int,int)中，由该方法调用。</div><div class="line">  * 因此，只有onMeasure(int,int)可以而且必须被子类复写</div><div class="line">  *</div><div class="line">  * <span class="doctag">@param</span> widthMeasureSpec 在水平方向上，父视图指定的的Measure要求</div><div class="line">  * <span class="doctag">@param</span> heightMeasureSpec 在竖直方向上，控件上父视图指定的Measure要求</div><div class="line">  *</div><div class="line">  */</div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">measure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">   ...</div><div class="line">   </div><div class="line">   onMeasure(widthMeasureSpec, heightMeasureSpec);</div><div class="line">   </div><div class="line">   ...</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">     setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),</div><div class="line">             getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> <span class="comment">/**</span></div><div class="line">  * 返回默认值的方法，如果MeasureSpec没有约束（Mode为UNSPECIFIED），则使用给定的值</div><div class="line">  * 如果MeasureSpec允许，将得到一个更大的值。 </div><div class="line">  * <span class="doctag">@param</span> size 该View的默认值</div><div class="line">  * <span class="doctag">@param</span> measureSpec 父视图的约束</div><div class="line">  * <span class="doctag">@return</span> 该View应该的大小</div><div class="line">  */</div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getDefaultSize</span><span class="params">(<span class="keyword">int</span> size, <span class="keyword">int</span> measureSpec)</span> </span>&#123;</div><div class="line">     <span class="keyword">int</span> result = size;</div><div class="line">     <span class="keyword">int</span> specMode = MeasureSpec.getMode(measureSpec);</div><div class="line">     <span class="keyword">int</span> specSize = MeasureSpec.getSize(measureSpec);</div><div class="line"></div><div class="line">     <span class="keyword">switch</span> (specMode) &#123;</div><div class="line">     <span class="keyword">case</span> MeasureSpec.UNSPECIFIED:<span class="comment">//父视图没有任何约束，则返回getSuggestedMinimumWidth()得到的最小值</span></div><div class="line">         result = size;</div><div class="line">         <span class="keyword">break</span>;</div><div class="line">     <span class="keyword">case</span> MeasureSpec.AT_MOST:<span class="comment">//父视图有约束，则返回MeasureSpec.getSize(measureSpec)的值，</span></div><div class="line">     <span class="keyword">case</span> MeasureSpec.EXACTLY:<span class="comment">//该值则是getChildMeasureSpec方法内部处理确定的</span></div><div class="line">         result = specSize;</div><div class="line">         <span class="keyword">break</span>;</div><div class="line">     &#125;</div><div class="line">     <span class="keyword">return</span> result;</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> <span class="comment">/**</span></div><div class="line">  * 返回建议的最小宽度值。会在View的最小值和背景图片的最小值之间获取一个较大的值</div><div class="line">  * 当在onMeasure(int,int)方法中使用的时候，调用者应该始终保证返回的宽度值在其父视图</div><div class="line">  * 要求的范围内</div><div class="line">  * <span class="doctag">@return</span> 当前View的建议最小宽度值</div><div class="line">  */</div><div class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">getSuggestedMinimumWidth</span><span class="params">()</span> </span>&#123;</div><div class="line">     <span class="keyword">return</span> (mBackground == <span class="keyword">null</span>) ? mMinWidth : max(mMinWidth, mBackground.getMinimumWidth());</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>#####3.2.2.4 layout相关概念及核心方法<br>子视图的具体位置都是相对与父视图的位置。与Measure过程类似，ViewGroup在onLayout函数中通过调用其children的layout函数来设置子视图相对与父视图中的位置，具体位置由函数layout的参数决定。</p>
+<p>View的onLayout方法为空实现。而ViewGroup的onLayout则为abstract的，因此，如果自定义的View要继承ViewGroup时，必须实现onLayout函数，而onMeasure并不强制实现，因为相对与layout来说，measure过程并不是必须的。  </p>
+<p>Note：和Measure过程代码上不太像的是，Measure过程最终调用onMeasure()方法来设置View的尺寸，而Layout过程，onLayout参数是空实现，其是调用了setFrame方法对View进行布局。</p>
+<p>实现onLayout通常做法就是进行一个for循环调用每一个子视图的layout(l, t, r, b)函数，传入不同的参数l, t, r, b来确定每个子视图在父视图中的显示位置。onLayout过程会通过调用getMeasuredWidth()和getMeasuredHeight()方法获取到measure过程得到的mMeasuredWidth和mMeasuredHeight,这两个参数为layout过程提供了一个很重要的参考值（不是必须值）。    </p>
+<p>之所以说measure过程不是必须的，因为View的Layout步骤是在Measure之后，在Layout里可以拿到Measure过程得到的值进行Layout，当然你也可以对Measure过程的值进行修改，但这样肯定是不可取的，这样违背了Android框架的绘制机制，要不Measure过程这么做的工作还有啥用。通常的做法是根据需求在measure过程决定尺寸，layout步骤决定位置，除非你所定义的View只需要指定View的位置，而不考虑View的尺寸。  </p>
+<p>我们来看一下LinearLayout的onLayout的实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"> <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLayout</span><span class="params">(<span class="keyword">boolean</span> changed, <span class="keyword">int</span> l, <span class="keyword">int</span> t, <span class="keyword">int</span> r, <span class="keyword">int</span> b)</span> </span>&#123;</div><div class="line">       <span class="keyword">if</span> (mOrientation == VERTICAL) &#123;</div><div class="line">           layoutVertical(l, t, r, b);</div><div class="line">       &#125; <span class="keyword">else</span> &#123;</div><div class="line">           layoutHorizontal(l, t, r, b);</div><div class="line">       &#125;</div><div class="line">   &#125;</div><div class="line">   </div><div class="line">   <span class="comment">/**</span></div><div class="line">    * 遍历所有的子View，为其设置相对其父视图上的坐标</div><div class="line">    */</div><div class="line">   <span class="function"><span class="keyword">void</span> <span class="title">layoutVertical</span><span class="params">(<span class="keyword">int</span> left, <span class="keyword">int</span> top, <span class="keyword">int</span> right, <span class="keyword">int</span> bottom)</span> </span>&#123;</div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</div><div class="line">            <span class="keyword">final</span> View child = getVirtualChildAt(i);</div><div class="line">            <span class="keyword">if</span> (child == <span class="keyword">null</span>) &#123;</div><div class="line">                childTop += measureNullChild(i);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (child.getVisibility() != GONE) &#123;</div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> childWidth = child.getMeasuredWidth();<span class="comment">//measure过程确定的Width</span></div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> childHeight = child.getMeasuredHeight();<span class="comment">//measure过程确定的height</span></div><div class="line">                </div><div class="line">                ...确定childLeft、childTop的值</div><div class="line"></div><div class="line">                setChildFrame(child, childLeft, childTop + getLocationOffset(child),</div><div class="line">                        childWidth, childHeight);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">   <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setChildFrame</span><span class="params">(View child, <span class="keyword">int</span> left, <span class="keyword">int</span> top, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;        </div><div class="line">       child.layout(left, top, left + width, top + height);</div><div class="line">   &#125;	</div><div class="line">   </div><div class="line">   <span class="comment">/**</span></div><div class="line">    * View的onLayout为空实现，这个和Measure过程不太像，这里调用的是setFrame方法来设置最终坐标</div><div class="line">    */</div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">layout</span><span class="params">(<span class="keyword">int</span> l, <span class="keyword">int</span> t, <span class="keyword">int</span> r, <span class="keyword">int</span> b)</span> </span>&#123;</div><div class="line">   	...</div><div class="line">   	setFrame(l, t, r, b)</div><div class="line">   &#125;</div><div class="line">   </div><div class="line">   <span class="comment">/**</span></div><div class="line">    * 为该View设置相对其父视图上的坐标</div><div class="line">    */</div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">setFrame</span><span class="params">(<span class="keyword">int</span> left, <span class="keyword">int</span> top, <span class="keyword">int</span> right, <span class="keyword">int</span> bottom)</span> </span>&#123;</div><div class="line">    	...</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>#####3.2.2.5 绘制流程相关概念及核心方法<br>draw过程在measure()和layout()之后进行，最终会调用到mView的draw()函数，这里的mView对于Actiity来说就是PhoneWindow.DecorView。<br>整个View树的绘图流程是在ViewRoot.java类的performTraversals()函数展开的，该函数做的执行过程可简单概况为根据之前设置的状态，判断是否需要重新计算视图大小(measure)、是否重新需要安置视图的位置(layout)、以及是否需要重绘(draw)，这里就不做延展了，我们只介绍在自定义View中直接涉及到的一些部分。</p>
+<p>先来看下与draw过程相关的函数：  </p>
+<ul>
+<li><p>ViewRootImpl.draw()：<br>仅在ViewRootImpl.performTraversals()的内部调用</p>
+</li>
+<li><p>DecorView.draw()：<br>ViewRootImpl.draw()方法会调用该函数，DecorView.draw()继承自Framelayout，由于DecorView、FrameLayout以及FrameLayout的父类ViewGroup都未复写draw(),而ViewGroup的父类是View，因此DecorView.draw()调用的就是View.draw()。</p>
+</li>
+<li><p>View.onDraw()：<br>绘制View本身，自定义View往往会重载该函数来绘制View本身的内容。</p>
+</li>
+<li><p>View.dispatchDraw()：<br>View中的dispatchDraw是空实现，ViewGroup复写了该函数，内部循环调用View.drawChild()来发起对子视图的绘制，你不应该重载View的dispatchDraw()方法，因为该函数的默认实现代表了View的绘制流程，你不可能也没必要把系统的绘制流程写一遍吧。</p>
+</li>
+<li><p>ViewGroup.drawChild()：<br>该函数只在ViewGroup中实现，因为只有ViewGroup才需要绘制child，drawChild内部还是调用View.draw()来完成子视图的绘制（也有可能直接调用dispatchDraw）。</p>
+</li>
+<li><p>View.draw(Canvas)  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * Manually render this view (and all of its children) to the given Canvas.</div><div class="line">    * The view must have already done a full layout before this function is</div><div class="line">    * called.  When implementing a view, implement</div><div class="line">    * &#123;@link #onDraw(android.graphics.Canvas)&#125; instead of overriding this method.</div><div class="line">    * If you do need to override this method, call the superclass version.</div><div class="line">    *</div><div class="line">    * @param canvas The Canvas to which the View is rendered.  </div><div class="line">    *</div><div class="line">    * 根据给定的Canvas自动渲染View（包括其所有子View）。在调用该方法之前必须要完成layout。当你自定义view的时候，</div><div class="line">    * 应该去是实现onDraw(Canvas)方法，而不是draw(canvas)方法。如果你确实需要复写该方法，请记得先调用父类的方法。</div><div class="line">    */</div><div class="line">   public void draw(Canvas canvas) &#123;</div><div class="line">   </div><div class="line">       / * Draw traversal performs several drawing steps which must be executed</div><div class="line">        * in the appropriate order:</div><div class="line">        *</div><div class="line">        *      1. Draw the background if need</div><div class="line">        *      2. If necessary, save the canvas' layers to prepare for fading</div><div class="line">        *      3. Draw view's content</div><div class="line">        *      4. Draw children (dispatchDraw)</div><div class="line">        *      5. If necessary, draw the fading edges and restore layers</div><div class="line">        *      6. Draw decorations (scrollbars for instance)</div><div class="line">        */</div><div class="line"></div><div class="line">	// Step 1, draw the background, if needed</div><div class="line">       if (!dirtyOpaque) &#123;</div><div class="line">           drawBackground(canvas);</div><div class="line">       &#125;</div><div class="line">       </div><div class="line">       // Step 2, save the canvas' layers</div><div class="line">       </div><div class="line">       // Step 3, draw the content</div><div class="line">       if (!dirtyOpaque) </div><div class="line">       	onDraw(canvas);</div><div class="line"></div><div class="line">       // Step 4, draw the children</div><div class="line">       dispatchDraw(canvas);</div><div class="line"></div><div class="line">       // Step 5, draw the fade effect and restore layers</div><div class="line">       </div><div class="line">       // Step 6, draw decorations (scrollbars)</div><div class="line">       onDrawScrollBars(canvas);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>源码中已经清楚的注释了整个绘制过程：<br>View的背景绘制—-&gt; View本身内容的绘制—-&gt;子视图的绘制（如果有子视图）—-&gt;渐变框的绘制—-&gt;滚动条的绘制<br>onDraw()和dispatchDraw()分别为View本身内容和子视图绘制的函数。<br>View和ViewGroup的onDraw()都是空实现，因为具体View如何绘制由设计者来决定的，默认不绘制任何东西。<br>ViewGroup复写了dispatchDraw()来对其子视图进行绘制，通常你自己定义的ViewGroup不应该对dispatchDraw()进行复写，因为它的默认实现体现了View系统的绘制流程，该流程所做的一系列工作你不用去管，你要做的就是复写View.onDraw(Canvas)方法或者ViewGroup.draw(Canvas)方法，但在ViewGroup.draw(Canvas)方法调用前，记得先调用super.draw(canvas)方法，先去绘制基础的View，然后你可以在ViewGroup.draw(Canvas)方法里做一些自己的绘制，在高级的自定义中会有这样的需求。</p>
+<ul>
+<li><p>dispatchDraw(Canvas)<br>核心代码就是通过for循环调用drawChild(canvas, child, drawingTime)方法对ViewGroup的每个子视图进行动画以及绘制:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">dispatchDraw(Canvas canvas)&#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"> <span class="keyword">if</span> ((flags &amp; FLAG_RUN_ANIMATION) != <span class="number">0</span> &amp;&amp; canAnimate()) &#123;<span class="comment">//处理ChildView的动画</span></div><div class="line"> 	<span class="keyword">final</span> <span class="keyword">boolean</span> buildCache = !isHardwareAccelerated();</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; childrenCount; i++) &#123;</div><div class="line">                <span class="keyword">final</span> View child = children[i];</div><div class="line">                <span class="keyword">if</span> ((child.mViewFlags &amp; VISIBILITY_MASK) == VISIBLE) &#123;</div><div class="line">                    <span class="keyword">final</span> LayoutParams params = child.getLayoutParams();</div><div class="line">                    attachLayoutAnimationParameters(child, params, i, childrenCount);</div><div class="line">                    bindLayoutAnimation(child);</div><div class="line">                    <span class="keyword">if</span> (cache) &#123;</div><div class="line">                        child.setDrawingCacheEnabled(<span class="keyword">true</span>);</div><div class="line">                        <span class="keyword">if</span> (buildCache) &#123;</div><div class="line">                            child.buildDrawingCache(<span class="keyword">true</span>);</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            </div><div class="line"> 	<span class="keyword">final</span> LayoutAnimationController controller = mLayoutAnimationController;</div><div class="line">            <span class="keyword">if</span> (controller.willOverlap()) &#123;</div><div class="line">                mGroupFlags |= FLAG_OPTIMIZE_INVALIDATE;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">	controller.start();<span class="comment">//启动View的动画</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"> <span class="comment">//绘制ChildView</span></div><div class="line"> <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; childrenCount; i++) &#123;</div><div class="line">            <span class="keyword">int</span> childIndex = customOrder ? getChildDrawingOrder(childrenCount, i) : i;</div><div class="line">            <span class="keyword">final</span> View child = (preorderedList == <span class="keyword">null</span>)</div><div class="line">                    ? children[childIndex] : preorderedList.get(childIndex);</div><div class="line">            <span class="keyword">if</span> ((child.mViewFlags &amp; VISIBILITY_MASK) == VISIBLE || child.getAnimation() != <span class="keyword">null</span>) &#123;</div><div class="line">                more |= drawChild(canvas, child, drawingTime);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">drawChild</span><span class="params">(Canvas canvas, View child, <span class="keyword">long</span> drawingTime)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> child.draw(canvas, <span class="keyword">this</span>, drawingTime);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>drawChild(canvas, this, drawingTime)<br>直接调用了View的child.draw(canvas, this,drawingTime)方法，和View.draw(canvas)不同的是：draw(canvas, this,drawingTime)方法是ViewGroup.drawChild()内部调用的，用于绘制其子视图，而且文档中也说明了，除了被ViewGroup.drawChild()方法外，你不应该去复写该方法或者在其它任何地方调用该方法，也就是说，该方法其实我们永远也接触不到，它是ViewGroup绘制流程中的一步。而View.draw(Canvas) 方法是我们自定义控件中可以复写的方法，具体可以参考上述对view.draw(Canvas)的说明。<br>child.draw(canvas, this,drawingTime)肯定是处理了和父视图相关的逻辑，但对于View的绘制，最终调用的还是View.draw(Canvas)方法。</p>
+</li>
+<li><p>invalidate()<br>请求重绘View树，即draw()过程，假如视图发生大小没有变化就不会调用layout()过程，并且只绘制那些调用了invalidate()方法的View。</p>
+</li>
+<li><p>requestLayout()<br>会触发measure()和layout()过程（不会进行draw）。</p>
+</li>
+</ul>
+<p>####3.2.3 Android的用户输入<br>要注意的有以下几点（更详细的介绍可以参考<a href="http://hukai.me/android-training-course-in-chinese/input/gestures/scale.html" target="_blank" rel="external">拖拽与缩放</a>部分）</p>
+<h5 id="3-2-3-1-保持对最初点的追踪"><a href="#3-2-3-1-保持对最初点的追踪" class="headerlink" title="3.2.3.1 保持对最初点的追踪"></a>3.2.3.1 保持对最初点的追踪</h5><p>拖拽操作时，即使有额外的手指放置到屏幕上了，app也必须保持对最初的点（手指）的追踪。比如，想象在拖拽图片时，用户放置了第二根手指在屏幕上，并且抬起了第一根手指。如果你的app只是单独地追踪每个点，它会把第二个点当做默认的点，并且把图片移到该点的位置。</p>
+<h5 id="3-2-3-2-区分原始点及之后的任意触摸点"><a href="#3-2-3-2-区分原始点及之后的任意触摸点" class="headerlink" title="3.2.3.2 区分原始点及之后的任意触摸点"></a>3.2.3.2 区分原始点及之后的任意触摸点</h5><p>为了防止这种情况发生，你的app需要区分初始点以及之后任意的触摸点。要做到这一点，它需要追踪处理多触摸手势中提到过的ACTION_POINTER_DOWN、 ACTION_POINTER_UP事件。每当第二根手指按下或拿起时，ACTION_POINTER_DOWN、ACTION_POINTER_UP事件就会传递给onTouchEvent())回调函数。</p>
+<h5 id="3-2-3-3-确保操作中的点的ID-the-active-pointer-ID-不会引用已经不在触摸屏上的触摸点"><a href="#3-2-3-3-确保操作中的点的ID-the-active-pointer-ID-不会引用已经不在触摸屏上的触摸点" class="headerlink" title="3.2.3.3 确保操作中的点的ID(the active pointer ID)不会引用已经不在触摸屏上的触摸点"></a>3.2.3.3 确保操作中的点的ID(the active pointer ID)不会引用已经不在触摸屏上的触摸点</h5><p>当ACTION_POINTER_UP事件发生时，示例程序会移除对该点的索引值的引用，确保操作中的点的ID(the active pointer ID)不会引用已经不在触摸屏上的触摸点。这种情况下，app会选择另一个触摸点来作为操作中(active)的点，并保存它当前的x、y值。由于在ACTION_MOVE事件时，这个保存的位置会被用来计算屏幕上的对象将要移动的距离，所以app会始终根据正确的触摸点来计算移动的距离。</p>
+<p>mTouchSlop<br>指在用户触摸事件可被识别为移动手势前,移动过的那一段像素距离。Touchslop通常用来预防用户在做一些其他操作时意外地滑动，例如触摸屏幕上的元素时。</p>
+<p><a href="http://hukai.me/android-training-course-in-chinese/input/gestures/scale.html" target="_blank" rel="external">onTouchEvent</a><br>对于pointer的处理是模板方法，在拖拽与缩放中有详细的讲解。ViewPagerIndicator中的onTouchEvent中的代码也就是官方文档的模板代码，就是为了确保以上几点，获取到可用、确信的点，然后处理ViewPager相应的偏移和滑动。</p>
+<p>####3.2.4 CirclePageIndicator 源码分析  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div><div class="line">292</div><div class="line">293</div><div class="line">294</div><div class="line">295</div><div class="line">296</div><div class="line">297</div><div class="line">298</div><div class="line">299</div><div class="line">300</div><div class="line">301</div><div class="line">302</div><div class="line">303</div><div class="line">304</div><div class="line">305</div><div class="line">306</div><div class="line">307</div><div class="line">308</div><div class="line">309</div><div class="line">310</div><div class="line">311</div><div class="line">312</div><div class="line">313</div><div class="line">314</div><div class="line">315</div><div class="line">316</div><div class="line">317</div><div class="line">318</div><div class="line">319</div><div class="line">320</div><div class="line">321</div><div class="line">322</div><div class="line">323</div><div class="line">324</div><div class="line">325</div><div class="line">326</div><div class="line">327</div><div class="line">328</div><div class="line">329</div><div class="line">330</div><div class="line">331</div><div class="line">332</div><div class="line">333</div><div class="line">334</div><div class="line">335</div><div class="line">336</div><div class="line">337</div><div class="line">338</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CirclePageIndicator</span> <span class="keyword">extends</span> <span class="title">View</span> <span class="keyword">implements</span> <span class="title">PageIndicator</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INVALID_POINTER = -<span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**当前界面的索引*/</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mCurrentPage;</div><div class="line"></div><div class="line">    <span class="comment">/**当前界面的索引，和mCurrentPage值一样*/</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mSnapPage;</div><div class="line"></div><div class="line">    <span class="comment">/**ViewPager的水平偏移量 */</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">float</span> mPageOffset;</div><div class="line"></div><div class="line">    <span class="comment">/**ViewPager的滑动状态 */</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mScrollState;</div><div class="line"></div><div class="line">    <span class="comment">/**Indicator的模式：水平、竖直*/</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mOrientation;</div><div class="line"></div><div class="line">    <span class="comment">/**每一次onTouch事件产生时水平位置的最后偏移量 */</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">float</span> mLastMotionX = -<span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**当前处于活动中pointer的ID*/</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mActivePointerId = INVALID_POINTER;</div><div class="line"></div><div class="line">    <span class="comment">/** 用户是否主观的滑动屏幕的标识*/</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mIsDragging;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * circle有2种绘制模式:</div><div class="line">     * mSnap = true：circle之间不绘制，只绘制最终的实心点</div><div class="line">     * mSnap = false：viewPager滑动过程中，相邻circle之间根据mPageOffset实时绘制circle</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mSnap;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * “Touch slop”是指在用户触摸事件可被识别为移动手势前,移动过的那一段像素距离。</div><div class="line">     * Touchslop通常用来预防用户在做一些其他操作时意外地滑动，例如触摸屏幕上的元素时产生的滑动。</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mTouchSlop;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CirclePageIndicator</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>(context, <span class="keyword">null</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CirclePageIndicator</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>(context, attrs, R.attr.vpiCirclePageIndicatorStyle);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CirclePageIndicator</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyle)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(context, attrs, defStyle);</div><div class="line">        <span class="keyword">if</span> (isInEditMode()) <span class="keyword">return</span>;</div><div class="line"></div><div class="line">        <span class="comment">//Load defaults from resources</span></div><div class="line">        <span class="keyword">final</span> Resources res = getResources();</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> defaultPageColor = res.getColor(R.color.default_circle_indicator_page_color);</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> defaultFillColor = res.getColor(R.color.default_circle_indicator_fill_color);</div><div class="line"></div><div class="line">        ......</div><div class="line"></div><div class="line">        <span class="comment">//Retrieve styles attributes</span></div><div class="line">        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CirclePageIndicator, defStyle, <span class="number">0</span>);</div><div class="line"></div><div class="line">        ......</div><div class="line"></div><div class="line">        a.recycle();<span class="comment">//这里记得及时释放资源</span></div><div class="line"></div><div class="line">        <span class="keyword">final</span> ViewConfiguration configuration = ViewConfiguration.get(context);</div><div class="line">        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOrientation</span><span class="params">(<span class="keyword">int</span> orientation)</span> </span>&#123;</div><div class="line">        <span class="keyword">switch</span> (orientation) &#123;</div><div class="line">            <span class="keyword">case</span> HORIZONTAL:</div><div class="line">            <span class="keyword">case</span> VERTICAL:</div><div class="line">                mOrientation = orientation;</div><div class="line">                requestLayout();<span class="comment">//设置完方向之后，就开始请求布局,会执行 measure , layout步骤</span></div><div class="line">                <span class="keyword">break</span>;</div><div class="line"></div><div class="line">            <span class="keyword">default</span>:</div><div class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Orientation must be either HORIZONTAL or VERTICAL."</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onDraw(canvas);</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (mViewPager == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> count = mViewPager.getAdapter().getCount();</div><div class="line">        <span class="keyword">if</span> (count == <span class="number">0</span>) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (mCurrentPage &gt;= count) &#123;</div><div class="line">            setCurrentItem(count - <span class="number">1</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * CirclePageIndicator 分为水平和竖直放置两种模式</div><div class="line">         */</div><div class="line"></div><div class="line">        <span class="comment">//TODO 这里给出图，更好。。。。。。。。。</span></div><div class="line">        <span class="keyword">int</span> longSize;	<span class="comment">/** 当前方向的Indicator宽度*/</span></div><div class="line">        <span class="keyword">int</span> longPaddingBefore;<span class="comment">/** 当前方向的Indicator起始位置 */</span></div><div class="line">        <span class="keyword">int</span> longPaddingAfter;	<span class="comment">/** 当前方向的Indicator结束位置 */</span></div><div class="line">        <span class="keyword">int</span> shortPaddingBefore;	<span class="comment">/** 如果Indicator是水平方向，则取：padding Top ，竖直方向则取：padding Left */</span></div><div class="line">        <span class="keyword">if</span> (mOrientation == HORIZONTAL) &#123;<span class="comment">//水平方向，则由上、右、左三个方向来确定绘制范围</span></div><div class="line">            longSize = getWidth();</div><div class="line">            longPaddingBefore = getPaddingLeft();</div><div class="line">            longPaddingAfter = getPaddingRight();</div><div class="line">            shortPaddingBefore = getPaddingTop();</div><div class="line">        &#125; <span class="keyword">else</span> &#123;<span class="comment">//垂直方向，则由左、上、下、来确定绘制的范围。</span></div><div class="line">            longSize = getHeight();</div><div class="line">            longPaddingBefore = getPaddingTop();</div><div class="line">            longPaddingAfter = getPaddingBottom();</div><div class="line">            shortPaddingBefore = getPaddingLeft();</div><div class="line">        &#125;</div><div class="line"></div><div class="line"></div><div class="line">        <span class="keyword">final</span> <span class="keyword">float</span> threeRadius = mRadius * <span class="number">3</span>;<span class="comment">//两相邻circle的间距</span></div><div class="line">        <span class="keyword">final</span> <span class="keyword">float</span> shortOffset = shortPaddingBefore + mRadius;<span class="comment">//当前方向的垂直方向的圆心坐标位置</span></div><div class="line">        <span class="keyword">float</span> longOffset = longPaddingBefore + mRadius;<span class="comment">//当前方向的圆心位置</span></div><div class="line">        <span class="keyword">if</span> (mCentered) &#123;</div><div class="line">            longOffset += ((longSize - longPaddingBefore - longPaddingAfter) / <span class="number">2.0f</span>) - ((count * threeRadius) / <span class="number">2.0f</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">float</span> dX;</div><div class="line">        <span class="keyword">float</span> dY;</div><div class="line"></div><div class="line">        <span class="keyword">float</span> pageFillRadius = mRadius;</div><div class="line">        <span class="keyword">if</span> (mPaintStroke.getStrokeWidth() &gt; <span class="number">0</span>) &#123;</div><div class="line">            pageFillRadius -= mPaintStroke.getStrokeWidth() / <span class="number">2.0f</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">//循环的 draw circle</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> iLoop = <span class="number">0</span>; iLoop &lt; count; iLoop++) &#123;</div><div class="line">            <span class="keyword">float</span> drawLong = longOffset + (iLoop * threeRadius);<span class="comment">//计算当前方向的每个circle偏移量</span></div><div class="line">            <span class="keyword">if</span> (mOrientation == HORIZONTAL) &#123;</div><div class="line">                dX = drawLong;</div><div class="line">                dY = shortOffset;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                dX = shortOffset;</div><div class="line">                dY = drawLong;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">//只绘制透明度 &gt; 0的circle</span></div><div class="line">            <span class="keyword">if</span> (mPaintPageFill.getAlpha() &gt; <span class="number">0</span>) &#123;</div><div class="line">                canvas.drawCircle(dX, dY, pageFillRadius, mPaintPageFill);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// Only paint stroke if a stroke width was non-zero</span></div><div class="line">            <span class="comment">//有pageFillRadius时才绘制</span></div><div class="line">            <span class="keyword">if</span> (pageFillRadius != mRadius) &#123;</div><div class="line">                canvas.drawCircle(dX, dY, mRadius, mPaintStroke);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">//Draw the filled circle according to the current scroll</span></div><div class="line">        <span class="comment">//根据滑动的位置画出实心的点</span></div><div class="line">        <span class="keyword">float</span> cx = (mSnap ? mSnapPage : mCurrentPage) * threeRadius;<span class="comment">//计算实心点的目标位置</span></div><div class="line">        <span class="keyword">if</span> (!mSnap) &#123;<span class="comment">//不是跳跃模式，则根据当前界面的偏移量平滑地绘制</span></div><div class="line">            cx += mPageOffset * threeRadius;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (mOrientation == HORIZONTAL) &#123;<span class="comment">//计算实心圆的坐标</span></div><div class="line">            dX = longOffset + cx;</div><div class="line">            dY = shortOffset;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            dX = shortOffset;</div><div class="line">            dY = longOffset + cx;</div><div class="line">        &#125;</div><div class="line">        canvas.drawCircle(dX, dY, mRadius, mPaintFill);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 模板代码</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent ev)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">super</span>.onTouchEvent(ev)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> ((mViewPager == <span class="keyword">null</span>) || (mViewPager.getAdapter().getCount() == <span class="number">0</span>)) &#123;<span class="comment">//无效的ViewPager，啥也不做</span></div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> action = ev.getAction() &amp; MotionEventCompat.ACTION_MASK;</div><div class="line">        <span class="keyword">switch</span> (action) &#123;</div><div class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</div><div class="line">                mActivePointerId = MotionEventCompat.getPointerId(ev, <span class="number">0</span>);<span class="comment">//记录第一触摸点的ID</span></div><div class="line">                mLastMotionX = ev.getX();<span class="comment">//获取当前水平移动距离</span></div><div class="line">                <span class="keyword">break</span>;</div><div class="line"></div><div class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE: &#123;</div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> activePointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);<span class="comment">//获取第一点的索引</span></div><div class="line">                <span class="keyword">final</span> <span class="keyword">float</span> x = MotionEventCompat.getX(ev, activePointerIndex);<span class="comment">//根据第一点的索引获取其X坐标</span></div><div class="line">                <span class="keyword">final</span> <span class="keyword">float</span> deltaX = x - mLastMotionX;<span class="comment">//计算X方向的偏移</span></div><div class="line"></div><div class="line">                <span class="keyword">if</span> (!mIsDragging) &#123;</div><div class="line">                    <span class="keyword">if</span> (Math.abs(deltaX) &gt; mTouchSlop) &#123;<span class="comment">//如果用户是主观的滑动屏幕，则设置标识为 mIsDragging = true</span></div><div class="line">                        mIsDragging = <span class="keyword">true</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="keyword">if</span> (mIsDragging) &#123;<span class="comment">//如果用户拖拽了屏幕，处理ViewPager移动相应的偏移量</span></div><div class="line">                    mLastMotionX = x;<span class="comment">//重新赋值当前的X坐标，以便下次重新计算偏移量</span></div><div class="line">                    <span class="keyword">if</span> (mViewPager.isFakeDragging() || mViewPager.beginFakeDrag()) &#123;</div><div class="line">                        mViewPager.fakeDragBy(deltaX);</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">case</span> MotionEvent.ACTION_CANCEL:</div><div class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</div><div class="line">                <span class="keyword">if</span> (!mIsDragging) &#123;</div><div class="line">                    <span class="keyword">final</span> <span class="keyword">int</span> count = mViewPager.getAdapter().getCount();</div><div class="line">                    <span class="keyword">final</span> <span class="keyword">int</span> width = getWidth();</div><div class="line">                    <span class="keyword">final</span> <span class="keyword">float</span> halfWidth = width / <span class="number">2f</span>;</div><div class="line">                    <span class="keyword">final</span> <span class="keyword">float</span> sixthWidth = width / <span class="number">6f</span>;</div><div class="line"></div><div class="line">                    <span class="keyword">if</span> ((mCurrentPage &gt; <span class="number">0</span>) &amp;&amp; (ev.getX() &lt; halfWidth - sixthWidth)) &#123;<span class="comment">// 向后滑动，回退，以1/3屏幕宽度 为分界线。。。。。。。。。因为布局文件设置为fill_parent????????</span></div><div class="line">                        <span class="keyword">if</span> (action != MotionEvent.ACTION_CANCEL) &#123;</div><div class="line">                            mViewPager.setCurrentItem(mCurrentPage - <span class="number">1</span>);</div><div class="line">                        &#125;</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> ((mCurrentPage &lt; count - <span class="number">1</span>) &amp;&amp; (ev.getX() &gt; halfWidth + sixthWidth)) &#123;<span class="comment">//向前滑动</span></div><div class="line">                        <span class="keyword">if</span> (action != MotionEvent.ACTION_CANCEL) &#123;</div><div class="line">                            mViewPager.setCurrentItem(mCurrentPage + <span class="number">1</span>);</div><div class="line">                        &#125;</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                mIsDragging = <span class="keyword">false</span>;<span class="comment">//设置ViewPager滑动标识为false.</span></div><div class="line">                mActivePointerId = INVALID_POINTER;<span class="comment">//设置第一个触摸点的ID为invalid</span></div><div class="line">                <span class="keyword">if</span> (mViewPager.isFakeDragging()) mViewPager.endFakeDrag();<span class="comment">//结束ViewPager的临时滑动</span></div><div class="line">                <span class="keyword">break</span>;</div><div class="line"></div><div class="line">            <span class="keyword">case</span> MotionEventCompat.ACTION_POINTER_DOWN: &#123;<span class="comment">//除最初点外的第一个外出现在屏幕上的点</span></div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> index = MotionEventCompat.getActionIndex(ev);</div><div class="line">                mLastMotionX = MotionEventCompat.getX(ev, index);</div><div class="line">                mActivePointerId = MotionEventCompat.getPointerId(ev, index);</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">case</span> MotionEventCompat.ACTION_POINTER_UP:<span class="comment">//当非第一点离开屏幕时</span></div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> pointerIndex = MotionEventCompat.getActionIndex(ev);<span class="comment">//获取抬起手指的索引</span></div><div class="line">                <span class="keyword">final</span> <span class="keyword">int</span> pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);<span class="comment">//获取抬起手指的ID</span></div><div class="line">                <span class="keyword">if</span> (pointerId == mActivePointerId) &#123;<span class="comment">//如果之前跟踪的mActivePointerId是当前抬起的手指ID，那么就重新为mActivePointerId 赋值另一个活动中的pointerId</span></div><div class="line">                    <span class="keyword">final</span> <span class="keyword">int</span> newPointerIndex = pointerIndex == <span class="number">0</span> ? <span class="number">1</span> : <span class="number">0</span>;</div><div class="line">                    mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);</div><div class="line">                &#125;</div><div class="line">                mLastMotionX = MotionEventCompat.getX(ev, MotionEventCompat.findPointerIndex(ev, mActivePointerId));<span class="comment">//获取仍活动在屏幕上pointer的X坐标值</span></div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * (non-Javadoc)</div><div class="line">     *</div><div class="line">     * @see android.view.View#onMeasure(int, int)</div><div class="line">     * View在测量阶段的最终大小的设定是由setMeasuredDimension()方法决定的,也是必须要调用的方法，否则会报异常，</div><div class="line">     * 这里就直接调用了setMeasuredDimension()方法设置值了。</div><div class="line">     */</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (mOrientation == HORIZONTAL) &#123;</div><div class="line">            setMeasuredDimension(measureLong(widthMeasureSpec), measureShort(heightMeasureSpec));</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            setMeasuredDimension(measureShort(widthMeasureSpec), measureLong(heightMeasureSpec));</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 决定View的宽度，这一部分可以参考上面View.getDefaultSize()方法的源码处理</div><div class="line">     *</div><div class="line">     * Determines the width of this view</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> measureSpec</div><div class="line">     *            A measureSpec packed into an int</div><div class="line">     * <span class="doctag">@return</span> The width of the view, honoring constraints from measureSpec</div><div class="line">     *</div><div class="line">     * 测量的步骤分为获取MeasureSpec模式，获取系统建议的值、自己计算height和width（需要考虑自身的padding）</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">measureLong</span><span class="params">(<span class="keyword">int</span> measureSpec)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> result;</div><div class="line">        <span class="keyword">int</span> specMode = MeasureSpec.getMode(measureSpec);<span class="comment">//获取测量要求</span></div><div class="line">        <span class="keyword">int</span> specSize = MeasureSpec.getSize(measureSpec);<span class="comment">//获取系统建议的值</span></div><div class="line"></div><div class="line">        <span class="keyword">if</span> ((specMode == MeasureSpec.EXACTLY) || (mViewPager == <span class="keyword">null</span>)) &#123;<span class="comment">//父视图指定的Mode为具体值</span></div><div class="line">            <span class="comment">//We were told how big to be</span></div><div class="line">            result = specSize;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">//如果测量要求为UNSPECIFIED或AT_MOST模式，则根据实际需求计算宽度</span></div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> count = mViewPager.getAdapter().getCount();</div><div class="line">            result = (<span class="keyword">int</span>)(getPaddingLeft() + getPaddingRight()</div><div class="line">                    + (count * <span class="number">2</span> * mRadius) + (count - <span class="number">1</span>) * mRadius + <span class="number">1</span>);</div><div class="line">            <span class="comment">//如果父视图的测量要求为AT_MOST，即限定了一个最大值，则再从系统建议值和自己计算值中取一个较小值</span></div><div class="line">            <span class="keyword">if</span> (specMode == MeasureSpec.AT_MOST) &#123;</div><div class="line">                result = Math.min(result, specSize);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> result;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 决定View的高度</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> measureSpec</div><div class="line">     *            A measureSpec packed into an int</div><div class="line">     * <span class="doctag">@return</span> The height of the view, honoring constraints from measureSpec</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">measureShort</span><span class="params">(<span class="keyword">int</span> measureSpec)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> result;</div><div class="line">        <span class="keyword">int</span> specMode = MeasureSpec.getMode(measureSpec);</div><div class="line">        <span class="keyword">int</span> specSize = MeasureSpec.getSize(measureSpec);</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (specMode == MeasureSpec.EXACTLY) &#123;</div><div class="line">            <span class="comment">//We were told how big to be</span></div><div class="line">            result = specSize;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">//Measure the height</span></div><div class="line">            result = (<span class="keyword">int</span>)(<span class="number">2</span> * mRadius + getPaddingTop() + getPaddingBottom() + <span class="number">1</span>);</div><div class="line">            <span class="comment">//Respect AT_MOST value if that was what is called for by measureSpec</span></div><div class="line">            <span class="keyword">if</span> (specMode == MeasureSpec.AT_MOST) &#123;</div><div class="line">                result = Math.min(result, specSize);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> result;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>####3.1.4 参考文献<br>View的绘制：<br><a href="http://blog.csdn.net/wangjinyu501/article/details/9008271" target="_blank" rel="external">http://blog.csdn.net/wangjinyu501/article/details/9008271</a><br><a href="http://blog.csdn.net/qinjuning/article/details/7110211" target="_blank" rel="external">http://blog.csdn.net/qinjuning/article/details/7110211</a><br><a href="http://blog.csdn.net/qinjuning/article/details/8074262" target="_blank" rel="external">http://blog.csdn.net/qinjuning/article/details/8074262</a></p>
+<p>Touch事件传递：<br><a href="http://blog.csdn.net/xiaanming/article/details/21696315" target="_blank" rel="external">http://blog.csdn.net/xiaanming/article/details/21696315</a><br><a href="http://blog.csdn.net/wangjinyu501/article/details/22584465" target="_blank" rel="external">http://blog.csdn.net/wangjinyu501/article/details/22584465</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/优秀项目原理解析/"> #优秀项目原理解析 </a>
+          
+            <a href="/tags/View绘制机制/"> #View绘制机制 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/10/propertyview-anim-practice/">动画系列 - PropertyAnim 实际应用</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/04/propertyview-anim-analysis/">动画系列 - PropertyAnim 详解</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2014/12/09/viewpagerindicator-analysis/"
+               data-title="ViewPagerindicator 源码解析" data-url="http://www.lightskystreet.com/2014/12/09/viewpagerindicator-analysis/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-功能介绍"><span class="nav-number">1.</span> <span class="nav-text">1. 功能介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-ViewPagerIndicator"><span class="nav-number">2.</span> <span class="nav-text">1.1 ViewPagerIndicator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-总体设计"><span class="nav-number">3.</span> <span class="nav-text">2. 总体设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-详细设计"><span class="nav-number">4.</span> <span class="nav-text">3. 详细设计</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-3-1-保持对最初点的追踪"><span class="nav-number">4.0.1.</span> <span class="nav-text">3.2.3.1 保持对最初点的追踪</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-3-2-区分原始点及之后的任意触摸点"><span class="nav-number">4.0.2.</span> <span class="nav-text">3.2.3.2 区分原始点及之后的任意触摸点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-3-3-确保操作中的点的ID-the-active-pointer-ID-不会引用已经不在触摸屏上的触摸点"><span class="nav-number">4.0.3.</span> <span class="nav-text">3.2.3.3 确保操作中的点的ID(the active pointer ID)不会引用已经不在触摸屏上的触摸点</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

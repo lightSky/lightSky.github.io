@@ -1,0 +1,1050 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="JS学习笔记," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> JS学习-封装和继承 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              JS学习-封装和继承
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-06-12
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/JS/">JS</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/06/13/js-inherit/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/13/js-inherit/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h1 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h1><h1 id="一-封装"><a href="#一-封装" class="headerlink" title="一 封装"></a>一 封装</h1><h2 id="1-1-prototype对象"><a href="#1-1-prototype对象" class="headerlink" title="1.1 prototype对象"></a>1.1 prototype对象</h2><h3 id="1-1-1-构造函数的缺点"><a href="#1-1-1-构造函数的缺点" class="headerlink" title="1.1.1 构造函数的缺点"></a>1.1.1 构造函数的缺点</h3><p>JavaScript通过构造函数生成新对象，因此构造函数可以视为对象的模板。实例对象的属性和方法，可以定义在构造函数内部。所有实例对象都会生成相同的属性。</p>
+<p>但是，这样做是对系统资源的浪费，因为同一个构造函数的对象实例之间，无法共享属性和方法。所有创建的对象的方法功能是相同的，完全可以只定义一份。</p>
+<h3 id="1-1-2-prototype属性的作用"><a href="#1-1-2-prototype属性的作用" class="headerlink" title="1.1.2 prototype属性的作用"></a>1.1.2 prototype属性的作用</h3><p>构造函数也有自己的属性和方法，其中有一个prototype属性指向另一个对象，一般称为prototype对象。该对象非常特别，只要定义在它上面的属性和方法，能被所有实例对象共享。也就是说，构造函数生成实例对象时，自动为实例对象分配了一个prototype属性。</p>
+<ul>
+<li>定义在prototype上面的属性和方法，能被所有实例对象共享</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">function Animal (name) &#123;</div><div class="line">  this.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Animal.prototype.color = &quot;white&quot;;</div><div class="line"></div><div class="line">var cat1 = new Animal(&apos;大毛&apos;);</div><div class="line">var cat2 = new Animal(&apos;二毛&apos;);</div><div class="line"></div><div class="line">cat1.color // &apos;white&apos;</div><div class="line">cat2.color // &apos;white&apos;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<ul>
+<li>修改prototype对象，变动就立刻会体现在实例对象</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Animal.prototype.color = &quot;yellow&quot;;</div><div class="line"></div><div class="line">cat1.color // &apos;yellow&apos;</div><div class="line">cat2.color // &apos;yellow&apos;</div></pre></td></tr></table></figure>
+<ul>
+<li>当实例对象本身没有某个属性或方法的时候，它会到构造函数的prototype对象去寻找该属性或方法</li>
+</ul>
+<ul>
+<li>如果实例对象自身就有某个属性或方法，它就不会再去prototype对象寻找这个属性或方法</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cat1.color = &apos;black&apos;;</div><div class="line"></div><div class="line">cat2.color // &apos;yellow&apos;</div><div class="line">Animal.prototype.color // &quot;yellow&quot;;</div></pre></td></tr></table></figure>
+<h3 id="1-1-3-原型链"><a href="#1-1-3-原型链" class="headerlink" title="1.1.3 原型链"></a>1.1.3 原型链</h3><h4 id="所有对象都有prototype原型对象"><a href="#所有对象都有prototype原型对象" class="headerlink" title="所有对象都有prototype原型对象"></a>所有对象都有prototype原型对象</h4><p>由于JavaScript的所有对象都有构造函数，而所有构造函数都有prototype属性（其实是所有函数都有prototype属性），所以所有对象都有自己的prototype原型对象。</p>
+<p>JavaScript的所有对象，都有自己的继承链。每个对象都继承另一个对象，该对象称为“原型”（prototype）对象。只有<code>null</code>除外，它没有自己的原型对象。</p>
+<p>一个对象的属性和方法，有可能是定义它自身上面，也有可能定义在它的原型对象上面。由于原型本身也是对象，又有自己的原型，所以形成了一条原型链（prototype chain）。</p>
+<ul>
+<li>“原型链”的作用</li>
+</ul>
+<p>当读取对象的某个属性时，JavaScript引擎先寻找对象本身的属性，如果找不到，就到它的原型去找，如果还是找不到，就到原型的原型去找。以此类推，如果直到最顶层的Object.prototype还是找不到，则返回undefined。</p>
+<h4 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h4><p>如果让某个函数的prototype属性指向一个数组，就意味着该函数可以用作数组的构造函数，因为它生成的实例对象都可以通过prototype属性调用数组方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function MyArray ()&#123;&#125;</div><div class="line"></div><div class="line">MyArray.prototype = new Array();</div><div class="line">MyArray.prototype.constructor = MyArray;</div><div class="line"></div><div class="line">var mine = new MyArray();</div><div class="line">mine.push(1, 2, 3);</div><div class="line"></div><div class="line">mine.length // 3</div><div class="line">mine instanceof Array // true</div></pre></td></tr></table></figure>
+<ul>
+<li>如果实例对象自身就有某个属性或方法，就不会再去prototype对象寻找</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cat1.color = &apos;black&apos;;</div><div class="line"></div><div class="line">cat2.color // &apos;yellow&apos;</div><div class="line">Animal.prototype.color // &quot;yellow&quot;;</div></pre></td></tr></table></figure>
+<h3 id="1-1-4-constructor属性"><a href="#1-1-4-constructor属性" class="headerlink" title="1.1.4 constructor属性"></a>1.1.4 constructor属性</h3><ul>
+<li>prototype对象有一个constructor属性，默认指向prototype对象所在的构造函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">function P() &#123;&#125;</div><div class="line"></div><div class="line">P.prototype.constructor === P</div><div class="line">// true</div></pre></td></tr></table></figure>
+<ul>
+<li>由于constructor属性定义在prototype对象上面，意味着可以被所有实例对象继承</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">function P() &#123;&#125;</div><div class="line"></div><div class="line">var p = new P();</div><div class="line"></div><div class="line">p.constructor</div><div class="line">// function P() &#123;&#125;</div><div class="line"></div><div class="line">p.constructor === P.prototype.constructor</div><div class="line">// true</div><div class="line"></div><div class="line">p.hasOwnProperty(&apos;constructor&apos;)</div><div class="line">// false</div></pre></td></tr></table></figure>
+<p>上面代码表示p是构造函数P的实例对象，但是p自身没有contructor属性，该属性其实是读取原型链上面的<code>P.prototype.constructor</code>属性。</p>
+<ul>
+<li>constructor属性的作用是分辨prototype对象到底定义在哪个构造函数上面</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">function F()&#123;&#125;;</div><div class="line"></div><div class="line">var f = new F();</div><div class="line"></div><div class="line">f.constructor === F // true</div><div class="line">f.constructor === RegExp // false</div></pre></td></tr></table></figure>
+<h2 id="1-2-Object-getPrototypeOf方法"><a href="#1-2-Object-getPrototypeOf方法" class="headerlink" title="1.2 Object.getPrototypeOf方法"></a>1.2 Object.getPrototypeOf方法</h2><p>Object.getPrototypeOf方法返回一个对象的原型：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">// 空对象的原型是Object.prototype</div><div class="line">Object.getPrototypeOf(&#123;&#125;) === Object.prototype</div><div class="line">// true</div><div class="line"></div><div class="line">// 函数的原型是Function.prototype</div><div class="line">function f() &#123;&#125;</div><div class="line">Object.getPrototypeOf(f) === Function.prototype</div><div class="line">// true</div><div class="line"></div><div class="line">// 假定F为构造函数，f为F的实例对象</div><div class="line">// 那么，f的原型是F.prototype</div><div class="line">var f = new F();</div><div class="line">Object.getPrototypeOf(f) === F.prototype</div><div class="line">// true</div></pre></td></tr></table></figure>
+<h3 id="1-3Object-create"><a href="#1-3Object-create" class="headerlink" title="1.3Object.create"></a>1.3<code>Object.create</code></h3><p><code>Object.create</code>方法用于生成新的对象，可以替代<code>new</code>命令。它接受一个对象作为参数，返回一个新对象，后者完全继承前者的属性，即前者成为后者的原型。</p>
+<p>下面三种方式生成的新对象是等价的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var o1 = Object.create(&#123;&#125;);</div><div class="line">var o2 = Object.create(Object.prototype);</div><div class="line">var o3 = new Object();</div></pre></td></tr></table></figure>
+<p>如果想要生成一个不继承任何属性（比如toString和valueOf方法）的对象，可以将Object.create的参数设为null。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var o = Object.create(null);</div><div class="line"></div><div class="line">o.valueOf()</div><div class="line">// TypeError: Object [object Object] has no method &apos;valueOf&apos;</div></pre></td></tr></table></figure>
+<p>修改对象原型会影响到新生成的对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var o1 = &#123; p: 1 &#125;;</div><div class="line">var o2 = Object.create(o1);</div><div class="line"></div><div class="line">o1.p = 2;</div><div class="line">o2.p</div><div class="line">// 2</div></pre></td></tr></table></figure>
+<h2 id="1-4-isPrototypeOf方法"><a href="#1-4-isPrototypeOf方法" class="headerlink" title="1.4 isPrototypeOf方法"></a>1.4 isPrototypeOf方法</h2><p>isPrototypeOf方法用来判断一个对象是否是另一个对象的原型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var o1 = &#123;&#125;;</div><div class="line">var o2 = Object.create(o1);</div><div class="line">var o3 = Object.create(o2);</div><div class="line"></div><div class="line">o2.isPrototypeOf(o3) // true</div><div class="line">o1.isPrototypeOf(o3) // true</div></pre></td></tr></table></figure>
+<p>上面代码表明，只要某个对象处在原型链上，isProtypeOf都返回true。</p>
+<h1 id="二-继承"><a href="#二-继承" class="headerlink" title="二 继承"></a>二 继承</h1><h2 id="2-1-构造函数的继承"><a href="#2-1-构造函数的继承" class="headerlink" title="2.1 构造函数的继承"></a>2.1 构造函数的继承</h2><h3 id="2-1-1-整体继承"><a href="#2-1-1-整体继承" class="headerlink" title="2.1.1 整体继承"></a>2.1.1 整体继承</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function Shape() &#123;</div><div class="line">  this.x = 0;</div><div class="line">  this.y = 0;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Shape.prototype.move = function (x, y) &#123;</div><div class="line">  this.x += x;</div><div class="line">  this.y += y;</div><div class="line">  console.info(&apos;Shape moved.&apos;);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p><code>Rectangle</code>构造函数继承<code>Shape</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">function Rectangle() &#123;</div><div class="line">  Shape.call(this); // 调用父类构造函数</div><div class="line">&#125;</div><div class="line">// 另一种写法</div><div class="line">function Rectangle() &#123;</div><div class="line">  this.base = Shape;</div><div class="line">  this.base();</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 子类继承父类的方法</div><div class="line">Rectangle.prototype = Object.create(Shape.prototype);</div><div class="line">Rectangle.prototype.constructor = Rectangle;</div><div class="line"></div><div class="line">var rect = new Rectangle();</div><div class="line"></div><div class="line">rect instanceof Rectangle  // true</div><div class="line">rect instanceof Shape  // true</div><div class="line"></div><div class="line">rect.move(1, 1) // &apos;Shape moved.&apos;</div></pre></td></tr></table></figure>
+<p>上面代码表示，构造函数的继承分成两部分</p>
+<ul>
+<li>子类调用父类的构造方法，</li>
+</ul>
+<ul>
+<li>子类的原型指向父类的原型。</li>
+</ul>
+<h3 id="2-1-2-部分继承"><a href="#2-1-2-部分继承" class="headerlink" title="2.1.2 部分继承"></a>2.1.2 部分继承</h3><p>有时，只需要单个方法的继承，这时可以采用下面的写法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ClassB.prototype.print = function() &#123;</div><div class="line">  ClassA.prototype.print.call(this);</div><div class="line">  // some code</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面代码中，子类<code>B</code>的<code>print</code>方法先调用父类<code>A</code>的<code>print</code>方法，再部署自己的代码。这就等于继承了父类<code>A</code>的<code>print</code>方法。</p>
+<h2 id="2-2-proto-属性"><a href="#2-2-proto-属性" class="headerlink" title="2.2 __proto__属性"></a>2.2 <code>__proto__</code>属性</h2><p><code>__proto__</code>属性指向当前对象的原型对象，即构造函数的<code>prototype</code>属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var obj = new Object();</div><div class="line"></div><div class="line">obj.__proto__ === Object.prototype</div><div class="line">// true</div><div class="line">obj.__proto__ === obj.constructor.prototype</div><div class="line">// true</div></pre></td></tr></table></figure>
+<p>因此，获取实例对象<code>obj</code>的原型对象，有三种方法：</p>
+<ul>
+<li><code>obj.__proto__</code></li>
+<li><code>obj.constructor.prototype</code></li>
+<li><code>Object.getPrototypeOf(obj)</code></li>
+</ul>
+<p>上面三种方法之中，前两种都不是很可靠：</p>
+<p>最新的ES6标准规定，<code>__proto__</code>属性只有浏览器才需要部署，其他环境可以不部署。而<code>obj.constructor.prototype</code>在手动改变原型对象时，可能会失效。</p>
+<p><em>这块的深入部分待补充</em></p>
+<p>非标准的<code>__proto__</code>属性（前后各两个下划线），可以改写某个对象的原型对象。</p>
+<p>但是，应该尽量少用这个属性，而是用<code>Object.getPrototypeof()</code>和<code>Object.setPrototypeOf()</code>，进行原型对象的读写操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">var obj = &#123;&#125;;</div><div class="line">var p = &#123;&#125;;</div><div class="line"></div><div class="line">obj.__proto__ = p;</div><div class="line">Object.getPrototypeOf(obj) === p // true</div></pre></td></tr></table></figure>
+<p>上面代码通过<code>__proto__</code>属性，将<code>p</code>对象设为<code>obj</code>对象的原型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var a = &#123;x: 1&#125;;</div><div class="line">var b = &#123;__proto__: a&#125;;</div><div class="line">b.x // 1</div></pre></td></tr></table></figure>
+<p>上面代码中，<code>b</code>对象通过<code>__proto__</code>属性，将自己的原型对象设为<code>a</code>对象，因此<code>b</code>对象可以拿到<code>a</code>对象的所有属性和方法。</p>
+<h2 id="2-3-属性的继承"><a href="#2-3-属性的继承" class="headerlink" title="2.3 属性的继承"></a>2.3 属性的继承</h2><h3 id="2-3-1-对象的原生属性"><a href="#2-3-1-对象的原生属性" class="headerlink" title="2.3.1 对象的原生属性"></a>2.3.1 对象的原生属性</h3><p>对象本身的所有属性，可以用Object.getOwnPropertyNames方法获得。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Object.getOwnPropertyNames(Date)</div><div class="line">// [&quot;parse&quot;, &quot;arguments&quot;, &quot;UTC&quot;, &quot;caller&quot;, &quot;name&quot;, &quot;prototype&quot;, &quot;now&quot;, &quot;length&quot;]</div></pre></td></tr></table></figure>
+<p>对象本身的属性之中，有的是可以枚举的（enumerable），有的是不可以枚举的。只获取那些可以枚举的属性，使用Object.keys方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Object.keys(Date) // []</div></pre></td></tr></table></figure>
+<h3 id="2-3-2-hasOwnProperty"><a href="#2-3-2-hasOwnProperty" class="headerlink" title="2.3.2 hasOwnProperty()"></a>2.3.2 hasOwnProperty()</h3><p><code>hasOwnProperty</code>方法返回一个布尔值，用于判断某个属性定义在对象自身，还是定义在原型链上。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Date.hasOwnProperty(&apos;length&apos;)</div><div class="line">// true</div><div class="line"></div><div class="line">Date.hasOwnProperty(&apos;toString&apos;)</div><div class="line">// false</div></pre></td></tr></table></figure>
+<p><strong><code>hasOwnProperty</code>方法是JavaScript之中唯一一个处理对象属性时，不会遍历原型链的方法。</strong></p>
+<h3 id="2-3-3-对象的继承属性"><a href="#2-3-3-对象的继承属性" class="headerlink" title="2.3.3 对象的继承属性"></a>2.3.3 对象的继承属性</h3><p>用Object.create方法创造的对象，会继承所有原型对象的属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">var proto = &#123; p1: 123 &#125;;</div><div class="line">var o = Object.create(proto);</div><div class="line"></div><div class="line">o.p1 // 123</div><div class="line">o.hasOwnProperty(&quot;p1&quot;) // false</div></pre></td></tr></table></figure>
+<h3 id="2-3-4-获取所有属性"><a href="#2-3-4-获取所有属性" class="headerlink" title="2.3.4 获取所有属性"></a>2.3.4 获取所有属性</h3><ul>
+<li>使用 <code>in</code> 运算符判断一个对象是否具有某个属性（不管是自身的还是继承的）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&quot;length&quot; in Date // true</div><div class="line">&quot;toString&quot; in Date // true</div></pre></td></tr></table></figure>
+<ul>
+<li>获得对象的所有可枚举属性（不管是自身的还是继承的），可以使用for-in循环</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">var o1 = &#123;p1: 123&#125;;</div><div class="line"></div><div class="line">var o2 = Object.create(o1,&#123;</div><div class="line">  p2: &#123; value: &quot;abc&quot;, enumerable: true &#125;</div><div class="line">&#125;);</div><div class="line"></div><div class="line">for (p in o2) &#123;console.info(p);&#125;</div><div class="line">// p2</div><div class="line">// p1</div></pre></td></tr></table></figure>
+<ul>
+<li>采用hasOwnProperty方法中针对对象自身的属性进行判断</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">for ( var name in object ) &#123;</div><div class="line">  if ( object.hasOwnProperty(name) ) &#123;</div><div class="line">    /* loop code */</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>获得对象的所有属性（不管是自身的还是继承的，以及是否可枚举），可以使用下面的函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function inheritedPropertyNames(obj) &#123;</div><div class="line">  var props = &#123;&#125;;</div><div class="line">  while(obj) &#123;</div><div class="line">    Object.getOwnPropertyNames(obj).forEach(function(p) &#123;</div><div class="line">      props[p] = true;</div><div class="line">    &#125;);</div><div class="line">    obj = Object.getPrototypeOf(obj);</div><div class="line">  &#125;</div><div class="line">  return Object.getOwnPropertyNames(props);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>用法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">inheritedPropertyNames(Date)</div><div class="line">// [&quot;caller&quot;, &quot;constructor&quot;, &quot;toString&quot;, &quot;UTC&quot;, &quot;call&quot;, &quot;parse&quot;, &quot;prototype&quot;, &quot;__defineSetter__&quot;, &quot;__lookupSetter__&quot;, &quot;length&quot;, &quot;arguments&quot;, &quot;bind&quot;, &quot;__lookupGetter__&quot;, &quot;isPrototypeOf&quot;, &quot;toLocaleString&quot;, &quot;propertyIsEnumerable&quot;, &quot;valueOf&quot;, &quot;apply&quot;, &quot;__defineGetter__&quot;, &quot;name&quot;, &quot;now&quot;, &quot;hasOwnProperty&quot;]</div></pre></td></tr></table></figure>
+<h2 id="2-4-对象的拷贝"><a href="#2-4-对象的拷贝" class="headerlink" title="2.4 对象的拷贝"></a>2.4 对象的拷贝</h2><p>如果要拷贝一个对象，需要做到下面两件事情。</p>
+<ul>
+<li>确保拷贝后的对象，与原对象具有同样的prototype原型对象。</li>
+<li>确保拷贝后的对象，与原对象具有同样的属性。</li>
+</ul>
+<p>下面就是根据上面两点，编写的对象拷贝的函数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">function copyObject(orig) &#123;</div><div class="line">  var copy = Object.create(Object.getPrototypeOf(orig));</div><div class="line">  copyOwnPropertiesFrom(copy, orig);</div><div class="line">  return copy;</div><div class="line">&#125;</div><div class="line"></div><div class="line">function copyOwnPropertiesFrom(target, source) &#123;</div><div class="line">  Object</div><div class="line">  .getOwnPropertyNames(source)</div><div class="line">  .forEach(function(propKey) &#123;</div><div class="line">    var desc = Object.getOwnPropertyDescriptor(source, propKey);</div><div class="line">    Object.defineProperty(target, propKey, desc);</div><div class="line">  &#125;);</div><div class="line">  return target;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JS学习笔记/"> #JS学习笔记 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/16/js-str-arr/">JS学习-字符串和数组</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/08/js-func/">JS学习-函数</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/06/13/js-inherit/"
+               data-title="JS学习-封装和继承" data-url="http://www.lightskystreet.com/2016/06/13/js-inherit/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#封装"><span class="nav-number">1.</span> <span class="nav-text">封装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一-封装"><span class="nav-number">2.</span> <span class="nav-text">一 封装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-prototype对象"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 prototype对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-构造函数的缺点"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.1.1 构造函数的缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-prototype属性的作用"><span class="nav-number">2.1.2.</span> <span class="nav-text">1.1.2 prototype属性的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-原型链"><span class="nav-number">2.1.3.</span> <span class="nav-text">1.1.3 原型链</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#所有对象都有prototype原型对象"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">所有对象都有prototype原型对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#举例"><span class="nav-number">2.1.3.2.</span> <span class="nav-text">举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-4-constructor属性"><span class="nav-number">2.1.4.</span> <span class="nav-text">1.1.4 constructor属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-Object-getPrototypeOf方法"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 Object.getPrototypeOf方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3Object-create"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.3Object.create</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-isPrototypeOf方法"><span class="nav-number">2.3.</span> <span class="nav-text">1.4 isPrototypeOf方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二-继承"><span class="nav-number">3.</span> <span class="nav-text">二 继承</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-构造函数的继承"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 构造函数的继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-整体继承"><span class="nav-number">3.1.1.</span> <span class="nav-text">2.1.1 整体继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-部分继承"><span class="nav-number">3.1.2.</span> <span class="nav-text">2.1.2 部分继承</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-proto-属性"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 __proto__属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-属性的继承"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 属性的继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1-对象的原生属性"><span class="nav-number">3.3.1.</span> <span class="nav-text">2.3.1 对象的原生属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-2-hasOwnProperty"><span class="nav-number">3.3.2.</span> <span class="nav-text">2.3.2 hasOwnProperty()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-3-对象的继承属性"><span class="nav-number">3.3.3.</span> <span class="nav-text">2.3.3 对象的继承属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-4-获取所有属性"><span class="nav-number">3.3.4.</span> <span class="nav-text">2.3.4 获取所有属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-对象的拷贝"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 对象的拷贝</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

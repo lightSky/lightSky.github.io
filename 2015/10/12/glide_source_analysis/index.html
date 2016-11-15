@@ -1,0 +1,1264 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="优秀项目原理解析," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Glide源码分析 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Glide源码分析
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-10-11
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/优秀项目原理解析/">优秀项目原理解析</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/10/12/glide_source_analysis/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/12/glide_source_analysis/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <blockquote>
+<p>本文为 <a href="https://github.com/android-cn/android-open-project-analysis" target="_blank" rel="external">Android 开源项目源码解析</a> 中 Glide 部分<br>项目地址：<a href="https://github.com/bumptech/glide" target="_blank" rel="external">Glide</a>，分析的版本：<a href="https://github.com/bumptech/glide/commit/cb640b2221044fe272ea6a249772cf71ba0d5fab" target="_blank" rel="external">cb640b2</a>，Demo 地址：<a href="https://github.com/android-cn/android-open-project-demo/tree/master/${项目 Demo 地址}" target="_blank" rel="external">Glide Demo</a><br>分析者：<a href="https://github.com/lightSky" target="_blank" rel="external">lightSky</a>，分析状态：未完成，校对者：<a href="https://github.com/Trinea" target="_blank" rel="external">Trinea</a>，校对状态：未开始   </p>
+</blockquote>
+<p>###1. 功能介绍<br>图片加载框架，相对于UniversalImageLoader，Picasso，它还支持video，Gif，SVG格式，支持缩略图请求，旨在打造更好的列表图片滑动体验。Glide有生命周期的概念（主要是对请求进行pause，resume，clear），而且其生命周期与Activity/Fragment的生命周期绑定，支持Volley，OkHttp，并提供了相应的integration libraries，内存方面也更加友好。</p>
+<p>###2. 总体设计</p>
+<a id="more"></a>
+<p>####2.1 总体设计图<br><img src="/img/glide_analysis/glide_module.jpg">  </p>
+<p>####2.2 Glide中的概念</p>
+<p><strong>Glide</strong><br>使用RequestBuilder创建request的静态接口，并持有Engine，BitmapPool，DiskCache，MemoryCache。<br>实现了ComponentCallbacks2，注册了低内存情况的回调。当内存不足的时候，进行相应的内存清理。回调的发生在RequestManagerFragment的onLowMemory和onTrimMemory中。<br>更详细的介绍可参考<strong>4.2.1 Glide</strong> </p>
+<p><strong>GlideBuilder</strong><br>为Glide设置一些默认配置，比如：Engine，MemoryCache，DiskCache，RequestOptions，GlideExecutor，MemorySizeCalculator</p>
+<p><strong>GlideModule</strong><br>可以通过GlideBuilder进行一些延迟的配置和ModelLoaders的注册。</p>
+<p><strong>注意：</strong><br>所有的实现的module必须是public的，并且只拥有一个空的构造函数，以便Glide懒加载的时候可以通过反射调用。<br>GlideModule是不能指定调用顺序的。因此在创建多个GlideModule的时候，要注意不同Module之间的setting不要冲突了。<br>如何创建Module，请参看Demo</p>
+<p><strong>Engine</strong><br>负责任务创建，发起，回调，资源的管理<br>详细介绍请参考<strong>4.2.3 Engine</strong></p>
+<p><strong>DecodeJob</strong><br>调度任务的核心类，整个请求的繁重工作都在这里完成,处理来自缓存或者原始的资源，应用转换动画以及transcode。<br>详细介绍请参考<strong>4.2.5 DecodeJob</strong>  </p>
+<p><strong>ModelLoader</strong><br>各种资源的ModelLoader<model, data=""> </model,></p>
+<p>该接口有两个目的： </p>
+<ul>
+<li>将任意复杂的model转换为可以被decode的数据类型</li>
+<li>允许model结合View的尺寸获取特定大小的资源</li>
+</ul>
+<p>更详细的介绍请参考 <strong>4.2.19 ModelLoader</strong>  </p>
+<p><strong>Resource</strong><br>对资源进行包装的接口，提供get，recycle，getSize，以及原始类的getResourceClass方法。<br>resource包下也就是各种资源：bitmap，bytes，drawable，file，gif，以及相关解码器，转换器</p>
+<p><strong>Target</strong><br>request的载体，各种资源对应的加载类，含有生命周期的回调方法，方便开发人员进行相应的准备以及资源回收工作。</p>
+<p><strong>ThumbnailRequestCoordinator</strong><br>请求协调器，包含两个请求：缩略图请求＋完整图片请求  </p>
+<p><strong>数据相关概念</strong>  </p>
+<ul>
+<li>data ：代表原始的，未修改过的资源，对应dataClass</li>
+<li>resource : 修改过的资源，对应resourceClass</li>
+<li>transcoder : 资源转换器，比如 BitmapBytesTranscoder（Bitmap转换为Bytes），GifDrawableBytesTranscoder</li>
+<li>ResourceEncoder : 持久化数据的接口，注意，该类并不与decoder相对应，而是用于本地缓存的接口</li>
+<li>ResourceDecoder : 数据解码器,比如ByteBufferGifDecoder（将ByteBuffer转换为Gif），StreamBitmapDecoder（Stream转换为Bitmap）</li>
+<li>ResourceTranscoder : 资源转换器，将给定的资源类型，转换为另一种资源类型，比如将Bitmap转换为Drawable，Bitmap转换为Bytes  </li>
+<li>Transformation : 比如对图片进行FitCenter，CircleCrop，CenterCrop的transformation，或者根据给定宽高对Bitmap进行处理的BitmapDrawableTransformation  </li>
+</ul>
+<p><strong>Registry</strong><br>对Glide所支持的Encoder ，Decoder ，Transcoder组件进行注册<br>因为Glide所支持的数据类型太多，把每一种的数据类型及相应处理方式的组合形象化为一种组件的概念。通过registry的方式管理。<br>如下，注册了将使用BitmapDrawableTranscoder将 Bitmap转换为BitmapDrawable的组件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Registry.register(Bitmap.class, BitmapDrawable.class,<span class="keyword">new</span> BitmapDrawableTranscoder(resources, bitmapPool))</div></pre></td></tr></table></figure>
+<p>关于Decoder，Transcoder和Registry的详细介绍请参考<strong>4.2.18 Registry</strong>  </p>
+<p>###3. 流程图</p>
+<p><img src="/img/glide_analysis/glide_base_flow.jpg">  </p>
+<p>###4. 详细设计</p>
+<p>####4.1 类关系图<br><img src="/img/glide_analysis/glide_framework.png">  </p>
+<p>####4.2 类详细介绍</p>
+<p>#####4.2.1 Glide<br>向外暴露单例静态接口，构建Request，配置资源类型，缓存策略，图片处理等，可以直接通过该类完整简单的图片请求和填充。内存持有一些内存变量<code>BitmapPool</code>，<code>MemoryCache</code>，<code>ByteArrayPool</code>，便于低内存情况时自动清理内存。</p>
+<p>#####4.2.2 RequestBuilder<br>创建请求，资源类型配置，缩略图配置，以及通过BaseRequestOptions进行一些默认图，图片处理的配置  </p>
+<p><strong>主要函数</strong><br>(1) <strong>thumbnail(@Nullable RequestBuilder<transcodetype> thumbnailRequest)</transcodetype></strong><br>配置缩略图的请求，如果配置的缩略图请求在完整的图片请求完成前回调，那么该缩略图会展示，如果在完整请求之后，那么缩略图就无效。Glide不会保证缩略图请求和完整图片请求的顺序。 </p>
+<p>(2) <strong>多个load重载的方法</strong><br>指定加载的数据类型<br>load(@Nullable Object model)<br>load(@Nullable String string)<br>load(@Nullable Uri uri)<br>load(@Nullable File file)<br>load(@Nullable Integer resourceId)<br>load(@Nullable URL url)<br>load(@Nullable byte[] model)</p>
+<p>(3) <strong>buildRequest(Target<transcodetype> target)</transcodetype></strong><br>创建请求，如果配置了thumbnail（缩略图）请求，则构建一个ThumbnailRequestCoordinator（包含了FullRequest和ThumbnailRequest）请求，否则简单的构建一个Request。  </p>
+<p>(4) <strong>into(Y target)</strong><br>设置资源的Target，并创建，绑定，跟踪，发起请求</p>
+<p><strong>整个请求的创建流程图</strong><br><img src="/img/glide_analysis/glide_request_build_flow.jpg">  </p>
+<p>###4.2.3 Engine<br>任务创建，发起，回调，管理存活和缓存的资源</p>
+<p><strong>主要函数</strong>  </p>
+<p><strong>(1) loadFromCache(Key key, boolean isMemoryCacheable)</strong><br>从内存缓存中获取资源，获取成功后会放入到activeResources中</p>
+<p><strong>(2) loadFromActiveResources</strong><br>从存活的资源中加载资源，资源加载完成后，再将这个缓存数据放到一个 value 为软引用的 activeResources map 中，并计数引用数，在图片加载完成后进行判断，如果引用计数为空则回收掉。</p>
+<p><strong>(3) getReferenceQueue</strong><br>activeResources是一个持有缓存WeakReference的Map集合。ReferenceQueue就是提供资源WeakReference的虚引用队列。<br><code>activeResources.put(key, new ResourceWeakReference(key, cached, getReferenceQueue()));</code><br>这里要提的是负责清除WeakReference被回收的activeResources资源的实现：<br>使用到了MessageQueue.IdleHandler，源码的注释：当一个线程等待更多message的时候会触发该回调,就是messageQuene空闲的时候会触发该回调</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">* Callback interface for discovering when a thread is going to block</div><div class="line">* waiting for more messages.</div><div class="line">*/</div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">interface</span> <span class="title">IdleHandler</span> </span>&#123;</div><div class="line"><span class="comment">/**</span></div><div class="line">* Called when the message queue has run out of messages and will now</div><div class="line">* wait for more.  Return true to keep your idle handler active, false</div><div class="line">* to have it removed.  This may be called if there are still messages</div><div class="line">* pending in the queue, but they are all scheduled to be dispatched</div><div class="line">* after the current time.</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">queueIdle</span><span class="params">()</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">resourceReferenceQueue = <span class="keyword">new</span> ReferenceQueue&lt;&gt;();</div><div class="line">MessageQueue queue = Looper.myQueue();</div><div class="line">queue.addIdleHandler(<span class="keyword">new</span> RefQueueIdleHandler(activeResources, resourceReferenceQueue));</div></pre></td></tr></table></figure>
+<p><code>RefQueueIdleHandler</code>实现了<code>MessageQueue.IdleHandler</code>接口，该接口有一个<code>queueIdle</code>方法，负责清除WeakReference被回收的activeResources资源。</p>
+<p>(4) <strong>load(<br>GlideContext glideContext,<br>Object model,<br>Key signature,<br>int width,<br>int height,<br>Class&lt;?&gt; resourceClass,<br>Class<r> transcodeClass,<br>Priority priority,<br>DiskCacheStrategy diskCacheStrategy,<br>Map<class<?>, Transformation&lt;?&gt;&gt; transformations,<br>boolean isTransformationRequired,<br>Options options,<br>boolean isMemoryCacheable,<br>ResourceCallback cb)</class<?></r></strong><br>真正的开始加载资源，看下面的流程图</p>
+<p><strong>load调用处理流程图：</strong><br>注：DecodeJob是整个任务的核心部分，在下面DecodeJob中有详细介绍，这里主要整个流程<br><img src="/img/glide_analysis/glide_preload_flow.jpg">  </p>
+<p>###4.2.4 EngineJob<br>调度DecodeJob，添加，移除资源回调，并notify回调    </p>
+<p>####主要方法<br><strong>(1)start(DecodeJob<r> decodeJob)</r></strong><br>调度一个DecodeJob任务  </p>
+<p><strong>(2) MainThreadCallback</strong><br>实现了Handler.Callback接口，用于Engine任务完成时回调主线程  </p>
+<p>###4.2.5  DecodeJob<br>实现了Runnable接口，调度任务的核心类，整个请求的繁重工作都在这里完成：处理来自缓存或者原始的资源，应用转换动画以及transcode。<br>负责根据缓存类型获取不同的Generator加载数据，数据加载成功后回调DecodeJob的onDataFetcherReady方法对资源进行处理</p>
+<p>####主要方法  </p>
+<p><strong>(1) runWrapped()</strong><br>根据不同的runReason执行不同的任务，共两种任务类型：</p>
+<ul>
+<li>runGenerators():load数据  </li>
+<li>decodeFromRetrievedData()：处理已经load到的数据</li>
+</ul>
+<p><strong>RunReason</strong><br>再次执行任务的原因，三种枚举值：  </p>
+<ul>
+<li>INITIALIZE:第一次调度任务</li>
+<li>WITCH_TO_SOURCE_SERVICE:本地缓存策略失败，尝试重新获取数据，两种情况；当stage为Stage.SOURCE，或者获取数据失败并且执行和回调发生在了不同的线程</li>
+<li>DECODE_DATA:获取数据成功，但执行和回调不在同一线程，希望回到自己的线程去处理数据</li>
+</ul>
+<p><strong>(2) getNextStage</strong><br>获取下一步执行的策略，一共5种策略：<br><code>INITIALIZE</code>，<code>RESOURCE_CACHE</code>，<code>DATA_CACHE</code>，<code>SOURCE</code>，<code>FINISHED</code>  </p>
+<p>其中加载数据的策略有三种：<br><code>RESOURCE_CACHE</code>，<code>DATA_CACHE</code>，<code>SOURCE</code>，<br>分别对应的Generator:  </p>
+<ul>
+<li><code>ResourceCacheGenerator</code>  ：尝试从修改过的资源缓存中获取，如果缓存未命中，尝试从DATA_CACHE中获取</li>
+<li><code>DataCacheGenerator</code>  尝试从未修改过的本地缓存中获取数据，如果缓存未命中则尝试从SourceGenerator中获取</li>
+<li><code>SourceGenerator</code>  从原始的资源中获取，可能是服务器，也可能是本地的一些原始资源</li>
+</ul>
+<p>策略的配置在DiskCacheStrategy。开发者可通过BaseRequestOptions设置：  </p>
+<ul>
+<li>ALL</li>
+<li>NONE</li>
+<li>DATA</li>
+<li>RESOURCE</li>
+<li>AUTOMATIC（默认方式，依赖于DataFetcher的数据源和ResourceEncoder的EncodeStrategy）</li>
+</ul>
+<p><strong>(3) getNextGenerator</strong><br>根据Stage获取到相应的Generator后会执行currentGenerator.startNext()，如果中途startNext返回true，则直接回调，否则最终会得到SOURCE的stage，重新调度任务</p>
+<p><strong>(4) startNext</strong><br>从当前策略对应的Generator获取数据，数据获取成功则回调DecodeJob的<code>onDataFetcherReady</code>对资源进行处理。否则尝试从下一个策略的Generator获取数据。</p>
+<p><strong>(5) reschedule</strong><br>重新调度当前任务  </p>
+<p><strong>(6) decodeFromRetrievedData</strong><br>获取数据成功后，进行处理，内部调用的是<code>runLoadPath(Data data, DataSource dataSource,LoadPath&lt;Data, ResourceType, R&gt; path)</code>    </p>
+<p><strong>(7) DecodeCallback.onResourceDecoded</strong><br>decode完成后的回调，对decode的资源进行transform<br>path.load(rewinder, options, width, height,<br>new DecodeCallback<resourcetype>(dataSource));</resourcetype></p>
+<p><strong>数据加载流程图</strong><br><img src="/img/glide_analysis/glide_load_flow.jpg">  </p>
+<p>####4.2.6  LoadPath<br>根据给定的数据类型的DataFetcher尝试获取数据，然后尝试通过一个或多个decodePath进行decode。  </p>
+<p>####4.2.7  DecodePath<br>根据指定的数据类型对resource进行decode和transcode</p>
+<p>####4.2.8 RequestTracker<br>追踪，取消，重启失败，正在处理或者已经完成的请求  </p>
+<p><strong>重要方法</strong>  </p>
+<p><strong>(1) resumeRequests</strong><br>重启所有未完成或者失败的请求，Activity/Fragment的生命周期<code>onStart</code>的时候，会触发RequestManager调用该方法 </p>
+<p><strong>(2) pauseRequests</strong><br>停止所有的请求，Activity/Fragment的生命周期<code>onStop</code>的时候，会触发RequestManager调用该方法。  </p>
+<p><strong>(3) clearRequests</strong><br>取消所有的请求并清理它们的资源,Activity/Fragment的生命周期<code>onDestory</code>的时候，会触发RequestManager调用该方法。  </p>
+<p><strong>(4) restartRequests</strong><br>重启失败的请求，取消并重新启动进行中的请求,网络重新连接的时候，会调用该方法重启请求。  </p>
+<p><strong>(5) clearRemoveAndRecycle</strong><br>停止追踪指定的请求，清理，回收相关资源。</p>
+<p>####4.2.9 TargetTracker<br>持有当前所有存活的Target，并触发Target相应的生命周期方法。方便开发者在整个请求过程的不同状态中进行回调，做相应的处理。  </p>
+<p>####4.2.10  RequestManager<br>核心类之一，用于Glide管理请求。<br>可通过Activity/Fragment/Connectivity（网络连接监听器）的生命周期方法进行stop,start和restart请求。</p>
+<p><strong>重要方法</strong><br><strong>(1) resumeRequests</strong><br>在onStart方法中调用，其实是通过requestTracker处理,同时也会调用<code>targetTracker.onStart();</code>回调Target相应周期方法。</p>
+<p><strong>(2) pauseRequests</strong><br>在onStop方法中调用，其实是通过requestTracker处理，同时也会调用<code>targetTracker.onStop();</code>回调Target相应周期方法  </p>
+<p><strong>(3) onDestroy</strong><br>调用<code>targetTracker.onDestroy();</code>，<code>requestTracker.clearRequests();</code>，<code>lifecycle.removeListener(this);</code>等进行资源清理。  </p>
+<p><strong>(4) resumeRequestsRecursive</strong><br>递归重启所有RequestManager下的所有request。在Glide中源码中没有用到，暴露给开发者的接口。</p>
+<p><strong>(5) pauseRequestsRecursive</strong><br>递归所有childFragments的RequestManager的<code>pauseRequest</code>方法。同样也只是暴露给开发者的接口。<br>childFragments表示那些依赖当前Activity或者Fragment的所有fragments   </p>
+<ul>
+<li>如果当前Context是Activity，那么依附它的所有fragments的请求都会中止  </li>
+<li>如果当前Context是Fragment，那么依附它的所有childFragment的请求都会中止  </li>
+<li>如果当前的Context是ApplicationContext，或者当前的Fragment处于detached状态，那么只有当前的RequestManager的请求会被中止</li>
+</ul>
+<p><strong>注意：</strong><br>在Android 4.2 AP17之前，如果当前的context是Fragment（当fragment的parent如果是activity，fragment.getParentFragment()直接返回null），那么它的childFragment的请求并不会被中止。原因是在4.2之前系统不允许获取parent fragment，因此不能确定其parentFragment。 但v4的support Fragment是可以的，因为v4包的Fragment对应的SupportRequestManagerFragment提供了一个parentFragmentHint，它相当于Fragment的ParentFragment。在RequestManagerRetriever.get(support.V4.Fragment fragment)的时候将参数fragment作为parentFragmentHint。 </p>
+<p><strong>(6) registerFragmentWithRoot</strong><br>获取Activity相应的RequestManagerFragment，并添加到Activity的事务当中去，同时将当前的Fragment添加到childRequestManagerFragments的HashSet集合中去，以便在<code>pauseRequestsRecursive</code>和<code>resumeRequestsRecursive</code>方法中调用<code>RequestManagerTreeNode.getDescendants()</code>的时候返回所有的childFragments。在RequestManagerFragment的<code>onAttach</code>方法以及<code>setParentFragmentHint</code>方法中调用。</p>
+<p><strong>(6) unregisterFragmentWithRoot</strong><br>对应上面的registerFragmentWithRoot方法，在RequestManagerFragment的onDetach，onDestroy或者重新register前将当前的fragment进行remove</p>
+<p>很重要的一个相关类:<code>RequestManagerFragment</code>。<br>当Glide.with(context)获取RequestManager的时候，Glide都会先尝试获取当前上下文相关的RequestManagerFragment。  </p>
+<p>RequestManagerFragment初始化时会创建一个ActivityFragmentLifecycle对象，并在创建自己的Request Manager的时候同时传入，这样ActivityFragmentLifecycle便成了它们之间的纽带。RequestManagerFragment生命周期方法触发的时候，就可以通过ActivityFragmentLifecycle同时触发RequestManager相应的方法，执行相应的操作。  </p>
+<p>Request Manager通过ActivityFragmentLifecycle的addListener方法注册一些LifecycleListener。当RequestManagerFragment生命周期方法执行的时候，触发ActivityFragmentLifecycle的相应方法，这些方法会遍历所有注册的LifecycleListener并执行相应生命周期方法。</p>
+<p>RequestManager注册的LifecycleListener类型</p>
+<ul>
+<li><p>RequestManager自身<br>RequestManager自己实现了LifecycleListener。主要的请求管理也是在这里处理的。</p>
+</li>
+<li><p>RequestManagerConnectivityListener，该listener也实现了LifecycleListener，用于网络连接时进行相应的请求恢复。 这里的请求是指那些还未完成的请求，已经完成的请求并不会重新发起。<br>另外Target接口也是直接继承自LifecycleListener，因此RequestManager在触发相应的生命周期方法的时候也会调用所有Target相应的生命周期方法，这样开发者可以监听资源处理的整个过程，在不同阶段进行相应的处理。</p>
+</li>
+</ul>
+<p>生命周期的管理主要由<code>RequestTracker</code>和<code>TargetTracker</code>处理。</p>
+<p><strong>生命周期事件的传递</strong><br><img src="/img/glide_analysis/glide_life_control.jpg">  </p>
+<p>####4.2.11 RequestManagerFragment<br>与当前上下文绑定的Fragment，统一管理当前上下文下的所有childFragment的请求。<br>每一个Context都会拥有一个RequestManagerFragment，在自身的Fragment生命周期方法中触发listener相应的生命周期方法。<br>复写了onLowMemory和onTrimMemory，低内存情况出现的时候，会调用RequestManager的相应方法进行内存清理。  </p>
+<p>释放的内存有：</p>
+<ul>
+<li>bitmapPool： </li>
+<li>memoryCache： </li>
+<li>byteArrayPool： </li>
+</ul>
+<p>####4.2.12 RequestManagerRetriever<br>提供一些静态方法，用语创建或者从Activity/Fragment获取RequestManager。<br>get(Activity activity)<br>get(android.app.Fragment fragment)<br>get(Activity activity)<br>get(FragmentActivity activity)<br>getSupportRequestManagerFragment</p>
+<p>####4.2.13 RequestManagerTreeNode<br>上文提到获取所有childRequestManagerFragments的RequestManager就是通过该类获得，就一个方法：getDescendants，作用就是基于给定的Context，获取所有层级相关的RequestManager。上下文层级由Activity或者Fragment获得，ApplicationContext的上下文不会提供RequestManager的层级关系，而且Application生命周期过长，所以Glide中对请求的控制只针对于Activity和Fragment。</p>
+<p>####4.2.14 LifecycleListener<br>用于监听Activity或者Fragment的生命周期方法的接口，基本上请求相关的所有类都实现了该接口</p>
+<ul>
+<li>void onStart();</li>
+<li>void onStop();</li>
+<li>void onDestroy();  </li>
+</ul>
+<p>####4.2.15 ActivityFragmentLifecycle<br>用于注册，同步所有监听了Activity或者Fragment的生命周期事件的listener的帮助类。  </p>
+<p>####4.2.16 DataFetcher<br>每一次通过ModelLoader加载资源的时候都会创建的实例。<br><code>loadData</code> ：异步方法，如果目标资源没有在缓存中找到时才会被调用,cancel方法也是。<br><code>cleanup</code>：清理或者回收DataFetcher使用的资源，在loadData提供的数据被decode完成后调用。</p>
+<p><strong>主要方法</strong><br><strong>(1) DataCallback</strong><br>用于数据加载结果的回调,三种Generator实现了该接口<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//数据load完成并且可用时回调</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">onDataReady</span><span class="params">(@Nullable T data)</span></span>;  </div><div class="line"><span class="comment">//数据load失败时回调</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">onLoadFailed</span><span class="params">(Exception e)</span></span>;</div></pre></td></tr></table></figure></p>
+<p><strong>(2) getDataClass()</strong><br>返回fetcher尝试获取的数据类型</p>
+<p><strong>(3) getDataSource()</strong><br>获取数据的来源</p>
+<p><strong>(4) DataSource</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public enum DataSource &#123;</div><div class="line">//数据从本地硬盘获取，也有可能通过一个已经从远程获取到数据的Content Provider</div><div class="line">LOCAL,</div><div class="line">//数据从远程获取</div><div class="line">REMOTE,</div><div class="line">//数据来自未修改过的硬盘缓存</div><div class="line">DATA_DISK_CACHE,</div><div class="line">//数据来自已经修改过的硬盘缓存</div><div class="line">RESOURCE_DISK_CACHE,</div><div class="line">//数据来自内存</div><div class="line">MEMORY_CACHE,</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>####4.2.17  DataFetcherGenerator<br>根据注册的ModelLoaders和model生成一系列的DataFetchers。</p>
+<p><strong>FetcherReadyCallback</strong><br>DecodeJob实现的接口，包含以下方法：<br><code>reschedule</code>：在Glide自己的线程上再次调用startNext<br>当Generator从DataFetcher完成loadData时回调，含有的方法：<br><code>onDataFetcherReady</code>：load完成<br><code>onDataFetcherFailed</code>：load失败  </p>
+<p>####4.2.18  Registry<br>管理组件（数据类型＋数据处理）的注册</p>
+<p><strong>主要成员变量</strong>  </p>
+<ul>
+<li>ModelLoaderRegistry ：注册所有数据加载的loader</li>
+<li>ResourceDecoderRegistry：注册所有资源转换的decoder  </li>
+<li>TranscoderRegistry：注册所有对decoder之后进行特殊处理的transcoder</li>
+<li>ResourceEncoderRegistry：注册所有持久化resource（处理过的资源）数据的encoder</li>
+<li>EncoderRegistry ： 注册所有的持久化原始数据的encoder</li>
+</ul>
+<p><strong>标准的数据处理流程：</strong><br><img src="/img/glide_analysis/glide_data_process_flow.jpg">  </p>
+<p>Glide在初始化的时候，通过Registry注册以下所有组件， 每种组件由功能及处理的资源类型组成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">组件</th>
+<th style="text-align:left">构成</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">loader</td>
+<td style="text-align:left">model＋data＋ModelLoaderFactory  </td>
+</tr>
+<tr>
+<td style="text-align:left">decoder</td>
+<td style="text-align:left">dataClass＋resourceClass＋decoder  </td>
+</tr>
+<tr>
+<td style="text-align:left">transcoder</td>
+<td style="text-align:left">resourceClass＋transcodeClass  </td>
+</tr>
+<tr>
+<td style="text-align:left">encoder</td>
+<td style="text-align:left">dataClass＋encoder  </td>
+</tr>
+<tr>
+<td style="text-align:left">resourceEncoder</td>
+<td style="text-align:left">resourceClass + encoder</td>
+</tr>
+<tr>
+<td style="text-align:left">rewind</td>
+<td style="text-align:left">缓冲区处理</td>
+</tr>
+</tbody>
+</table>
+<h2 id=""><a href="#" class="headerlink" title=" "></a> </h2><table>
+<thead>
+<tr>
+<th style="text-align:left">Decoder</th>
+<th style="text-align:left">数据源</th>
+<th style="text-align:left">解码后的资源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">BitmapDrawableDecoder</td>
+<td style="text-align:left">Bitmap</td>
+<td style="text-align:left">Drawable  </td>
+</tr>
+<tr>
+<td style="text-align:left">StreamBitmapDecoder</td>
+<td style="text-align:left">InputStream</td>
+<td style="text-align:left">Bitmap    </td>
+</tr>
+<tr>
+<td style="text-align:left">ByteBufferBitmapDecoder</td>
+<td style="text-align:left">ByteBuffer</td>
+<td style="text-align:left">Bitmap  </td>
+</tr>
+<tr>
+<td style="text-align:left">GifFrameResourceDecoder</td>
+<td style="text-align:left">GifDecoder</td>
+<td style="text-align:left">Bitmap  </td>
+</tr>
+<tr>
+<td style="text-align:left">StreamGifDecoder</td>
+<td style="text-align:left">InputStream</td>
+<td style="text-align:left">GifDrawable  </td>
+</tr>
+<tr>
+<td style="text-align:left">ByteBufferGifDecoder</td>
+<td style="text-align:left">ByteBuffer</td>
+<td style="text-align:left">Gif      </td>
+</tr>
+<tr>
+<td style="text-align:left">SvgDecoder</td>
+<td style="text-align:left">InputStream</td>
+<td style="text-align:left">SVG  </td>
+</tr>
+<tr>
+<td style="text-align:left">VideoBitmapDecoder</td>
+<td style="text-align:left">ParcelFileDescriptor</td>
+<td style="text-align:left">Bitmap  </td>
+</tr>
+<tr>
+<td style="text-align:left">FileDecoder</td>
+<td style="text-align:left">File</td>
+<td style="text-align:left">file    </td>
+</tr>
+</tbody>
+</table>
+<h2 id="-1"><a href="#-1" class="headerlink" title=" "></a> </h2><table>
+<thead>
+<tr>
+<th style="text-align:left">Transcoder</th>
+<th style="text-align:left">数据源</th>
+<th style="text-align:left">转换后的资源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">BitmapBytesTranscoder</td>
+<td style="text-align:left">Bitmap</td>
+<td style="text-align:left">Bytes  </td>
+</tr>
+<tr>
+<td style="text-align:left">BitmapDrawableTranscoder</td>
+<td style="text-align:left">Bitmap</td>
+<td style="text-align:left">Drawable    </td>
+</tr>
+<tr>
+<td style="text-align:left">GifDrawableBytesTranscoder</td>
+<td style="text-align:left">GifDrawable</td>
+<td style="text-align:left">Bytes  </td>
+</tr>
+<tr>
+<td style="text-align:left">SvgDrawableTranscoder</td>
+<td style="text-align:left">Svg</td>
+<td style="text-align:left">Drawable  </td>
+</tr>
+</tbody>
+</table>
+<p><code>decode＋transcode</code>的处理流程称为decodePath。<br>LoadPath是对decodePath的封装，持有一个decodePath的List。在通过modelloader.fetchData获取到data后，会对data进行decode，具体的decode操作就是通过loadPath来完成。resourceClass就是asBitmap，asDrawable方法的参数。  </p>
+<p><strong>ModelLoaderRegistry</strong><br>持有多个ModelLoader，model和数据类型按照优先级进行处理</p>
+<p>loader注册示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">registry  </div><div class="line">.append(Integer.class, InputStream.class, <span class="keyword">new</span> ResourceLoader.StreamFactory())</div><div class="line">.append(GifDecoder.class, GifDecoder.class, <span class="keyword">new</span> UnitModelLoader.Factory&lt;GifDecoder&gt;())</div></pre></td></tr></table></figure></p>
+<p><strong>主要函数</strong><br><strong>(1) register，append，prepend</strong><br>注册各种功能的组件</p>
+<p><strong>(2) getRegisteredResourceClasses(Class<model> modelClass, Class<tresource> resourceClass, Class<transcode> transcodeClass)</transcode></tresource></model></strong><br>获取Glide初始化时注册的所有resourceClass</p>
+<p><strong>(3) getModelLoaders(Model model)</strong>  </p>
+<p><strong>(4) hasLoadPath(Class&lt;?&gt; dataClass)</strong><br>判断注册的组件是否可以处理给定的dataClass  </p>
+<ul>
+<li>直接调用<code>getLoadPath(dataClass, resourceClass, transcodeClass)</code>  </li>
+<li>该方法先从loadPathCache缓存中尝试获取LoadPath,如果没有，则先根据dataClass, resourceClass, transcodeClass获取所有的decodePaths，如果decodePaths不为空，则创建一个<code>LoadPath&lt;&gt;(dataClass, resourceClass, transcodeClass, decodePaths,exceptionListPool)</code> 并缓存起来。</li>
+</ul>
+<p><strong>(5) getDecodePaths</strong><br>根据dataClass, resourceClass, transcodeClass从注册的组件中找到所有可以处理的组合decodePath。就是将满足条件的不同处理阶段（modelloader，decoder，transcoder）的组件组合在一起。满足处理条件的有可能是多个组合。因为decodePath的功能是进行decode和transcode，所以getDecodePath的目的就是要找到符合条件的decoder和transcoder然后创建DecodePath。  </p>
+<p>####4.2.19   ModelLoader<model, data=""></model,></p>
+<p>ModelLoader是一个工厂接口。将任意复杂的model转换为准确具体的可以被DataFetcher获取的数据类型。<br>每一个model内部实现了一个ModelLoaderFactory，内部实现就是将model转换为Data</p>
+<p><strong>重要成员</strong><br><code>LoadData&lt;Data&gt;</code><br>Key sourceKey，用于表明load数据的来源。<br>List<key> alternateKeys：指向相应的变更数据<br>DataFetcher<data> fetcher：用于获取不在缓存中的数据</data></key></p>
+<p><strong>重要方法</strong>  </p>
+<p><strong>(1) buildLoadData</strong><br>返回一个LoadData</p>
+<p><strong>(2) handles(Model model)</strong><br>判断给定的model是否可以被当前modelLoader处理</p>
+<p>####4.2.20  ModelLoaderFactory<br>根据给定的类型，创建不同的ModelLoader，因为它会被静态持有，所以不应该维持非应用生命周期的context或者对象。</p>
+<p>####4.2.21 DataFetcherGenerator<br>通过注册的DataLoader生成一系列的DataFetcher<br><code>DataCacheGenerator</code>：根据未修改的缓存数据生成DataFetcher<br><code>ResourceCacheGenerator</code>：根据已处理的缓存数据生成DataFetcher<br><code>SourceGenerator</code>：根据原始的数据和给定的model通过ModelLoader生成的DataFetcher  </p>
+<p>####4.2.22 DecodeHelper<br>getPriority<br>getDiskCache<br>getLoadPath<br>getModelLoaders<br>getWidth<br>getHeight</p>
+<h4 id="如何监测当前context的生命周期？"><a href="#如何监测当前context的生命周期？" class="headerlink" title="如何监测当前context的生命周期？"></a>如何监测当前context的生命周期？</h4><p>为当前的上下文Activity或者Fragment绑定一个TAG为”com.bumptech.glide.manager”的RequestManagerFragment，然后把该fragment作为rootRequestManagerFragment，并加入到当前上下文的FragmentTransaction事务中，从而与当前上下文Activity或者Fragment的生命周期保持一致。</p>
+<p>关键就是<code>RequestManagerFragment</code>，用于绑定当前上下文以及同步生命周期。比如当前的context为activity，那么activity对应的RequestManagerFragment就与宿主activity的生命周期绑定了。同样Fragment对应的RequestManagerFragment的生命周期也与宿主Fragment保持一致。</p>
+<p>####五 请求管理的实现<br><code>pauseRequests</code>，<code>resumeRequests</code><br>在RequestManagerFragment对应Request Manager的生命周期方法中触发，</p>
+<p>#####5.1 如何控制当前上下文的所有ChildFragment的请求？<br><strong>情景：</strong><br>假设当前上下文是Activity（Fragment类似）创建了多个Fragment，每个Fragment通过Glide.with(fragment.this)方式加载图片<br><img src="/img/glide_analysis/glide_life_control_theory.jpg">  </p>
+<ul>
+<li>首先Glide会为Activity以及每一个Fragment创建一个RequestManagerFragment（原因看下面）并提交到当前上下文的事务中。<br>以上保证了每个Fragment以及对应的RequestManagerFragment生命周期是与Activity的生命周期绑定的。  </li>
+<li>在RequestManagerFragment的onAttach方法中通过Glide.with(activity.this)先获得Activity（宿主）的<code>RequestManagerFragment</code>(rootRequestManagerFragment)，并将每个Fragment相应的RequestManagerFragment添加到childRequestManagerFragments集合中。  </li>
+<li>Activity通过自己的RequestManager的childRequestManagerFragments获取所有childFragment的RequestManager，然后对请求进行pause，resume。</li>
+</ul>
+<p>同理，如果当前context是Fragment，Fragment对应的RequestManagerFragment可以获取它自己所有的Child Fragment的RequestManagerFragment。</p>
+<p>#####5.2 如何管理没有ChildFragment的请求？<br>很简单，只会存在当前context自己的RequestManagerFragment，那么伴随当前上下文的生命周期触发，会调用RequestManagerFragment的RequestManager相应的lefecycle方法实现请求的控制，资源回收。</p>
+<p>#####5.3 为何每一个上下文会创建自己的RequestManagerFragment ？<br>因为<code>RequestManagerRetriever.getSupportRequestManagerFragment(fm)</code>是通过FragmentManager来获取的</p>
+<ul>
+<li>如果传入到Glide.with(…)的context是activity<br><code>fm = activity.getSupportFragmentManager();</code>  </li>
+<li>如果传入到Glide.with(…)的context是Fragment<br><code>fm = fragment.getChildFragmentManager();</code></li>
+</ul>
+<p>因为上下文不同导致得到的fm不同，从而<code>RequestManagerRetriever.getSupportRequestManagerFragment(fm)</code>方法返回的RequestManagerFrament不同。而且如果一个activity下面有多个Fragment，并以Glide.with(fragment.this)的方式加载图片。那么每个Fragment都会为自己创建一个fm相关的RequestManagerFragment。</p>
+<p>关键在于每一个上下文拥有一个自己的RequestManagerFragment。而传入的context不同，会返回不同的RequestManagerFragment，顶层上下文会保存所有的childRequestManagerFragments。</p>
+<p>###六. 杂谈<br>Glide优点在于其生命周期的管理，资源类型的支持多。但相对于简洁的UniversalImageLoader和Picasso，无论从设计上还是细节实现上，都复杂的多，从代码的实现上可以看出，正式因为Glide的生命周期管理，内存友好，资源类型支持多这些优点相关。一些设计概念很少碰到，比如decodePath，loadpath。整个数据处理流程的拆分三个部分，每个部分所支持的数据以及处理方式全部通过组件注册的方式来支持，很多方法或者构造函数会接收10多个参数，看着着实眼花缭乱。这里的分析把大体的功能模块分析了，比如请求的统一管理，生命周期的同步，具体的实现细节还需要一部分的工作量。对于开源项目的初学者来说，Glide并不是一个好的项目，门槛太高。也因为如此，所以Glide的使用并没有其它几种图片库的使用那么广泛，相关文档很欠缺，本篇分析希望成为一个很好的参考，也希望大家提出自己的建议和意见，继续优化，让更多开发者能更快了解，使用这个强大的库。</p>
+<p>###参考文档<br><a href="http://mp.weixin.qq.com/s?__biz=MzAxNjI3MDkzOQ==&amp;mid=400056342&amp;idx=1&amp;sn=894325d70f16a28bfe8d6a4da31ec304&amp;scene=2&amp;srcid=10210byVbMGLHg7vXUJLgHaR&amp;from=timeline&amp;isappinstalled=0#rd" target="_blank" rel="external">开源选型之 Android 三大图片缓存原理、特性对比</a><br><a href="http://inthecheesefactory.com/blog/get-to-know-glide-recommended-by-google/en" target="_blank" rel="external">get-to-know-glide-recommended-by-google</a><br><a href="http://stackoverflow.com/questions/29363321/picasso-v-s-imageloader-v-s-fresco-vs-glide" target="_blank" rel="external">picasso-vs-imageloader-vs-fresco-vs-glide</a><br><a href="https://plus.google.com/+HugoVisser/posts/Rra8mrU1pCx" target="_blank" rel="external">https://plus.google.com/+HugoVisser/posts/Rra8mrU1pCx</a><br><a href="http://blog.csdn.net/fancylovejava/article/details/44747759" target="_blank" rel="external">http://blog.csdn.net/fancylovejava/article/details/44747759</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/优秀项目原理解析/"> #优秀项目原理解析 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/11/29/translate-be-reactive/">译文Be Reactive</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/01/mat_usage/">MAT - Memory Analyzer Tool 使用进阶</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/10/12/glide_source_analysis/"
+               data-title="Glide源码分析" data-url="http://www.lightskystreet.com/2015/10/12/glide_source_analysis/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-1"><span class="nav-number">2.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何监测当前context的生命周期？"><span class="nav-number">2.0.1.</span> <span class="nav-text">如何监测当前context的生命周期？</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

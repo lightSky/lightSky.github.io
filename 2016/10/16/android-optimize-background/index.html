@@ -1,0 +1,998 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，性能优化," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Android性能优化-App后台优化 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Android性能优化-App后台优化
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-10-15
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/性能优化/">性能优化</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/10/16/android-optimize-background/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/16/android-optimize-background/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>原文链接 <a href="https://developer.android.com/topic/performance/background-optimization.html" target="_blank" rel="external">Background Optimizations</a></p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>后台进程是内存和电池敏感的。一个隐式的broadcast可能会启动很多监听它的后台进程，即使这些进程可能做得工作不多。这可能丢设备性能和用户体验都有比较大的影响。</p>
+<p>为了缓解这种问题，7.0（API 24）做了以下限制：</p>
+<ul>
+<li>Target为 Android 7.0 (API level 24)的App，将不会再收到在mainfest中注册的 <code>CONNECTIVITY_ACTION</code>广播。运行中的App仍然可以在Main Thread中通过<code>Context.registerReceiver()</code>注册 <code>CONNECTIVITY_CHANGE</code> 广播来监听</li>
+</ul>
+<ul>
+<li>App 将不能够发送或者接收  <code>ACTION_NEW_PICTURE</code> or <code>ACTION_NEW_VIDEO</code>。这种优化会影响到所有的app，不仅是target为Android7.0的设备。`</li>
+</ul>
+<p>因此如果你使用了这些intennt，应该尽快的移除对它们的依赖，以便你的app可以在Target为Android 7.0的设备上正常运行。Android框架提供了几种解决方案去减小对这些隐式广播的依赖。比如，<code>JobScheduler</code> and <code>GcmNetworkManager</code>提供了强健的机制去调度特定情况下的网络操作。比如，你也可以使用<a href="https://developer.android.com/reference/android/app/job/JobScheduler.html" target="_blank" rel="external">JobScheduler</a>去响应content provider的变化。<code>JobInfo</code>对象封装了<code>JobScheduler</code>用于调度job的参数。当满足指定的条件的时候，系统会通<a href="https://developer.android.com/reference/android/app/job/JobService.html" target="_blank" rel="external">JobService</a>过执行该job。</p>
+<p>这篇文章将会告诉你如何使用替代的方法，比如JobScheduler去为你的app做这些限制的适配。</p>
+<h2 id="一-CONNECTIVITY-ACTION的限制"><a href="#一-CONNECTIVITY-ACTION的限制" class="headerlink" title="一 CONNECTIVITY_ACTION的限制"></a>一 CONNECTIVITY_ACTION的限制</h2><p>上面提到，Android 7.0 (API level 24) 将不再能够收到mainfest中注册的 <code>CONNECTIVITY_ACTION</code> 广播。Android框架中已经提供了几种替代方案，如何选择依赖于你的具体实现。</p>
+<p><strong>注意：</strong>一个通过 <code>Context.registerReceiver()</code>注册的<a href="https://developer.android.com/reference/android/content/BroadcastReceiver.html" target="_blank" rel="external">BroadcastReceiver</a> 在app运行期间是可以继续收到广播的。</p>
+<a id="more"></a>
+<h3 id="在不可预测的网络的情况下调度Network-Jobs"><a href="#在不可预测的网络的情况下调度Network-Jobs" class="headerlink" title="在不可预测的网络的情况下调度Network Jobs"></a>在不可预测的网络的情况下调度Network Jobs</h3><p>当使用 <code>JobInfo.Builder</code> 类构建 <code>JobInfo</code>对象的时候, 通过 <code>setRequiredNetworkType()</code> 方法并传递<code>JobInfo.NETWORK_TYPE_UNMETERED</code>参数。下面的示例代码演示了当设备连接到一个未知的网络并且是在充电的时候，去调度一个service去执行的情景：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public static final int MY_BACKGROUND_JOB = 0;</div><div class="line">...</div><div class="line">public static void scheduleJob(Context context) &#123;</div><div class="line">  JobScheduler js =</div><div class="line">      (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);</div><div class="line">  JobInfo job = new JobInfo.Builder(</div><div class="line">    MY_BACKGROUND_JOB,</div><div class="line">    new ComponentName(context, MyJobService.class))</div><div class="line">      .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)</div><div class="line">      .setRequiresCharging(true)</div><div class="line">      .build();</div><div class="line">  js.schedule(job);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当以上条件满足的时候，app就会收到一个回调去执行指定的<code>JobService.class</code>中的<code>onStartJob()</code>方法，更多 <code>JobScheduler</code>实例可参考 <a href="https://developer.android.com/samples/JobScheduler/index.html" target="_blank" rel="external">JobScheduler sample app</a>.</p>
+<p>使用GMSCore service的应用，并且target是5.0或者以下的，可以使用 <a href="https://developers.google.com/android/reference/com/google/android/gms/gcm/GcmNetworkManager" target="_blank" rel="external"><code>GcmNetworkManager</code></a> 并指定 <code>Task.NETWORK_STATE_UNMETERED。</code></p>
+<h3 id="在APP运行期间监测网络连接"><a href="#在APP运行期间监测网络连接" class="headerlink" title="在APP运行期间监测网络连接"></a>在APP运行期间监测网络连接</h3><p>运行期间的App仍然可以监听<code>CONNECTIVITY_CHANGE</code> ，但是， <code>ConnectivityManager</code> 提供了更多强大的方法在特定网络条件满足的时候去触发一个回调。</p>
+<p><a href="https://developer.android.com/reference/android/net/NetworkRequest.html" target="_blank" rel="external"><code>NetworkRequest</code></a>对象定义了<a href="https://developer.android.com/reference/android/net/NetworkRequest.html" target="_blank" rel="external"><code>NetworkCapabilities</code></a>相关网络回调的参数，你可以通过<code>NetworkRequest.Builder</code>类构建<code>NetworkRequest对象，</code>registerNetworkCallback()<code>，然后将NetworkRequest</code>传递对象到系统中去。当网络条件满足的时候，app就会受到一个回调去执行定义在 <code>ConnectivityManager.NetworkCallback</code>中的 <code>onAvailable()</code>方法。</p>
+<p>App会一直接收注册的回调，除非app退出或者调用<code>unregisterNetworkCallback()</code>方法。</p>
+<h2 id="二-NEW-PICTURE-和-NEW-VIDEO-的限制"><a href="#二-NEW-PICTURE-和-NEW-VIDEO-的限制" class="headerlink" title="二 NEW_PICTURE 和 NEW_VIDEO 的限制"></a>二 NEW_PICTURE 和 NEW_VIDEO 的限制</h2><p>Android 7.0 (API level 24),中，app将不能够发送和接收这两个广播。当几个不同的app必须唤醒设备去处理一个新的Image或者video的时候，这样的限制可以改善性能和用户体验的影响。Android 7.0 (API level 24) 扩展了 <code>JobInfo</code> 和 <code>JobParameters</code>来提供一种替代方案。</p>
+<h3 id="新的JobInfo方法"><a href="#新的JobInfo方法" class="headerlink" title="新的JobInfo方法"></a>新的JobInfo方法</h3><p>为了让content URI的变化去触发job，Android 7.0 (API level 24)扩展了<a href="https://developer.android.com/reference/android/app/job/JobInfo.html" target="_blank" rel="external"> <code>JobInfo</code> </a>的以下方法：</p>
+<ul>
+<li><code>JobInfo.TriggerContentUri()</code></li>
+</ul>
+<p>​    封装了contentn URL变化需要的参数</p>
+<ul>
+<li><p><code>JobInfo.Builder.addTriggerContentUri()</code></p>
+<p>   传递一个 <code>TriggerContentUri</code> 对象给<code>JobInfo</code>。一个<code>ContentObserver</code> 监测器封装的content URI。如果这里有多个<code>TriggerContentUri</code> 对象关联到某个job上，只要其中某个URI变化，系统都会触发回调事件。</p>
+</li>
+</ul>
+<p><code>TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS</code> 标志在任何给定URI的子集有变化的时候，都会触发job。该标志对应于传递给<code>registerContentObserver()</code>的<code>notifyForDescendants</code>参数。</p>
+<p><strong>注意:</strong> <code>TriggerContentUri()</code> cannot be used in combination with <code>setPeriodic()</code> or <code>setPersisted()</code>. To continually monitor for content changes, schedule a new <code>JobInfo</code> before the app’s <code>JobService</code> finishes handling the most recent callback.</p>
+<p><strong>注意</strong>：<code>TriggerContentUri()</code> 不能够和 <code>setPeriodic()</code> 或者 <code>setPersisted()</code>一起使用。为了持续地监测content 的变化，可以在<code>JobService</code> 处理完最近的回调之前去调度一个新的JobInfo。</p>
+<p>下面的代码演示了当系统上报一个MEDIA_URI contentURI的时候，调度一个job的场景：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public static final int MY_BACKGROUND_JOB = 0;</div><div class="line">...</div><div class="line">public static void scheduleJob(Context context) &#123;</div><div class="line">  JobScheduler js =</div><div class="line">          (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);</div><div class="line">  JobInfo.Builder builder = new JobInfo.Builder(</div><div class="line">          MY_BACKGROUND_JOB,</div><div class="line">          new ComponentName(context, MediaContentJob.class));</div><div class="line">  builder.addTriggerContentUri(</div><div class="line">          new JobInfo.TriggerContentUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,</div><div class="line">          JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS));</div><div class="line">  js.schedule(builder.build());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当系统上报指定的conent URI(s)，你的app会收到一个回调和一个传递给<code>onStartJob()</code>方法（ 在<code>MediaContentJob.class</code>中）的 <code>JobParameters</code> 对象。</p>
+<h3 id="新的JobParameter方法"><a href="#新的JobParameter方法" class="headerlink" title="新的JobParameter方法"></a><strong>新的JobParameter方法</strong></h3><p>Android 7.0 (API level 24)也扩展了<code>JobParameters</code>允许app接收有用的信息，该信息包含了具体是哪些content authorities 和 URIs 触发了job。</p>
+<ul>
+<li><code>Uri[] getTriggeredContentUris()</code></li>
+</ul>
+<p>返回一个触发了该Job的URIs数组。如果没有URIs触发job，或者URIs的数量大于50，那么该数组将为null（有可能job是由于其它原因触发，比如一个deadline）。</p>
+<ul>
+<li><code>String[] getTriggeredContentAuthorities()</code></li>
+</ul>
+<p>Returns a string array of content authorities that have triggered the job. If the returned array is not <code>null</code>, use <code>getTriggeredContentUris()</code> to retrieve the details of which URIs have changed.</p>
+<p>The following sample code overrides the <code>JobService.onStartJob()</code> method and records the content authorities and URIs that have triggered the job:</p>
+<p>返回一个触发了该Job的content authorities数组。如果返回的数组不为null，可以使用 <code>getTriggeredContentUris()</code>方法获取URIs变化的具体信息。</p>
+<p>下面的代码复写了 <code>JobService.onStartJob()</code> 方法，并且记录了触发job的 content authorities 和URIs ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">publicboolean onStartJob(JobParametersparams)&#123;</div><div class="line">  StringBuilder sb =newStringBuilder();</div><div class="line">  sb.append(&quot;Media content has changed:\n&quot;);</div><div class="line">  if(params.getTriggeredContentAuthorities()!=null)&#123;</div><div class="line">      sb.append(&quot;Authorities: &quot;);</div><div class="line">      boolean first =true;</div><div class="line">      for(String auth :</div><div class="line">          params.getTriggeredContentAuthorities())&#123;</div><div class="line">          if(first)&#123;</div><div class="line">              first =false;</div><div class="line">          &#125;else&#123;</div><div class="line">             sb.append(&quot;, &quot;);</div><div class="line">          &#125;</div><div class="line">           sb.append(auth);</div><div class="line">      &#125;</div><div class="line">      if(params.getTriggeredContentUris()!=null)&#123;</div><div class="line">          for(Uri uri :params.getTriggeredContentUris())&#123;</div><div class="line">              sb.append(&quot;\n&quot;);</div><div class="line">              sb.append(uri);</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line">  &#125;else&#123;</div><div class="line">      sb.append(&quot;(No content)&quot;);</div><div class="line">  &#125;</div><div class="line">  Log.i(TAG, sb.toString());</div><div class="line">  returntrue;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="三-Further-Optimizing-Your-App"><a href="#三-Further-Optimizing-Your-App" class="headerlink" title="三 Further Optimizing Your App"></a>三 Further Optimizing Your App</h2><p>为低内存设备或者在低内存条件做优化，可以提升系能和用户体验。移除对后台的service的依赖和静态方式注册的隐式广播，可以帮助你的app在这样的设备上运行的更好。尽管7.0上采取了一些措施减少了这些问题，但还是建议去优化app，即使在完全没有使用后台进程的情况也可以正常运行。</p>
+<p>Android 7.0 (API level 24)引入了一些 <a href="https://developer.android.com/tools/help/adb.html" target="_blank" rel="external">Android Debug Bridge (ADB)</a> 命令，可以帮助你测试app在禁止后台进程的情况下app的行为：</p>
+<ul>
+<li><p>模拟隐式广播和后台service不可用的情况，可以使用下面的命令</p>
+<p><code>$ adb shell cmd appops set  RUN_IN_BACKGROUND ignore</code></p>
+</li>
+<li><p>重新开启隐式广播和后台service</p>
+<p><code>$ adb shell cmd appops set  RUN_IN_BACKGROUND allow</code></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，性能优化/"> #Android，性能优化 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/17/android-optimize-apk/">Android性能优化-减小APK大小</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/16/android-optimize-memory/">Android性能优化-内存优化</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/10/16/android-optimize-background/"
+               data-title="Android性能优化-App后台优化" data-url="http://www.lightskystreet.com/2016/10/16/android-optimize-background/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一-CONNECTIVITY-ACTION的限制"><span class="nav-number"></span> <span class="nav-text">一 CONNECTIVITY_ACTION的限制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在不可预测的网络的情况下调度Network-Jobs"><span class="nav-number">1.</span> <span class="nav-text">在不可预测的网络的情况下调度Network Jobs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在APP运行期间监测网络连接"><span class="nav-number">2.</span> <span class="nav-text">在APP运行期间监测网络连接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-NEW-PICTURE-和-NEW-VIDEO-的限制"><span class="nav-number"></span> <span class="nav-text">二 NEW_PICTURE 和 NEW_VIDEO 的限制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新的JobInfo方法"><span class="nav-number">1.</span> <span class="nav-text">新的JobInfo方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新的JobParameter方法"><span class="nav-number">2.</span> <span class="nav-text">新的JobParameter方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-Further-Optimizing-Your-App"><span class="nav-number"></span> <span class="nav-text">三 Further Optimizing Your App</span></a></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

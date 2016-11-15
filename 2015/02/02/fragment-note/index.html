@@ -1,0 +1,996 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，性能优化," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Fragment笔记整理 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Fragment笔记整理
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-02-01
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/性能优化/">性能优化</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/02/02/fragment-note/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/02/02/fragment-note/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>#前言#<br>一直在用Fragment，但是没有系统的整理过，Google了一下相关文章，看到了几篇，将几篇还不错的文章重点整理了下，很多是直接Copy的，只为做个笔记，以后翻来看比较方便，建议大家看一下下面几篇，相信会有一些收获的。<br><a id="more"></a></p>
+<p>Android Fragment 真正的完全解析（上）<br><a href="http://blog.csdn.net/lmj623565791/article/details/37970961" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/37970961</a><br>Android Fragment 真正的完全解析（下）<br><a href="http://blog.csdn.net/lmj623565791/article/details/37992017" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/37992017</a></p>
+<p>Android Fragment 你应该知道的一切<br><a href="http://blog.csdn.net/lmj623565791/article/details/42628537" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/42628537</a></p>
+<p>Android 屏幕旋转 处理 AsyncTask 和 ProgressDialog 的最佳方案<br><a href="http://blog.csdn.net/lmj623565791/article/details/37936275" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/37936275</a></p>
+<p>#Fragment出现的缘由#<br>不同大小屏幕的手机、平板、以及TV要展示统一的界面，但是由于屏幕大小不同，布局展示上就会有差异，但是又不想写多套布局，Fragment便诞生了。比如在手机上，先展示列表内容，点击后，再进入详情，而在平板或者电视上，因为屏幕足够大，那么就要充分利用屏幕，可以左侧展示列表，右侧实时的展示详情。比如Activity上面提到的列表和详情，手机和平板上的详情直接加载一个Fragment就可以了，不要再为平板单独写一套代码，达到了代码复用的效果。</p>
+<p>#生命周期#</p>
+<p>关于Activity与Fragment的完整声明周期以及交互，你可以在<a href="https://github.com/xxv/android-lifecycle" target="_blank" rel="external">android-lifecycle</a> 中看到，由于图片太大，这里就不展示了，建议大家都看一下。</p>
+<p>#生命周期方法介绍#<br>因为Fragment是依赖与Activity的。所以会有onAttach，和onDetach,onActivityCreate.这样的和Activity相关的方法。另外Fragment也有自己的创建和销毁视图的方法：onCreateView和onDestoryView。</p>
+<p>Create阶段：<br>    onAttach，onCreate，onCreateView，onActivityCreated</p>
+<p>Destory阶段：<br>    onDestroyView，onDestory,onDettach.</p>
+<p>Create的时候多了一个onActivityCreated的回调，Activity创建完成的回调。</p>
+<p>onAttached()<br>    当fragment被加入到activity时调用（在这个方法中可以获得所在的activity）</p>
+<p>onCreateView()<br>当activity要得到fragment的layout时，调用此方法，fragment在其中创建自己的layout(界面)。</p>
+<p>onActivityCreated()<br>当activity的onCreated()方法返回后调用此方法</p>
+<p>onDestroyView()<br>当fragment中的视图被移除的时候，调用这个方法。</p>
+<p>onDetach()<br>     当fragment和activity分离的时候，调用这个方法。</p>
+<p>一旦activity进入resumed状态（也就是running状态），fragment的生命周期才能独<br>立的运转，才可以自由地添加和删除fragment了。其它时候是依赖于activity的生命周期变化的。</p>
+<p>#创建Fragment的两种方式#</p>
+<p>##XML布局中使用<fragment>标签##<br>不能移除，而且这种方式在Activity创建的时候，就被创建出来了，灵活性差，仅仅作为简单的视图展示可以。</fragment></p>
+<p>##代码动态添加##<br>可以实现不同Fragment之间的切换：FragmentManager实现activity运行时对fragment进行添加，移除，和替换。推荐的方式，可控性高，方便处理不同屏幕的适配。但布局中必须有一个视图容器去存放fragment。</p>
+<p>#FragmentTransaction的方法#<br>FragmentTransaction transaction = fm.benginTransatcion();//开启一个事务<br><strong>transaction.add()</strong><br>往Activity中添加一个Fragment<br><strong>transaction.remove()</strong><br>从Activity中移除一个Fragment，如果被移除的Fragment没有添加到回退栈（回退栈后面会详细说），这个Fragment实例将会被销毁。<br><strong>transaction.replace()</strong><br>使用另一个Fragment替换当前的，实际上就是remove()然后add()的合体~<br><strong>transaction.hide()</strong><br>隐藏当前的Fragment，仅仅是设为不可见，并不会销毁<br><strong>transaction.show()</strong><br>显示之前隐藏的Fragment<br><strong>detach()</strong><br>将此Fragment从Activity中分离，会销毁其布局，但不会销毁该实例<br><strong>attach()</strong><br>将从Activity中分离的Fragment，重新关联到该Activity，重新创建其视图层次<br><strong>transatcion.commit()</strong><br>提交一个事务</p>
+<p>在一个事务开启到提交可以进行多个的添加、移除、替换等操作。</p>
+<p>#正确使用API#<br>a、当切换到Fragment时，如果希望切回来后数据和面板状态仍然存在，可以使用hide和show，当然了不要使劲在那new实例，进行下非null判断。</p>
+<p>b、不希望保留用户操作，你可以使用remove()，然后add()；或者使用replace()这个和remove,add是相同的效果。</p>
+<p>c、remove和detach有一点细微的区别，在不考虑回退栈的情况下，remove会销毁整个Fragment实例，而detach则只是销毁其视图结构，实例并不会被销毁。那么二者怎么取舍使用呢？如果你的当前Activity一直存在，那么在不希望保留用户操作的时候，你可以优先使用detach。</p>
+<p>#管理Fragment回退栈#</p>
+<p>通过FragmentManager对象和FragmentTransaction来进行事物管理。你也可以将Fragment压入堆栈，这样按返回键的时候可以回退到上一个Fragment。<br>调用add()方法即可添加一个fragment。 你可以对activity使用同一个FragmentTransaction对象去执行多个fragment事务，当你确定要做这些操作时，你必须调用commint()方法。<br>通过replace方法来替换一个Fragment。如果你希望让用户可以通过fragment事务“后退”，需要在提交fragment事务之前调用 addToBackStack()方法。</p>
+<p>注意：<br>如果当你移除或者替换fragment时将事务添加到堆栈中（允许用户撤销或后退），那么被移除的fragment就被停止了(没有消亡，但视图已经销毁了)，如果用户导航回来重新加载这个fragment，它将会重新启动，视图也会重新创建，如果你没有把事务加入到堆栈中，当fragment被删除或者替换时，这个fragment也就消亡了。</p>
+<p>调用tx.addToBackStack(null);将当前的事务添加到了回退栈，所以Fragment实例不会被销毁，但是视图层次依然会被销毁，即会调用onDestoryView和onCreateView.<br>replace是remove和add的合体，如果使用了replace并且没有将之前的Fragment添加到回退栈，那么该Fragment实例会被销毁。<br>类似与Android系统为Activity维护一个任务栈，我们也可以通过Activity维护一个回退栈来保存每次Fragment事务发生的变化。如果你将Fragment任务添加到回退栈，当用户点击后退按钮时，将看到上一次的保存的Fragment。一旦Fragment完全从后退栈中弹出，用户再次点击后退键，则退出当前Activity。</p>
+<p>#Fragment与Activity的交互#</p>
+<p>Activity直接影响它所包含的fragment的生命周期，所以对activity的某个生命周期方法的调用也会产生对fragment相同方法的调用。<br>例如：当activity的onPause()方法被调用时，它所包含的所有的fragment们的onPause()方法都会被调用。</p>
+<p>为了重用Fragment UI组件，你应该将Fragment建立成完全独立。一旦你定义了这些可重用的Fragment， 你可以通过activity，使它们关联以及交互，Fragment之间的交互也应该通过Activity统一管理，各个Fragment之间应该保持独立。</p>
+<p>#Activity 与 Fragment交互的实现方式#<br>a、如果你Activity中包含自己管理的Fragment的引用，可以通过引用直接访问所有的Fragment的public方法</p>
+<p>b、如果Activity中未保存任何Fragment的引用，那么没关系，每个Fragment都有一个唯一的TAG或者ID,可以通过getFragmentManager.findFragmentByTag()或者findFragmentById()获得任何Fragment实例，然后进行操作。</p>
+<p>c、（推荐）在Fragment中定义回调接口listener，由Activity实现，然后在Fragment的onAttach获取到该Activity强转为listener，之后进行一些操作。<br>这种方式是一种比较官方的做法，Android官方文档的举例就是这样的方式，而且在AndroidStudio中创建一个FragmentActivity的时候，会为你写好这些回调，也说明官方推荐这种方式。</p>
+<p>#如何处理运行时配置发生变化#</p>
+<p>当屏幕旋转或者当你的应用被至于后台（例如用户点击了home），长时间没有返回的时候，你的应用也会被重新启动。这样会导致Fragment的重复创建，导致Fragment重叠的问题。</p>
+<p>##解决Fragment的重复创建##<br>在Activity的onCreate方法中对saveInstanceState进行判断，如果saveInstaceState==null时，再进行Fragment创建。现在无论进行多次旋转都只会有一个Fragment实例在Activity中。</p>
+<p>  if(savedInstanceState == null)<br>        {<br>            mFOne = new FragmentOne();<br>            FragmentManager fm = getFragmentManager();<br>            FragmentTransaction tx = fm.beginTransaction();<br>            tx.add(R.id.id_content, mFOne, “ONE”);<br>            tx.commit();<br>        }</p>
+<p>##解决Fragment重叠的问题##<br><a href="https://typeblog.net/tech/2014/08/22/fix-duplicate-menu.html" target="_blank" rel="external">https://typeblog.net/tech/2014/08/22/fix-duplicate-menu.html</a><br>在Activity中复写onSaveIndstanceState方法然后注释掉super.onSaveInstanceState()<br>这种方式不保存之前的Fragment状态，因此不会重叠。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onSaveInstanceState</span><span class="params">(Bundle bundle)</span> </span>&#123;</div><div class="line">    <span class="comment">// do not call super.onSaveInstanceState()</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>##如果Fragment发生重建，如何保持原本的数据？##<br>和Activity类似，Fragment也有onSaveInstanceState的方法，在此方法中进行保存数据，然后在onCreate或者onCreateView或者onActivityCreated进行恢复都可以。</p>
+<p>#Fragment状态的恢复#</p>
+<p>##a、onSaveInstanceState()和onRestoreInstanceState()##<br>少量数据，可以通过onSaveInstanceState()和onRestoreInstanceState()进行保存与恢复。<br>Android会在销毁你的Activity之前调用onSaveInstanceState()方法，于是，你可以在此方法中存储关于应用状态的数据。然后你可以在onCreate()或onRestoreInstanceState()方法中恢复</p>
+<p>##b、Fragment##<br>大量数据，使用Fragment保持需要恢复的对象</p>
+<p>##c、自已处理配置变化##<br>注:getLastNonConfigurationInstance()已经被弃用，被上述方法二替代。</p>
+<p>##使用Fragment来保存对象、恢复数据##<br>如果重新启动你的Activity需要恢复大量的数据，重新建立网络连接，或者执行其他的密集型操作，这样完全重新启动可能会是一个慢的用户体验。并且，使用系统提供的onSaveIntanceState()的回调中，使用Bundle来完全恢复你Activity的状态是可能是不现实的（Bundle不是设计用来携带大量数据的（例如bitmap），并且Bundle中的数据必须能够被序列化和反序列化），这样会消耗大量的内存和导致配置变化缓慢。<br>在这样的情况下，当你的Activity因为配置发生改变而重启，你可以通过保持一个Fragment来缓解重新启动带来的负担。这个Fragment可以包含你想要保持的有状态的对象的引用。<br>在屏幕旋转后，可以使用Lru缓存来存储Fragment中的图片，然后可以快速的从内存中读取。当Android系统因为配置变化关闭你的Activity的时候，你的Activity中被标识保持的fragments不会被销毁。你可以在你的Activity中添加这样的fragements来保存有状态的对象。</p>
+<p>在运行时配置发生变化时，在Fragment中保存有状态的对象<br>a) 继承Fragment，声明引用指向你的有状态的对象<br>b) 当Fragment创建时调用setRetainInstance(boolean)<br>c) 把Fragment实例添加到Activity中<br>d) 当Activity重新启动后，使用FragmentManager对Fragment进行恢复</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setData</span><span class="params">(Object data)</span>  </span>&#123;  </div><div class="line">       <span class="keyword">this</span>.data = data;  </div><div class="line">&#125;  </div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getData</span><span class="params">()</span></span>&#123;  </div><div class="line">       <span class="keyword">return</span> data;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在Fragment的onDestroy方法中为Fragment调用setData设置数据。然后在Activity重新创建时获取到该Fragment实例，调用getData()方法，获取到保存的数据。进行视图填充。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FragmentRetainDataActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span></span>&#123;  </div><div class="line">  </div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"FragmentRetainDataActivity"</span>;  </div><div class="line">    <span class="keyword">private</span> RetainedFragment dataFragment;  </div><div class="line">    <span class="keyword">private</span> DialogFragment mLoadingDialog;  </div><div class="line">    <span class="keyword">private</span> ImageView mImageView;  </div><div class="line">    <span class="keyword">private</span> Bitmap mBitmap;  </div><div class="line">  </div><div class="line">    <span class="meta">@Override</span>  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;  </div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);  </div><div class="line">        setContentView(R.layout.activity_main);  </div><div class="line">        Log.e(TAG, <span class="string">"onCreate"</span>);  </div><div class="line">  </div><div class="line">        <span class="comment">// find the retained fragment on activity restarts  </span></div><div class="line">        FragmentManager fm = getFragmentManager();  </div><div class="line">        dataFragment = (RetainedFragment) fm.findFragmentByTag(<span class="string">"data"</span>);  </div><div class="line">        <span class="comment">// create the fragment and data the first time  </span></div><div class="line">        <span class="keyword">if</span> (dataFragment == <span class="keyword">null</span>)  </div><div class="line">        &#123;  </div><div class="line">            <span class="comment">// add the fragment  </span></div><div class="line">            dataFragment = <span class="keyword">new</span> RetainedFragment();  </div><div class="line">            fm.beginTransaction().add(dataFragment, <span class="string">"data"</span>).commit();  </div><div class="line">        &#125;  </div><div class="line">        mBitmap = getData();  </div><div class="line">        initData();  </div><div class="line">  </div><div class="line">        <span class="comment">// the data is available in dataFragment.getData()  </span></div><div class="line">    &#125;  </div><div class="line">  &#125;</div><div class="line"></div><div class="line"> <span class="function"><span class="keyword">private</span> Object <span class="title">getData</span><span class="params">()</span></span>&#123;  </div><div class="line">        <span class="keyword">return</span> dataFragment.getData();  </div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>##配置configChanges，自己对屏幕旋转的变化进行处理##</p>
+<p>此时，无论用户何时旋转屏幕都不会重新启动Activity，并且onConfigurationChanged中的代码可以得到调用。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">activity</span></span></div><div class="line">        <span class="attr">android:name</span>=<span class="string">".ConfigChangesTestActivity"</span></div><div class="line">        <span class="attr">android:configChanges</span>=<span class="string">"screenSize|orientation"</span> &gt;</div><div class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** </span></div><div class="line">  * 当配置发生变化时，不会重新启动Activity。但是会回调此方法，用户自行进行对屏幕旋转后进行处理 </div><div class="line">  */  </div><div class="line"> <span class="meta">@Override</span>  </div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onConfigurationChanged</span><span class="params">(Configuration newConfig)</span>  </span></div><div class="line"> &#123;  </div><div class="line">     <span class="keyword">super</span>.onConfigurationChanged(newConfig);  </div><div class="line">  </div><div class="line">     <span class="keyword">if</span> (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)  </div><div class="line">     &#123;  </div><div class="line">         Toast.makeText(<span class="keyword">this</span>, <span class="string">"landscape"</span>, Toast.LENGTH_SHORT).show();  </div><div class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)  </div><div class="line">     &#123;  </div><div class="line">         Toast.makeText(<span class="keyword">this</span>, <span class="string">"portrait"</span>, Toast.LENGTH_SHORT).show();  </div><div class="line">     &#125;  </div><div class="line">  </div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p><a href="http://developer.android.com/guide/topics/resources/runtime-changes.html" target="_blank" rel="external">http://developer.android.com/guide/topics/resources/runtime-changes.html</a><br><a href="http://blog.doityourselfandroid.com/2010/11/14/handling-progress-dialogs-and-screen-orientation-changes/" target="_blank" rel="external">http://blog.doityourselfandroid.com/2010/11/14/handling-progress-dialogs-and-screen-orientation-changes/</a></p>
+<p>##FragmentPagerAdapter与FragmentStatePagerAdapter##<br>主要区别在与对于fragment是否销毁<br>FragmentPagerAdapter：对于不再需要的fragment，选择调用detach方法，仅销毁视图，并不会销毁fragment实例。<br>FragmentStatePagerAdapter：会销毁不再需要的fragment，当当前事务提交以后，会彻底的将fragmeng从当前Activity的FragmentManager中移除，state标明，销毁时，会将其onSaveInstanceState(Bundle outState)中的bundle信息保存下来，当用户切换回来，可以通过该bundle恢复生成新的fragment，也就是说，你可以在onSaveInstanceState(Bundle outState)方法中保存一些数据，在onCreate中进行恢复创建。<br>如上所说，使用FragmentStatePagerAdapter当然更省内存，但是销毁新建也是需要时间的。一般情况下，如果你是制作主页面，就3、4个Tab，那么可以选择使用FragmentPagerAdapter，如果你是用于ViewPager展示数量特别多的条目时，那么建议使用FragmentStatePagerAdapter</p>
+<p>#其它Fragment类型#<br>DialogFragment<br>    显示一个浮动的对话框.<br>    用这个类来创建一个对话框,是使用在Activity类的对话框工具方法之外的一个好的选择,<br>    因为你可以将一个fragment对话框合并到activity管理的fragment back stack中,允许用户返回到一个之前曾被摒弃的fragment.</p>
+<p>ListFragment<br>    显示一个由一个adapter(例如 SimpleCursorAdapter)管理的项目的列表, 类似于ListActivity.<br>    它提供一些方法来管理一个list view, 例如 onListItemClick()回调来处理点击事件.</p>
+<p>PreferenceFragment<br>    显示一个Preference对象的层次结构的列表, 类似于PreferenceActivity.<br>    这在为你的应用创建一个”设置”activity时有用处.</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，性能优化/"> #Android，性能优化 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/02/04/android_screen_ajust/">Android屏幕适配笔记</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/01/31/official-doc-study-canvas-and-drawable/">官方文档学习 - Canvas and Drawables</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/02/02/fragment-note/"
+               data-title="Fragment笔记整理" data-url="http://www.lightskystreet.com/2015/02/02/fragment-note/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

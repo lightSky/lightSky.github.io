@@ -1,0 +1,956 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Hexo,next" />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> 官方文档学习 - Canvas and Drawables // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              官方文档学习 - Canvas and Drawables
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-01-30
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/01/31/official-doc-study-canvas-and-drawable/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/01/31/official-doc-study-canvas-and-drawable/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>前言:<br>本文为官方文档的Drawable学习部分，由于开一些开源库时经常遇到自定义的Drawable，最基本的组件，但却只会简单的使用，以后肯定会遇到它，那就深入理解下，所以有了这篇文章。这里简单介绍下相关概念，后续会整理一些自定义的Drawable分析。<br><a id="more"></a></p>
+<p>##Drawable源码注释##<br>定义了可以被绘制的资源，提供了通用的API用于处理基本的视觉资源。和View不同的是，Drawable无法接收Event或者与用户交互。为了简单的绘制，Drawable提供了一些通用的机制告诉使用者绘制中的细节。</p>
+<p>setBounds：<br>必须被调用的方法，告诉Drawable绘制的区域和大小。所有的Drawable都应该遵从该大小。使用者可以通过getIntrinsicHeight 和 getIntrinsicWidth 获得一个更好的值。</p>
+<p>getPadding<br>可以获取一些如何组织内部Drawable内容的信息。<br>比如，当你需要将一个Drawable用于一个Button时，你就需要返回padding值，以便于可以在Drawable内部正确的放置label。</p>
+<p>setLevel：<br>允许你对Drawable的展示进行单一连贯的控制，比如一个电量和progress的level。依赖于level可以修改Drawable的成像。</p>
+<p>Callback<br>Drawable可以通过CallBack回调接口执行一些动画。<br>为了让Drawable拥有动画的能力，所有的使用者应该支持该接口。简单的方式是通过View和ImageView的setBackground(Drawable)来完成。</p>
+<p>Drawable拥有多种形式<br>Bitmap：最简单的Drawable，比如PNG或者JPEG的图片<br>Nine Patch：PNG的一种扩展形式    ,根据内容自由拉伸<br>Shape<br>Layers<br>States<br>Levels<br>Scale  </p>
+<p>##Canvas and Drawables##<br>Android framework 为2D图形的绘制提供了一些API。<br>绘制2D图形的方式，通常有以下两种“</p>
+<p>###方式一###<br>通过View来绘制你的图片资源和动画。这种方式使用了Android系统提供的View机制。你可以在View内部简单的定义图片资源。  </p>
+<p><strong>使用情景</strong><br>当你只需要绘制简单的绘制那些不需要经常动态变化的图片资源或者性能敏感的游戏时，你可以使用这种方式。比如展示一个静态的图片或者预定义的动画。    </p>
+<p>###方式二###<br>直接使用Canvas绘制，这种方式，你可以自己调用适当类的onDraw方法，或者canvas身上的一些绘制方法。这种方式，你也可以控制各种动画。</p>
+<p><strong>使用情景</strong><br>通过Canvas绘制，当你的应用需要经常重绘的时候，比如Video Game。  </p>
+<p>当然这里还有其它的方式：<br>在Activity的UI线程中，当你在布局中创建了一个自定义View组件时，可以调用invalidate()，然后在onDraw方法中处理回调，进行绘制。或者在其它线程中，你可以使用SurfaceView在线程的能力范围内快速的绘制。  </p>
+<p>##Draw with a Canvas##<br>当你的应用希望进行特定的绘制或者控制图形的动画时，你需要通过Canvas进行绘制。Canvas为你需要展示在面板上的图片资源和交互而工作。它持有所有绘制的调用。通过Canvas，你实际操作的是可被放置到Window上的Bitmap。<br>在onDraw方法的回调中，Canvas已经作为参数为你提供，你要做的就是在该方法中进行绘制。当处理SurfaceView时，你也可以通过SurfaceHolder.lockCanvas()获取一个Canvas。<br>然而如果你需要创建一个新的Canvas时，你必须定义Bitmap，实际的执行的是在Bitmap上的。Bitmap通常为Canvas而准备，你可以通过以下方式创建一个Canvas：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Bitmap b = Bitmap.createBitmap(<span class="number">100</span>, <span class="number">100</span>, Bitmap.Config.ARGB_8888);</div><div class="line">Canvas c = <span class="keyword">new</span> Canvas(b);</div></pre></td></tr></table></figure></p>
+<p>现在你的Canvas将要绘制到定义的Bitmap上。在绘制完后，你可以通过Canvas.drawBitmap(Bimtmap,…)方法将该Bitmap传递给另外一个Canvas。建议你最终的绘制是通过View.onDraw()或者SurfaceHolder.lockCanvas得到的Canvas。<br>Canvas用哟自己的一些列绘制方法，比如drawBitmap(…),drawRect(…)，drawText(…)等等。其它的类通常也拥有draw()方法，比如Drawable。  </p>
+<p>##关于View##<br>如果你的应用不需要大量的帧级别的处理，比如贪吃蛇有些或者其它执行非常慢的动画，你应该考虑创建自定义的View然后在View.onDraw()方法中进行绘制。Android framework已经在onDraw方法中为你提供了预定义的Canvas。  </p>
+<p>Android framework只会把onDraw()作为必要的调用。当每一次需要绘制的时候，你必须通过调用View的invalidate()方法。这意味着你希望View要被绘制，紧接着Android会调用onDraw()方法（尽管不能确保回调是否是及时的）。<br>在你的View的onDraw()或者其它的重载的onDraw()方法中，你可以通过Canvas.draw…()方法使用给定的Canvas进行所有的绘制。一旦onDraw完成，Android framework将由系统使用你的Canvas去绘制一个Bitmap。<br>Note:在UI线程之外请求一个invalidate，你必须调用postInvalidate()方法。  </p>
+<p>更多请参考/samples/Snake/.</p>
+<p>##在SurfaceView上绘制##<br>SurfaceView是View的一个特殊子类，在View的层级中为绘制层提供了一些专门的绘制。目的是在非UI线程中进行一些绘制，不需要等到系统的View的绘制准备工作。相反，非Ui线程持有一个SurfaceView的引用，其可以在自己的区域进行绘制。  </p>
+<p>首先，你需要创建一个新的类继承SurfaceView，该类需要实现SurfaceView.Callback，你可以通过该回调获取Surface的一些底层信息。比如合适create、change、或者destroy。这些时间对于你的绘制是非常重要的，比如合适开始绘制，合适根据新的surface属性进行相应的调整，何时停止绘制并干掉一些任务。在你的SurfaceView内部，也需要一些地方去定义自己的后台线程，处理Canvas的绘制进程。<br>除了直接处理Surface对象，也可以通过SurfaceHolder。但你的SurfaceView已经初始化，你可以通过getHolder()方法获取到SurfaceHolder。然后你应该通过调用addCallBback()方法去通知SurfaceHolder接收一些回调。<br>为了在你的后台线程中通过Surface Canvas进行绘制，你必须将该后台线程传递到你的SurfaceHandler并通过lockCanvas()方法获取该Canvas。然后就可以使用该Canva在SurfaceHolder上进行一些绘制了。一旦使用该Canvas完成了绘制，就调用unlockCanvasAndPost()方法，将你的Canvas对象传递给它。该Surface将绘制你给它的Canvas。在每一次重绘的时候都需要进行相应的locking和unlocking操作。</p>
+<p><strong>Note</strong><br>在每一次从SurfaceHolder获取Canvas的时候，之前的Canvas的state将被保留，为了你的图片资源正确的进行动画，你必须重绘整个Surface。比如，你可以clear之前使用drawColr填充颜色的Canvas的状态，或者通过drawBitmap()设置的北京资源，否则，你会看到之前执行的绘制痕迹。  </p>
+<p>你可以参考&gt;/samples/LunarLander/的代码  </p>
+<p>##Drawables##<br>Android提供了自定义2D图片资源的library，用于绘制shapes和iamges。  </p>
+<p>关于如何使用Drawable进行动画，可以参考Drawable Animation。<br>Drawable的子类有 BitmapDrawable, ShapeDrawable, PictureDrawable, LayerDrawable,  </p>
+<p>有三种方式定义并实例化一个Drawable：<br>使用图片资源、使用XML定义、使用普通的构造函数。  </p>
+<p>从resource images创建<br>简单的方式就是使用支持的PNG（首选）、JPG、GIF（不建议）图片资源。    </p>
+<p>Note<br>在res/drawable/目录下的资源会被自动优化，在编译处理的时候通过aapt工具进行无损压缩。比如，纯色的PNG图片的颜色值不会超过256的色值会通过调色板转化为8位的PNG，这可以使得一张相同质量的图片需要更少的内存。注意到，在该目录下的二进制图片在编译时期会有所变化，因此，如果你准备读取一个图片作为转化为Bitmap的bit stream，你应该把图片放到res/raw/文件夹下，它们将不会被优化。  </p>
+<p>示例:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">  LinearLayout mLinearLayout;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">  <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line"></div><div class="line">  <span class="comment">// Create a LinearLayout in which to add the ImageView</span></div><div class="line">  mLinearLayout = <span class="keyword">new</span> LinearLayout(<span class="keyword">this</span>);</div><div class="line"></div><div class="line">  <span class="comment">// Instantiate an ImageView and define its properties</span></div><div class="line">  ImageView i = <span class="keyword">new</span> ImageView(<span class="keyword">this</span>);</div><div class="line">  i.setImageResource(R.drawable.my_image);</div><div class="line">  i.setAdjustViewBounds(<span class="keyword">true</span>); <span class="comment">// set the ImageView bounds to match the Drawable's dimensions</span></div><div class="line">  i.setLayoutParams(<span class="keyword">new</span> Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,</div><div class="line">  LayoutParams.WRAP_CONTENT));</div><div class="line"></div><div class="line">  <span class="comment">// Add the ImageView to the layout and set the layout as the content view</span></div><div class="line">  mLinearLayout.addView(i);</div><div class="line">  setContentView(mLinearLayout);</div><div class="line">  &#125;</div><div class="line">    </div><div class="line">Resources res = mContext.getResources();</div><div class="line">    Drawable myImage = res.getDrawable(R.drawable.my_image);</div></pre></td></tr></table></figure></p>
+<p><strong>Note</strong><br>每一种唯一的资源只能持有一种状态，无论你实例化了多少次。比如，你从一个相同的图片资源中实例化了两个Drawable对象，然后改变其中一个Drawable的属性，比如Alpha，那么它会影响到另一个Drawable的Alpha属性，因此处理同一图片资源的多个实例化对象，可以应用tween animation。</p>
+<p>##Shape Drawable##<br>当你希望动态的绘制一些二维图片资源的时候，ShapeDrawable是个不错的选择。你可以使用它绘制各种形状和样式。  </p>
+<p>ShapeDrawable是Drawable的扩展。可以设置为View的背景，当然也可以作为在自定义的View中绘制Drawable，然后在布局中引入，因为ShapeDrawable有自己的draw()方法，你可以创建一个View的子类，然后在View.onDraw方法中进行绘制，如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomDrawableView</span> <span class="keyword">extends</span> <span class="title">View</span> </span>&#123;</div><div class="line">     <span class="keyword">private</span> ShapeDrawable mDrawable;</div><div class="line"></div><div class="line">     <span class="function"><span class="keyword">public</span> <span class="title">CustomDrawableView</span><span class="params">(Context context)</span> </span>&#123;</div><div class="line">     <span class="keyword">super</span>(context);</div><div class="line"></div><div class="line">     <span class="keyword">int</span> x = <span class="number">10</span>;</div><div class="line">     <span class="keyword">int</span> y = <span class="number">10</span>;</div><div class="line">     <span class="keyword">int</span> width = <span class="number">300</span>;</div><div class="line">     <span class="keyword">int</span> height = <span class="number">50</span>;</div><div class="line"></div><div class="line">     mDrawable = <span class="keyword">new</span> ShapeDrawable(<span class="keyword">new</span> OvalShape());</div><div class="line">     mDrawable.getPaint().setColor(<span class="number">0xff74AC23</span>);</div><div class="line">     mDrawable.setBounds(x, y, x + width, y + height);</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</div><div class="line">     mDrawable.draw(canvas);</div><div class="line">     &#125;</div><div class="line">     &#125;</div></pre></td></tr></table></figure></p>
+<p>上述代码中定义了一个OvalShape的ShapeDrawable，指定了颜色和边界值。如果没有设置边界，将不会被绘制。如果没有设置颜色，默认是黑色。  </p>
+<p>原文<br><a href="http://www.android-doc.com/guide/topics/graphics/2d-graphics.html" target="_blank" rel="external">http://www.android-doc.com/guide/topics/graphics/2d-graphics.html</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/02/02/fragment-note/">Fragment笔记整理</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/01/19/android-layout-optimize/">Android布局优化</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/01/31/official-doc-study-canvas-and-drawable/"
+               data-title="官方文档学习 - Canvas and Drawables" data-url="http://www.lightskystreet.com/2015/01/31/official-doc-study-canvas-and-drawable/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

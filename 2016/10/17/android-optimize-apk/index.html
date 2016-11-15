@@ -1,0 +1,1011 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，性能优化," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Android性能优化-减小APK大小 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Android性能优化-减小APK大小
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-10-16
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/性能优化/">性能优化</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/10/17/android-optimize-apk/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/17/android-optimize-apk/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>原文链接：<a href="https://developer.android.com/topic/performance/reduce-apk-size.html" target="_blank" rel="external">Reduce APK Size</a>  </p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>用户通常会避免下载比较大的应用，特别是连接到2G和3G网络，或者按流量收费的设备。这篇文章描述了如何减小apk的大小，帮助你让更多的用户下载你的app。</p>
+<h2 id="一-理解APK的结构"><a href="#一-理解APK的结构" class="headerlink" title="一 理解APK的结构"></a>一 理解APK的结构</h2><p>在讨论如何减小apk大小之前，理解apk的结构很有必要。一个APK文件包括一个ZIP 文件，该ZIP包含app的所有文件。包括java 字节码文件，资源文件和一个包含了编译后的资源文件。APK包含以下目录：</p>
+<ul>
+<li><code>META-INF/</code>:包含了<code>CERT.SF</code> 和 <code>CERT.RSA</code> 签名文件, 以及 <code>MANIFEST.MF</code>manifest 文件.</li>
+<li><code>assets/</code>: 包含了app的assets，app可以通过 <code>AssetManager</code> 对象获取到这些资源</li>
+<li><code>res/</code>: 包含了那些没有被编译到 <code>resources.arsc</code>的资源</li>
+<li><code>lib/</code>: 包含了用于软件处理器的编译代码，该目录包含一个子目录，针对不同平台： <code>armeabi</code>, <code>armeabi-v7a</code>, <code>arm64-v8a</code>, <code>x86</code>, <code>x86_64</code>, and <code>mips</code>.</li>
+</ul>
+<p>一个APK也包含了下面的文件，但只有 <code>AndroidManifest.xml</code>  是强制性的</p>
+<ul>
+<li><p><code>resources.arsc</code>: </p>
+<p>包含了编译后的资源。该文件包含了 <code>res/values/</code>文件夹下的所有XML内容。打包工具抽取了XML内容，将它编译成二进制格式，并且进行了压缩。该内容包括language strings和styles，以及未直接包含在<code>resources.arsc</code> 文件中的内容路径。比如layout文件和图片。</p>
+</li>
+<li><p><code>classes.dex</code>: </p>
+<p>包含可以被Dalvik/ART 识别，以dex文件格式编译后的代码</p>
+</li>
+<li><p><code>AndroidManifest.xml</code>: </p>
+<p>包含了Android核心mainfest文件。该文件罗列了app名字，版本，访问权限，和引用的library文件。该文件采用二进制XML格式。</p>
+<p>​</p>
+</li>
+</ul>
+<h2 id="二-减少资源的数量和大小"><a href="#二-减少资源的数量和大小" class="headerlink" title="二 减少资源的数量和大小"></a>二 减少资源的数量和大小</h2><p>APK的大小对app的加载速度以及内存的使用和电量消耗都有影响。一种减小APK大小的最简单方法就是减少APK的资源文件数量和大小。也可以移除那些app不再使用的资源，或者使用可扩展的 <code>Drawable</code> 对象替代图片文件。这部分讨论了这些方法，以及其它几种减小app资源以便最终达到减小APK总体大小的其它方法。</p>
+<h3 id="移除无用资源"><a href="#移除无用资源" class="headerlink" title="移除无用资源"></a>移除无用资源</h3><p>使用 <a href="https://developer.android.com/studio/write/lint.html" target="_blank" rel="external"><code>lint</code></a> 工具,AndroidStudio中的一个静态的代码分析工具。可以检测<code>res/</code> 目录下那些没有被引用的资源. 当 <code>lint</code>工具发现了项目中潜在的无用资源，就会打印类似如下的信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">res/layout/preferences.xml: Warning: The resource R.layout.preferences appears</div><div class="line">    to be unused [UnusedResources]</div></pre></td></tr></table></figure>
+<p><strong>注意:</strong>  <code>lint</code> 工具不能够扫描<code>assets/</code> 目录, assets 资源是通过反射的方式引用的，或者app中引用的其它library 文件。但lint并不会移除资源，它只会提示它们的存在。</p>
+<p>你引入的Libraries有可能引入了无用的资源。Gradle可以通过在 <code>build.gradle</code> 文件中开启<a href="https://developer.android.com/studio/build/shrink-code.html" target="_blank" rel="external"><code>shrinkResources</code></a> 来帮你自动的移除这些资源：</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    // Other settings</div><div class="line"></div><div class="line">    buildTypes &#123;</div><div class="line">        release &#123;</div><div class="line">            minifyEnabled true</div><div class="line">            shrinkResources true</div><div class="line">            proguardFiles getDefaultProguardFile(&apos;proguard-android.txt&apos;), &apos;proguard-rules.pro&apos;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了使用 <code>shrinkResources</code>，你应该开启code shrinking，在build处理期间， <a href="https://developer.android.com/studio/build/shrink-code.html" target="_blank" rel="external">ProGuard</a> 首先会移除无用的代码但是会保留无用的资源。之后Gradle会移除无用的资源。</p>
+<p>关于ProGuard和使用Android Studio帮助你减小APK大小的更多信息，可以参考 <a href="https://developer.android.com/studio/build/shrink-code.html" target="_blank" rel="external">Shrink Your Code and Resources</a>.</p>
+<p>在Android Gradle Plugin 0.7以及更高的版本中，你可以声明app支持的配置。Gradle通过 <code>resConfig</code> 和 <code>resConfigs</code> flavors 和 <code>defaultConfig</code> 选项把这些信息传递给构建系统。构建系统会阻止来自其它不受支持的资源出现在APK中，从而减少APK的大小。更多信息可以参考 <a href="https://developer.android.com/studio/build/shrink-code.html#unused-alt-resources" target="_blank" rel="external">Remove unused alternative resources</a>。</p>
+<h3 id="最小化使用Libraries中的资源"><a href="#最小化使用Libraries中的资源" class="headerlink" title="最小化使用Libraries中的资源"></a>最小化使用Libraries中的资源</h3><p>在开发App的时候，通常会使用外部libraries去提升app的可用性和功能扩展。比如，你可能会引用<a href="https://developer.android.com/topic/libraries/support-library/index.html" target="_blank" rel="external">Android Support Library</a>去提升老设备的用户体验。或者使用 <a href="https://developers.google.com/android/guides/overview" target="_blank" rel="external">Google Play Services</a> 为app提供自动翻译。</p>
+<p>如果一个library被设计用于桌面服务，那么就可能包含很多app不需要的对象和方法。为了只保留library中app需要的代码，如果license许可的话，你需要编辑library文件。你也可以使用一个移动端友好的替代库。</p>
+<p><strong>注意:</strong> <a href="https://developer.android.com/studio/build/shrink-code.html" target="_blank" rel="external">ProGuard</a> 可以清除一些从library中导入的不需要的代码。但是不会移除一个 library的内部依赖。</p>
+<h3 id="只支持特定的分辨率"><a href="#只支持特定的分辨率" class="headerlink" title="只支持特定的分辨率"></a>只支持特定的分辨率</h3><p>Android支持非常大的设备集，包括各种屏幕密度。 在Android 4.4（API级别19）及更高版本中，框架支持各种分辨率：ldpi，mdpi，tvdpi，hdpi，xhdpi，xxhdpi和xxxhdpi。 虽然Android支持所有这些分辨率，但你不需要导出光栅化资源到每种分辨率。</p>
+<p>如果你知道只有一小部分用户使用特定分辨率的设备，请考虑是否需要支持这些分辨率。 如果你不包括特定屏幕密度的资源，Android会自动缩放最初为其他屏幕密度设计的现有资源。</p>
+<p>如果您的应用只需要缩放的图片，您可以通过在drawable-nodpi /中使用图片的单个版本来节省更多空间。 我们建议每个应用至少包含一个xxhdpi图片版本。</p>
+<p>更多屏幕分辨率的信息，可以参考 <a href="https://developer.android.com/about/dashboards/index.html#Screens" target="_blank" rel="external">Screen Sizes and Densities</a>.</p>
+<h3 id="减少动画帧数"><a href="#减少动画帧数" class="headerlink" title="减少动画帧数"></a>减少动画帧数</h3><p>逐帧动画可能会大幅增加APK的大小。 图1中展示了一个帧动画被分成多个PNG文件的情况。 每个图像是动画中的一帧。</p>
+<p>对于添加到动画中的每一帧，都会增加APK中存储的图片数量。 在图1中，图像在应用程序中以30 FPS动画。 如果图像仅以15FPS动画化，则动画将仅需要所需帧的数目的一半。</p>
+<p>  <img src="/img/android-optimize/anim-frame.png">  </p>
+<h3 id="Use-Drawable-Objects"><a href="#Use-Drawable-Objects" class="headerlink" title="Use Drawable Objects"></a>Use Drawable Objects</h3><p>一些图像不需要静态图像资源; 框架可以在运行时动态地绘制图像。 相反，Drawable对象（XML中的）可能只会占用APK中的一小部分空间。 此外，XML形式的Drawable对象可以生成符合MaterialDesign指南的单色图像。</p>
+<h3 id="减少资源"><a href="#减少资源" class="headerlink" title="减少资源"></a>减少资源</h3><p>你可能为同一种图像的不同形式都提供了独立的资源，例如同一图像的有色，阴影或旋转版本。 但是，我们建议你重复使用相同的资源，在运行时根据需要进行自定义。</p>
+<p>Android提供了几个工具来更改资源的颜色，可以在Android 5.0（API级别21）以及更高版本上使用android：tint和tintMode属性。 对于较低版本的平台，请使用ColorFilter类。</p>
+<p>您还可以节约那些只是某一种资源做了旋转的资源。 以下代码段提供了一个例子，通过简单地将原始图像旋转180度，将“展开”箭头转换为“折叠”箭头图标：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;rotate xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:drawable=&quot;@drawable/ic_arrow_expand&quot;</div><div class="line">    android:fromDegrees=&quot;180&quot;</div><div class="line">    android:pivotX=&quot;50%&quot;</div><div class="line">    android:pivotY=&quot;50%&quot;</div><div class="line">    android:toDegrees=&quot;180&quot; /&gt;</div></pre></td></tr></table></figure>
+<h3 id="从代码中渲染"><a href="#从代码中渲染" class="headerlink" title="从代码中渲染"></a>从代码中渲染</h3><p>You can also reduce your APK size by procedurally rendering your images. Procedural rendering frees up space because you no longer store an image file in your APK.</p>
+<p>你也可以通过程序对图像渲染来减少APK大小。 通过程序渲染可以节约空间是因为不需要在APK中存储图像文件。</p>
+<h3 id="压缩PNG文件"><a href="#压缩PNG文件" class="headerlink" title="压缩PNG文件"></a>压缩PNG文件</h3><p>aapt工具可以在构建过程期间优化放置在res / drawable /中的图像资源，以及无损压缩。 例如，aapt工具可以将不需要多于256种颜色的真彩色PNG转换为具有调色板的8位PNG。 这样做会产生质量相同但占用内存较小的映像。</p>
+<p>但请记得aapt有以下限制：</p>
+<ul>
+<li>aapt工具不会收缩asset/文件夹中包含的PNG文件。</li>
+<li>图像文件需要使用256个或更少的颜色的aapt工具来优化它们。</li>
+<li>aapt工具可能会填充已压缩的PNG文件。 为了防止这种情况，您可以在Gradle中使用cruncherEnabled标志为PNG文件禁用此过程：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">aaptOptions &#123;</div><div class="line">    cruncherEnabled = false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="压缩PNG和JPG文件"><a href="#压缩PNG和JPG文件" class="headerlink" title="压缩PNG和JPG文件"></a>压缩PNG和JPG文件</h3><p>你可以使用像 <a href="http://pmt.sourceforge.net/pngcrush/" target="_blank" rel="external">pngcrush</a>, <a href="https://pngquant.org/" target="_blank" rel="external">pngquant</a>, 或<a href="https://github.com/google/zopfli" target="_blank" rel="external">zopflipng</a>等工具来减少PNG文件大小，而不会损失图像质量。 所有这些工具都可以减少PNG文件大小，同时保持图像质量。</p>
+<p>pngcrush工具特别有效：此工具在PNG过滤器和zlib（Deflate）参数上迭代，使用每个过滤器和参数的组合来压缩图像。 然后选择产生最小压缩输出的配置。</p>
+<p>对于JPEG文件，您可以使用 <a href="http://www.elektronik.htw-aalen.de/packjpg/" target="_blank" rel="external">packJPG</a> 等工具将JPEG文件压缩为更紧凑的形式。</p>
+<h3 id="使用WebP-文件格式"><a href="#使用WebP-文件格式" class="headerlink" title="使用WebP 文件格式"></a>使用WebP 文件格式</h3><p>除了使用PNG或JPEG文件，你还可以使用WebP的图像文件。 WebP格式提供有损压缩（如JPEG）和透明度（如PNG），但可以提供比JPEG或PNG更好的压缩。</p>
+<p>但是，使用WebP文件格式有一些显着的缺点。 首先，在低于Android 3.2（API级别13）的平台版本中不支持WebP。 第二，系统解码WebP比PNG文件需要更长的时间。</p>
+<p><strong>注意</strong>：Google Play只接受使用PNG格式的图标。 如果你打算通过Google Play发布应用，图标就不能使用其他文件格式（如JPEG或WebP）。</p>
+<h3 id="使用矢量图形"><a href="#使用矢量图形" class="headerlink" title="使用矢量图形"></a>使用矢量图形</h3><p>你可以使用矢量图形创建分辨率独立的图标和其他可伸缩媒体。 使用这些图形可以大大减少APK体积。 矢量图像在Android中表示为VectorDrawable对象。 使用VectorDrawable对象，100字节的文件可以生成屏幕大小的清晰图像。</p>
+<p>然而，系统渲染每个VectorDrawable对象需要大量的时间，较大的图像则需要更长的时间才能出现在屏幕上。 因此，只有在显示小图像时才考虑使用这些矢量图形。</p>
+<p>有关使用VectorDrawable对象的更多信息，请参考 <a href="https://developer.android.com/training/material/drawables.html" target="_blank" rel="external">Working with Drawables</a>.</p>
+<h2 id="三-减少Native和Java代码"><a href="#三-减少Native和Java代码" class="headerlink" title="三 减少Native和Java代码"></a>三 减少Native和Java代码</h2><h3 id="删除不必要的生成代码"><a href="#删除不必要的生成代码" class="headerlink" title="删除不必要的生成代码"></a>删除不必要的生成代码</h3><p>确保你能够理解那些任何自动生成的代码部分。 例如，许多协议缓冲工具生成过多的方法和类，可以使应用程序的大小增加一倍或两倍。</p>
+<h3 id="删除枚举"><a href="#删除枚举" class="headerlink" title="删除枚举"></a>删除枚举</h3><p>单个枚举可能为应用程序的classes.dex文件添加大小为1.0到1.4 KB的大小。 对于复杂的系统或者共享库，这种增加可能比较快迅速。 如果可能，请考虑使用@IntDef注解和<a href="https://developer.android.com/studio/build/shrink-code.html" target="_blank" rel="external">ProGuard</a> 来除去枚举并将它们转换为整数。 这种类型转换保留了枚举的所有类型安全的好处。</p>
+<h3 id="减少本地二进制文件的大小"><a href="#减少本地二进制文件的大小" class="headerlink" title="减少本地二进制文件的大小"></a>减少本地二进制文件的大小</h3><p>如果你的应用使用本地代码和Android NDK，你还可以通过优化这些代码来减小应用的大小。 两个有用的方式是删除debug标记，不提取本地库。</p>
+<h4 id="删除Debug符号"><a href="#删除Debug符号" class="headerlink" title="删除Debug符号"></a>删除Debug符号</h4><p>如果你的应用程序正在开发中并仍需要调试，那么使用debug标记很有意义。 使用Android NDK中提供的 <code>arm-eabi-strip</code> 工具从本地库中删除不必要的调试标记。 之后，再编译release版本。</p>
+<h4 id="避免提取本地库"><a href="#避免提取本地库" class="headerlink" title="避免提取本地库"></a>避免提取本地库</h4><p>将.so文件存储在APK中未压缩的文件中，并在应用清单的``元素中将android：extractNativeLibs标记设置为false。 这将防止PackageManager在安装过程中将.so文件从APK复制到文件系统，并且有一个额外的好处，会让app的差分更新变得更小。</p>
+<h2 id="四-维护多个精简版APK"><a href="#四-维护多个精简版APK" class="headerlink" title="四 维护多个精简版APK"></a>四 维护多个精简版APK</h2><p>你的APK可能包含用户下载但从不使用的内容，例如区域或语言信息。 为了让用户提供最小化的下载，你可以将应用细分为多个APK，并根据屏幕尺寸或GPU纹理支持等因素进行区分。</p>
+<p>当用户下载您的应用时，其设备会根据设备的功能和设置接收正确的APK。 这样，设备不会接收设备没有的功能的资源。 例如，如果用户拥有的是hdpi设备，那么他们不需要你为更高分辨率设备提供的xxxhdpi资源。</p>
+<p>更多信息请参考<a href="https://developer.android.com/studio/build/configure-apk-splits.html" target="_blank" rel="external">Configure APK Splits</a> and <a href="https://developer.android.com/training/multiple-apks/index.html" target="_blank" rel="external">Maintaining Multiple APKs</a>.</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，性能优化/"> #Android，性能优化 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/18/android-optimize-thread/">Android性能优化-线程性能优化</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/16/android-optimize-background/">Android性能优化-App后台优化</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/10/17/android-optimize-apk/"
+               data-title="Android性能优化-减小APK大小" data-url="http://www.lightskystreet.com/2016/10/17/android-optimize-apk/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一-理解APK的结构"><span class="nav-number"></span> <span class="nav-text">一 理解APK的结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-减少资源的数量和大小"><span class="nav-number"></span> <span class="nav-text">二 减少资源的数量和大小</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#移除无用资源"><span class="nav-number">1.</span> <span class="nav-text">移除无用资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最小化使用Libraries中的资源"><span class="nav-number">2.</span> <span class="nav-text">最小化使用Libraries中的资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#只支持特定的分辨率"><span class="nav-number">3.</span> <span class="nav-text">只支持特定的分辨率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减少动画帧数"><span class="nav-number">4.</span> <span class="nav-text">减少动画帧数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Use-Drawable-Objects"><span class="nav-number">5.</span> <span class="nav-text">Use Drawable Objects</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减少资源"><span class="nav-number">6.</span> <span class="nav-text">减少资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从代码中渲染"><span class="nav-number">7.</span> <span class="nav-text">从代码中渲染</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#压缩PNG文件"><span class="nav-number">8.</span> <span class="nav-text">压缩PNG文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#压缩PNG和JPG文件"><span class="nav-number">9.</span> <span class="nav-text">压缩PNG和JPG文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用WebP-文件格式"><span class="nav-number">10.</span> <span class="nav-text">使用WebP 文件格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用矢量图形"><span class="nav-number">11.</span> <span class="nav-text">使用矢量图形</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-减少Native和Java代码"><span class="nav-number"></span> <span class="nav-text">三 减少Native和Java代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#删除不必要的生成代码"><span class="nav-number">1.</span> <span class="nav-text">删除不必要的生成代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除枚举"><span class="nav-number">2.</span> <span class="nav-text">删除枚举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减少本地二进制文件的大小"><span class="nav-number">3.</span> <span class="nav-text">减少本地二进制文件的大小</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#删除Debug符号"><span class="nav-number">3.1.</span> <span class="nav-text">删除Debug符号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#避免提取本地库"><span class="nav-number">3.2.</span> <span class="nav-text">避免提取本地库</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四-维护多个精简版APK"><span class="nav-number"></span> <span class="nav-text">四 维护多个精简版APK</span></a></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

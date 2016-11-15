@@ -1,0 +1,1101 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，架构," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Android架构初探 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Android架构初探
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-05-19
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/05/20/android-architecture/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/20/android-architecture/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>#一 背景<br>点评美团合并之后，业务需要整合，我们部门的几条业务需要往美团平台迁移，为了降低迁移成本，开发和维护成本，以及将来可能要做的单元测试，需要对架构进行相应的调整。之前的代码都堆在Activity或Fragment里面，UI，业务，数据混合在一起，就使得难以单独的复用和扩展、测试。</p>
+<a id="more"></a>
+<p>## </p>
+<p>#二 目标</p>
+<ul>
+<li>代码复用</li>
+</ul>
+<ul>
+<li>UI独立</li>
+</ul>
+<ul>
+<li>业务独立</li>
+</ul>
+<ul>
+<li>数据独立</li>
+</ul>
+<ul>
+<li>可测试</li>
+</ul>
+<p>## </p>
+<p>#三 简洁架构<br>这里先引入简洁架构的概念，该架构由Uncle Bob提出，他认为一个架构应该具有以下特性</p>
+<ul>
+<li><p><strong>框架独立性</strong></p>
+<p>架构不应该依赖于现有的library，这样可以让你像工具一样去使用架构，而不是对你的系统添加约束</p>
+</li>
+<li><p><strong>可测试</strong></p>
+<p>业务逻辑可以在不依赖UI，数据库，网络服务等其它外部因素的情况下进行测试</p>
+</li>
+<li><p><strong>UI独立性</strong></p>
+<p>在不变动系统其它部分的情况下，可以很方便的改变UI，比如，在没有变动任何业务逻辑的情况下web ui可以被替换成console ui</p>
+</li>
+<li><p><strong>数据库独立性</strong></p>
+<p>可以很自如的在Oracle，SQL Server之间切换，而不涉及业务逻辑</p>
+</li>
+<li><p><strong>任何外部代理模块的独立性</strong></p>
+<p>业务逻辑应该不需要知道外部世界的任何事情</p>
+<p>​</p>
+<p> 下图阐述了一个简洁架构的各个层之间的关系</p>
+<p><img src="/img/architecture/clean-architecture.png" width="500" height="450">  </p>
+</li>
+</ul>
+<ul>
+<li>内层不应该知道外层的任何情况</li>
+</ul>
+<ul>
+<li>各层之间通过接口交互</li>
+</ul>
+<ul>
+<li>上层依赖下层，但依赖于接口</li>
+</ul>
+<blockquote>
+<p>应用中最重部分就是业务逻辑层。它负责解决应用所真正想解决的问题。该层不包含任何框架相关的代码，因此其代码应该可以在没有模拟器的情况下独立运行。这样，测试、开发和维护业务逻辑代码就要容易很多。而这就是干净架构的主要优势。</p>
+</blockquote>
+<p>下面简单对以上几个概念进行简单的介绍</p>
+<p>##Entities<br>数据部分，一个Entity可以是一个带有方法的对象，或者一个数据结构和方法的集合</p>
+<p>##Use Cases<br>该层包含了应用特定的业务规则，封装了应用中所有的use cases。这些use cases从entities组装数据流，传递给业务使用。</p>
+<p>该层的变更不应该影响到Entities，也不希望该层会被database，UI，或者其它通用框架的外部变化所影响到，该层应该独立于这些部分。</p>
+<p>##Interface Adapters<br>该层是一些为了便于use cases和entities的数据转换的适配器。这一层包含GUI的MVC架构，展示层，Views和Controllers都属于该层。models更倾向于在controllers和use cases之间传递的数据结构，然后从use cases传递给Presenter和Views。</p>
+<p>上面的这些原则足以构建高内聚，低耦合，可扩展的应用</p>
+<p>## </p>
+<p>#四 Android架构探索<br>一个应用基本可以划分为3个部分，UI，业务，和数据，而在移动端来说，更注重UI的展示，复杂的业务通常放在服务端。</p>
+<p>针对这3部分，如何进行设计呢？</p>
+<p>可以参考上面的基本原则 ，把整个项目拆分成3个不同的层级：</p>
+<p><strong>数据层</strong>— <strong>业务层</strong> — <strong>展示层</strong></p>
+<p>每一层保持功能独立，上层依赖下层，但依赖于接口，而不是具体。每一层拥有自己的数据模型，做到依赖独立。</p>
+<p> <img src="/img/architecture/android-architecture.png">  </p>
+<p>## </p>
+<p>###4.1 表现层（Presentation Layer）<br>常见的模式有MVP，MVC，MVVM</p>
+<p>表现层除了UI相关逻辑，不应该含有任何逻辑，这一层应该很轻，数据的获取和业务处理应该交给业务层和数据层，Presenter在该层由Use Cases组装，Use Cases会在新的线程执行一个任务并使用一个带有数据的回调用于渲染view，下图是<strong>MVP</strong>架构模块之间的基本关系</p>
+<p>  <img src="/img/architecture/mvp.png" width="700" height="380">  </p>
+<p>## </p>
+<p>###4.2 业务层 （Business logic（Domain） Layer）<br>业务层可能有些模糊，哪些应该属于该层呢？</p>
+<p>按照MVP的方式划分，很容易理解的是，所有的业务逻辑放到P中即可。但实际开发中，你会发现，稍微复杂的业务，P层的代码就会变得非常臃肿。我认为P的角色作为业务逻辑的组装更合适。业务逻辑可以进行相应的封装，比如</p>
+<p>另外业务层应该是纯java代码，对android平台没有任何依赖，业务层向外暴露接口。</p>
+<p><img src="/img/architecture/domain.png">   </p>
+<p>## </p>
+<p>###4.3 数据层（Data Layer）<br>数据层提供了数据源，数据层也可以包括一些简单的数据处理，比如JSON的封装，一些model的转换，外部不关心具体如何获取数据的细节，只向数据层拿数据。比如下面展示了 仓库模式（<a href="http://martinfowler.com/eaaCatalog/repository.html" target="_blank" rel="external">Repository Pattern</a>）来实现数据层，它的策略是采用工厂模式，传递不同的条件参数，获取不同的数据。</p>
+<p> <img src="/img/architecture/data.png" width="650" height="380">  </p>
+<p>## </p>
+<p>###4.4 测试 （Testing）<br>基于上面的架构，我们更容易进行测试，不同的分层之间完全独立，每一层也有自己相应的测试方案：</p>
+<ul>
+<li><strong>Presentation Layer：</strong> 使用Android自带的<code>instrumentation</code> 和<code>espresso</code> 做集成和功能测试。</li>
+<li><strong>Domain Layer:</strong> <code>JUnit</code> + <code>mockito</code>做单元测试。</li>
+<li><strong>Data Layer:</strong> <code>Robolectric</code> （这一层开始有Android相关的依赖）+<code>junit</code> +<code>mockito</code> 做单元和集成测试</li>
+</ul>
+<p>## </p>
+<p>#五 表现层架构</p>
+<blockquote>
+<p><strong>MVC</strong><br>Model–View–Controller (MVC) is a software architectural pattern for implementing user interfaces.*</p>
+</blockquote>
+<p><strong>MVP，MVC，MVVM</strong> 都是表现层的一种模式</p>
+<p>这些架构相对于传统的开发方式，门槛高些，要想深入掌握和更高层次的理解各个层的职责，需要一定积累，对于一些简单的场景并不是一种好的方案，复杂的业务场景则会从中得到很多好处。</p>
+<p><strong>这些模式的好处</strong></p>
+<ul>
+<li><p><strong>关注点分离，职责明确</strong></p>
+<p>o    UI – 负责UI的渲染</p>
+<p>o    Presenter/controller – 负责响应UI事件并和Model交互</p>
+<p>o    Model – 负责业务行为和状态管理</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>代码重用性</strong></p>
+<p>关注点和责任分离之后，各层独立，可以增加代码的可用性</p>
+</li>
+<li><p><strong>测试驱动</strong></p>
+<p>易于测试，只要写一个实现了ViewInterface的类即可测试，而不需依赖android平台</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>隐藏数据访问</strong></p>
+<p>使用这种模式之后，数据的访问代码就被划分到data层</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>扩展性高，可适配</strong></p>
+<p>将代码分离到Presenter，Controller和Model中，可以更自由的适配</p>
+</li>
+</ul>
+<p>## </p>
+<p>##5.1 MVP</p>
+<p>这里简单的介绍下MVP的基本元素</p>
+<ul>
+<li>M：数据实体，封装数据</li>
+</ul>
+<ul>
+<li>V：视图的渲染，事件的响应</li>
+</ul>
+<ul>
+<li>P：中间层，作为与M和V通讯的桥梁，组装业务逻辑</li>
+</ul>
+<p><strong>在MVP模式里通常包含4个要素</strong></p>
+<p>(1) <strong>View</strong>: 负责绘制UI元素、与用户进行交互(Activity或Fragment);</p>
+<p>(2) <strong>View interface</strong>: View需要实现的接口，View通过View interface与Presenter进行交互</p>
+<p>(3) <strong>Model</strong>: 业务Bean</p>
+<p>(4) <strong>Presenter</strong>: 作为View与Model交互的纽带，承载了大部分的复杂逻辑</p>
+<p>## </p>
+<p>##5.2 MVP vs MVC</p>
+<p>###相同点</p>
+<ul>
+<li>分离了不同组件之间的责任，降低了View和Model之间的耦合</li>
+</ul>
+<p>###不同点</p>
+<ul>
+<li>MVP中，View与model之间的耦合更低，不容许View直接访问Model，通过Presenter来交互，更加容易进行单元测试，因为View是通过接口来交互</li>
+</ul>
+<ul>
+<li>通常View与Presenter的关系是一对一，复杂的View可能有多个Presenter</li>
+</ul>
+<ul>
+<li>MVC可以决定展示哪个View，Controller依赖于行为，而且可以被多个View共用</li>
+</ul>
+<p>## </p>
+<p>##5.3 MVP vs MVVM<br>MVP单项绑定，而MVVM采用双向绑定（data-binding），View的变动，自动反映在 ViewModel，Model的变动也会反映到View中</p>
+<p><img src="/img/architecture/mvvm.jpg" width="700" height="500">   </p>
+<p><img src="/img/architecture/mvp.png" width="700" height="500">     </p>
+<p>其实MVP中Model是很轻的，数据的获取和处理属于架构中的数据层和业务层，所以这一点并不是很让人能够理解。</p>
+<p>本篇文章主要是对android架构的探索，目前我们采用的是data+domain+MVP这种架构模式。</p>
+<p>后期会分享在架构调整中所遇到的问题和经验。</p>
+<p>## </p>
+<p>##项目</p>
+<p><a href="https://github.com/googlesamples/android-architecture" target="_blank" rel="external">https://github.com/googlesamples/android-architecture</a></p>
+<p><a href="https://github.com/pedrovgs/EffectiveAndroidUI" target="_blank" rel="external">https://github.com/pedrovgs/EffectiveAndroidUI</a></p>
+<p><a href="https://github.com/dmilicic/Android-Clean-Boilerplate" target="_blank" rel="external">https://github.com/dmilicic/Android-Clean-Boilerplate</a></p>
+<p><a href="https://github.com/android10/Android-CleanArchitecture" target="_blank" rel="external">https://github.com/android10/Android-CleanArchitecture</a></p>
+<p>##参考文档</p>
+<p><a href="https://github.com/AWCNTT/ArticleTranslateProject/blob/master/translated/Issue%23118/2014-09-11-Architecting%20Android%E2%80%A6The%20clean%20way.md" target="_blank" rel="external"><strong>Architecting Android…The clean way?</strong></a></p>
+<p><a href="https://blog.8thlight.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank" rel="external">The Clean Architecture</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2015/02/mvcmvp_mvvm.html" target="_blank" rel="external">MVC，MVP 和 MVVM 的图示</a></p>
+<p><a href="https://segmentfault.com/a/1190000003966281?utm_source=APP&amp;utm_medium=iOS&amp;utm_campaign=socialShare" target="_blank" rel="external">https://segmentfault.com/a/1190000003966281?utm_source=APP&amp;utm_medium=iOS&amp;utm_campaign=socialShare</a></p>
+<p><a href="http://www.infragistics.com/community/blogs/todd_snyder/archive/2007/10/17/mvc-or-mvp-pattern-whats-the-difference.aspx" target="_blank" rel="external">MVC or MVP Pattern – Whats the difference?</a></p>
+<p><a href="https://www.zhihu.com/question/30976423/answer/50181505" target="_blank" rel="external">https://www.zhihu.com/question/30976423/answer/50181505</a></p>
+<p><a href="http://wiki.sankuai.com/pages/viewpage.action?pageId=447914510" target="_blank" rel="external"></a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，架构/"> #Android，架构 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/26/reactnative-introduction/">Reactive Native 入门</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/08/reactive-programming/">Reactive Programming 入门</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/05/20/android-architecture/"
+               data-title="Android架构初探" data-url="http://www.lightskystreet.com/2016/05/20/android-architecture/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

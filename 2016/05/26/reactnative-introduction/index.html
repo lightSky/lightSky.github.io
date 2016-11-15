@@ -1,0 +1,1185 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="RN," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Reactive Native 入门 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Reactive Native 入门
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-05-25
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/RN/">RN</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/05/26/reactnative-introduction/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/26/reactnative-introduction/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h2 id="一-React-Native"><a href="#一-React-Native" class="headerlink" title="一 React Native"></a>一 React Native</h2><h3 id="1-1-RN-的目标"><a href="#1-1-RN-的目标" class="headerlink" title="1.1 RN 的目标"></a>1.1 RN 的目标</h3><p>React Native使你能够在Javascript和<a href="http://facebook.github.io/react/" target="_blank" rel="external">React</a>的基础上获得完全一致的开发体验，构建世界一流的原生APP</p>
+<p>React Native着力于提高多平台开发的开发效率 —— 仅需学习一次，编写任何平台 (Learn once, write anywhere</p>
+<h3 id="1-2-RN-的优点"><a href="#1-2-RN-的优点" class="headerlink" title="1.2 RN 的优点"></a>1.2 RN 的优点</h3><ul>
+<li>编译，开发效率更高</li>
+<li>更短的迭代周期，方便新功能测试</li>
+<li>热部署</li>
+<li>采用web的方式来开发native应用</li>
+<li>和native相同的用户体验和用户习惯</li>
+<li>“一次学习，随处可写”，降低开发成本</li>
+<li>可预测性</li>
+</ul>
+<a id="more"></a>
+<h3 id="1-2-RN-开发原则"><a href="#1-2-RN-开发原则" class="headerlink" title="1.2 RN 开发原则"></a>1.2 RN 开发原则</h3><ul>
+<li>复用性<ul>
+<li>在编写任何 React Native 的代码之前，你应该考虑如何“尽可能地复用代码”。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>组件化的平台抽象<ul>
+<li>在考量 React Native app 中的可视化组件时，关键在于使用平台抽象。我们可以与设计师确定 app 中可复用的组件，比如：按钮，容器，列表的每一行等等。并且，只在有需要的地方将这些组件做分化。</li>
+</ul>
+</li>
+</ul>
+<p>以上原则可以帮助我们在Android IOS两个平台上尽可能的复用一套代码，降低开发成本，这也是RN开发中很重要的一点</p>
+<h2 id="二-RN-的架构起源"><a href="#二-RN-的架构起源" class="headerlink" title="二 RN 的架构起源"></a>二 RN 的架构起源</h2><h3 id="2-1-React"><a href="#2-1-React" class="headerlink" title="2.1 React"></a>2.1 <a href="http://facebook.github.io/react/" target="_blank" rel="external">React</a></h3><p>Facebook开源的<strong>web UI</strong>框架。它使得工程师们可以把更多的时间和精力用于关注他们的产品本身，而不是应付框架带来的各种问题</p>
+<ul>
+<li><p>React 废弃了模板</p>
+<ul>
+<li><p>传统的web方式构建UI是将一堆抽象的HTML 模板堆起来，React将UI划分为一个个组件，这意味着React使用了一种真实、完整特性的语言去渲染View，相比于模板它有以下优点</p>
+<ul>
+<li>较强的构建能力：JS是一种简便、强大的编程语言，拥有构建抽象的能力，这一点在大型应用中非常重要</li>
+<li>易于扩展和维护：通过相应的VIew逻辑将标签组合起来，React可以更方便的扩展和维护这些view，每个组件作为一个独立的视图。这使得更容易进行迭代产品，扩展时只需关注组件本身</li>
+<li>代码复用、测试和关注分离（separation of concerns）</li>
+<li>更安全：将一些可理解的标签和内容引入到JS中，没有人工字符串拼接，从而减少了XSS漏洞</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>多平台复用<ul>
+<li>React包装了复杂而易变的DOM API，提供一个声明式的结构，使得整个程序模型变得抽象而简单，达到多平台复用</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>代码可预测<ul>
+<li>这种可预测性使得我们在快速迭代产品时更多的信任已有的代码，最终我们的应用程序也变得更为可靠。更易于扩展，我们的团队规模也更容易进行调整</li>
+</ul>
+</li>
+<li><p>自更新</p>
+<ul>
+<li><p>任何时候底层数据变化时，React 会<em>自动处理所有用户界面的更新</em>。只需描述应用程序在任一个时间点应该长的样子。</p>
+</li>
+<li><p>在传统的JS应用中，需要观察数据变化，并将变化通知DOM去更新。</p>
+<p>在React中，组件第一次初始化的时候，会执行render方法生成轻量级的View表示。通过这种表示，标签对应的string会生成，并且注入到document中。当数据变化的时候，render方法会再次被调用。</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>Diff更新<ul>
+<li>数据变化后，<em>仅会更新变化的部分</em></li>
+<li>为了尽可能快的执行更新，React会使用新的返回值和之前的返回值对比，生成一个最小变更集合到DOM中</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-3-原生开发"><a href="#2-3-原生开发" class="headerlink" title="2.3 原生开发"></a>2.3 原生开发</h3><h4 id="原生开发缺点"><a href="#原生开发缺点" class="headerlink" title="原生开发缺点"></a>原生开发缺点</h4><ul>
+<li>开发效率低，web开发可以用React或Relay来简化开发流程</li>
+</ul>
+<ul>
+<li>编译和构建效率低</li>
+</ul>
+<ul>
+<li>迭代周期长，新功能测试比较慢</li>
+</ul>
+<h4 id="原生开发的优点"><a href="#原生开发的优点" class="headerlink" title="原生开发的优点"></a>原生开发的优点</h4><ul>
+<li>原生应用相比web更好的用户体验<ul>
+<li>原生平台特有的UI组件，譬如地图、日期选择器、开关，还有导航栈这些基本组件，有更好的体验，Google官方会不断更新</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>一些系统服务，web很难实现<ul>
+<li>很难在web上构建复杂的手势识别系统</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>web上没有一个足够完善的线程模型</p>
+<ul>
+<li>在web上很难利用多线程并行执行工作</li>
+<li>虽然web的Worker机制可以在后台执行一部分程序逻辑，但依然无法去做一些高负荷的数值计算，譬如在主线程以外的地方去进行图片解码、文本布局等等。这可能是开发一个高性能和快速响应的web app最大的难点。</li>
+</ul>
+<p>​</p>
+</li>
+</ul>
+<h3 id="2-5-web-Native-？"><a href="#2-5-web-Native-？" class="headerlink" title="2.5 web + Native ？"></a>2.5 web + Native ？</h3><p>如果我们希望既能具备原生应用的用户体验，又能获得我们用React开发web应用的开发体验，该如何做呢？facebook曾考虑过以下几种方案：</p>
+<ul>
+<li>webview<ul>
+<li>虽然灵活，可以以web开发的方式进行开发，但所有的渲染都由web相关的技术来完成，无法得到一个真正原生的用户体验</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>将React移植到原生</p>
+<ul>
+<li>IOS上已经成功移植，开源项目<a href="http://componentkit.org/" target="_blank" rel="external">ComponentKit</a>，<a href="https://segmentfault.com/a/1190000002625560" target="_blank" rel="external">ComponentKit – 一个功能性和声明性的UI工具</a></li>
+<li>Android上还没有，需要重新开发，开发成本高，上手成本高，无法使用web顶层的技术栈和工具，最重要的是，仍然无法改善开发中最大的问题——每次修改之后，重新编译和构建工程。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>用脚本封装原生</p>
+<ul>
+<li><p>JS语言本身跨平台，可以采用像web的开发方式</p>
+</li>
+<li><p>直接利用JS基础平台和技术</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-6-用脚本封装原生的问题"><a href="#2-6-用脚本封装原生的问题" class="headerlink" title="2.6 用脚本封装原生的问题"></a>2.6 用脚本封装原生的问题</h3><ul>
+<li>UI线程阻塞<ul>
+<li>直接在原生环境和解释环境之间采用同步调用，UI线程很可能会被JavaScript执行阻塞住，要提高界面的响应效率，必须把JavaScript放到主线程之外执行。但这样做最直接的困难是资源访问竞争。如果我们的JavaScript访问正在被其它线程使用的资源（譬如一个渲染的View的尺寸），系统就只能加锁来确保方案安全，而这又会导致UI线程的卡顿</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>资源开销<ul>
+<li>每次原生和JavaScript虚拟机之间互相访问，在访问过程中都会带来极大的开销。如果经常跨线程访问，就会造成大量的开销</li>
+<li>必须改变一些基础层次的编程模型来确保系统在线程之间传递消息永远是异步的，这样就可以在一帧之内尽可能打包更多的消息发送，来尽可能减少一些跨线程交互的开销</li>
+</ul>
+</li>
+</ul>
+<h4 id="React模型"><a href="#React模型" class="headerlink" title="React模型"></a>React模型</h4><p><img src="/img/rn/react-model.jpg">  </p>
+<ul>
+<li><strong>非阻塞</strong><ul>
+<li>React是完全异步的，因此React的模型可以很好地解决上面提到的线程问题</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><strong>Virtual DOM</strong><ul>
+<li>React中的DOM是一种抽象的概念，这种抽象可以使React绑定到任何需要的视图系统上，比如IOS的UIKit，Android UI等等。</li>
+</ul>
+</li>
+</ul>
+<h2 id="三-RN-的架构"><a href="#三-RN-的架构" class="headerlink" title="三 RN 的架构"></a>三 RN 的架构</h2><h4 id="逻辑架构"><a href="#逻辑架构" class="headerlink" title="逻辑架构"></a>逻辑架构</h4><p><img src="/img/rn/react-dom.jpg">  </p>
+<h4 id="Virtural-DOM"><a href="#Virtural-DOM" class="headerlink" title="Virtural DOM"></a>Virtural DOM</h4><p>Virtual DOM是DOM在内存中的一种轻量级表达方式，可以通过不同的渲染引擎生成不同平台下的UI</p>
+<p>Vitual Dom对于RN的更新效率有很大帮助，React 中的Dom并不保证马上影响真实的Dom，React会等到事件循环结束，利用diff算法，通过当前新Dom树与之前的Dom树作比较，计算出更新真实的DOM的最小步骤</p>
+<p>Virtual Dom 的抽象为跨平台提供了可能，达到  <em>Learn once, write anywhere</em></p>
+<h2 id="四-开发基础"><a href="#四-开发基础" class="headerlink" title="四 开发基础"></a>四 开发基础</h2><h2 id="4-1-语言"><a href="#4-1-语言" class="headerlink" title="4.1 语言"></a>4.1 语言</h2><h3 id="4-1-1-JS"><a href="#4-1-1-JS" class="headerlink" title="4.1.1 JS"></a>4.1.1 JS</h3><ul>
+<li>ES5/6/7<ul>
+<li><a href="http://bbs.reactnative.cn/topic/15/react-react-native-%E7%9A%84es5-es6%E5%86%99%E6%B3%95%E5%AF%B9%E7%85%A7%E8%A1%A8" target="_blank" rel="external">ES语法</a></li>
+<li><a href="http://bbs.reactnative.cn/topic/15" target="_blank" rel="external">ES6和ES5的区别</a></li>
+<li><a href="http://es6.ruanyifeng.com/" target="_blank" rel="external">ECMAScript 6入门</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>ECMAScript 6（以下简称ES6）是JavaScript语言的下一代标准，已经在2015年6月正式发布了。它的目标，是使得JavaScript语言可以用来编写复杂的大型应用程序，成为企业级开发语言。</p>
+</blockquote>
+<h3 id="4-1-2-JSX"><a href="#4-1-2-JSX" class="headerlink" title="4.1.2 JSX"></a>4.1.2 JSX</h3><ul>
+<li><a href="http://facebook.github.io/jsx/" target="_blank" rel="external">JSX</a> 是一个看起来很像 XML 的 JavaScript 语法扩展，在 JavaScript 代码里写着 XML 格式的代码称为 JSX<ul>
+<li>在React 中可以接使用纯粹的 JS。但更建议使用 JSX , 因为它能定义简洁且我们熟知的包含属性的树状结构语法。</li>
+<li>对于非开发者（比如设计师）同样容易理解。</li>
+<li>XML 有固定的标签开启和闭合。这能让复杂的树更易于阅读，优于方法调用和对象字面量的形式。</li>
+<li>React 可以渲染 HTML 标签 (strings) 或 React 组件 (classes)。</li>
+<li><a href="http://reactjs.cn/react/docs/jsx-in-depth.html" target="_blank" rel="external">深入理解JSX</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="4-2-开发方式"><a href="#4-2-开发方式" class="headerlink" title="4.2 开发方式"></a>4.2 开发方式</h2><h4 id="4-2-1-组件"><a href="#4-2-1-组件" class="headerlink" title="4.2.1 组件"></a>4.2.1 组件</h4><h4 id="UI-和-样式-分离"><a href="#UI-和-样式-分离" class="headerlink" title="UI 和 样式 分离"></a>UI 和 样式 分离</h4><ul>
+<li>组件的构成<ul>
+<li>UI元素</li>
+<li>属性 <code>Props</code></li>
+<li>状态 <code>State</code></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>组件的特性<ul>
+<li>生命周期</li>
+<li>状态机</li>
+<li>数据绑定</li>
+<li>主线程问题</li>
+</ul>
+</li>
+</ul>
+<h4 id="4-2-2-样式"><a href="#4-2-2-样式" class="headerlink" title="4.2.2 样式"></a>4.2.2 样式</h4><ul>
+<li>StyleSheet<ul>
+<li>类似CSS语法，灵活，多样式复用</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank" rel="external">FlexBox</a>：弹性布局<ul>
+<li>响应式布局模型</li>
+<li>灵活性高，几乎可实现任意布局</li>
+</ul>
+</li>
+</ul>
+<p>Google已经放出了android平台的<a href="https://github.com/google/flexbox-layout" target="_blank" rel="external">Flexbox</a></p>
+<p>React Native并没有完整实现CSS，而是使用JavaScript来给应用添加样式。这种做法当初是有争议的，你可以参考这个<a href="http://pan.baidu.com/s/1mg5xcKC" target="_blank" rel="external">幻灯片</a>来了解一下这样做的理由。</p>
+<h4 id="4-2-3-API"><a href="#4-2-3-API" class="headerlink" title="4.2.3 API"></a>4.2.3 API</h4><ul>
+<li>基本组件<ul>
+<li><code>View</code>、<code>Text</code>、<code>ScrollVIew</code>、<code>Image</code>、<code>List</code>、<code>Drawer</code></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>常用模块<ul>
+<li><code>Toast</code>、<code>Storage</code>、<code>Navigator</code></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>动画：完整的动画API<ul>
+<li>缩放</li>
+<li>移动</li>
+<li>旋转</li>
+<li>插值</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>手势识别</p>
+<ul>
+<li><p><code>PanResponder</code>，类似Android事件处理机制</p>
+<p>​</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="4-2-4-RN-开发工具-Nuclide"><a href="#4-2-4-RN-开发工具-Nuclide" class="headerlink" title="4.2.4 RN 开发工具 Nuclide"></a>4.2.4 RN 开发工具 <a href="http://nuclide.io/docs/quick-start/getting-started/" target="_blank" rel="external"><strong>Nuclide</strong></a></h4><p><a href="https://atom.io/" target="_blank" rel="external">Atom编辑器</a>上的一个package</p>
+<p>Atom是Github官方开源的一个编辑器</p>
+<h3 id="五-RN-缺点"><a href="#五-RN-缺点" class="headerlink" title="五 RN 缺点"></a>五 RN 缺点</h3><ul>
+<li>Bug定位困难</li>
+<li>版本不稳定</li>
+<li>安装包太大</li>
+<li>issue很多</li>
+</ul>
+<h3 id="六-参考文献"><a href="#六-参考文献" class="headerlink" title="六 参考文献"></a>六 参考文献</h3><p><a href="http://facebook.github.io/react-native/docs/getting-started.html" target="_blank" rel="external">RN官方文档</a></p>
+<p><a href="http://reactnative.cn/docs/0.25/getting-started.html" target="_blank" rel="external">RN中文文档</a></p>
+<p><a href="http://reactjs.cn/" target="_blank" rel="external">React中文文档</a></p>
+<p><a href="http://facebook.github.io/react/docs/thinking-in-react.html#step-1-break-the-ui-into-a-component-hierarchy" target="_blank" rel="external">React组件化概念</a></p>
+<p><a href="http://reactjs.cn/react/docs/thinking-in-react.html" target="_blank" rel="external">深入理解React</a></p>
+<p><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank" rel="external">FlexBox Guide</a></p>
+<p><a href="http://liubin.org/promises-book/" target="_blank" rel="external">Promises</a></p>
+<p><a href="http://mp.weixin.qq.com/s?__biz=MzI1MTA1MzM2Nw==&amp;mid=207782506&amp;idx=1&amp;sn=3ff6b03c0d59fbda406f64739d9272cf&amp;scene=23&amp;srcid=1009Q3qo6mLeT2ydjdzUwLQ7#rd" target="_blank" rel="external">React Native For Android 架构初探</a></p>
+<p><a href="https://code.facebook.com/posts/1014532261909640/react-native-bringing-modern-web-techniques-to-mobile/" target="_blank" rel="external">react-native-bringing-modern-web-techniques-to-mobile</a></p>
+<p><a href="http://f8-app.liaohuqiu.net/" target="_blank" rel="external">F8项目整体介绍</a></p>
+<p><a href="http://facebook.github.io/react/blog/2013/06/05/why-react.html" target="_blank" rel="external">为什么构建React</a></p>
+<p><a href="http://facebook.github.io/jsx/" target="_blank" rel="external">JSX</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RN/"> #RN </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/07/js-object/">JS学习-对象</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/20/android-architecture/">Android架构初探</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/05/26/reactnative-introduction/"
+               data-title="Reactive Native 入门" data-url="http://www.lightskystreet.com/2016/05/26/reactnative-introduction/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-React-Native"><span class="nav-number">1.</span> <span class="nav-text">一 React Native</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-RN-的目标"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 RN 的目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-RN-的优点"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 RN 的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-RN-开发原则"><span class="nav-number">1.3.</span> <span class="nav-text">1.2 RN 开发原则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-RN-的架构起源"><span class="nav-number">2.</span> <span class="nav-text">二 RN 的架构起源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-React"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 React</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-原生开发"><span class="nav-number">2.2.</span> <span class="nav-text">2.3 原生开发</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#原生开发缺点"><span class="nav-number">2.2.1.</span> <span class="nav-text">原生开发缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#原生开发的优点"><span class="nav-number">2.2.2.</span> <span class="nav-text">原生开发的优点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-web-Native-？"><span class="nav-number">2.3.</span> <span class="nav-text">2.5 web + Native ？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-用脚本封装原生的问题"><span class="nav-number">2.4.</span> <span class="nav-text">2.6 用脚本封装原生的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#React模型"><span class="nav-number">2.4.1.</span> <span class="nav-text">React模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-RN-的架构"><span class="nav-number">3.</span> <span class="nav-text">三 RN 的架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#逻辑架构"><span class="nav-number">3.0.1.</span> <span class="nav-text">逻辑架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Virtural-DOM"><span class="nav-number">3.0.2.</span> <span class="nav-text">Virtural DOM</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四-开发基础"><span class="nav-number">4.</span> <span class="nav-text">四 开发基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-语言"><span class="nav-number">5.</span> <span class="nav-text">4.1 语言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-1-JS"><span class="nav-number">5.1.</span> <span class="nav-text">4.1.1 JS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-2-JSX"><span class="nav-number">5.2.</span> <span class="nav-text">4.1.2 JSX</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-开发方式"><span class="nav-number">6.</span> <span class="nav-text">4.2 开发方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-组件"><span class="nav-number">6.0.1.</span> <span class="nav-text">4.2.1 组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UI-和-样式-分离"><span class="nav-number">6.0.2.</span> <span class="nav-text">UI 和 样式 分离</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-样式"><span class="nav-number">6.0.3.</span> <span class="nav-text">4.2.2 样式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-3-API"><span class="nav-number">6.0.4.</span> <span class="nav-text">4.2.3 API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-4-RN-开发工具-Nuclide"><span class="nav-number">6.0.5.</span> <span class="nav-text">4.2.4 RN 开发工具 Nuclide</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五-RN-缺点"><span class="nav-number">6.1.</span> <span class="nav-text">五 RN 缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六-参考文献"><span class="nav-number">6.2.</span> <span class="nav-text">六 参考文献</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

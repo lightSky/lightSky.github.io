@@ -1,0 +1,1002 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，性能优化," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Android性能优化-减小图片下载大小 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Android性能优化-减小图片下载大小
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-10-19
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/性能优化/">性能优化</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/10/19/android-optimize-image-download-size/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/19/android-optimize-image-download-size/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>原文链接 <a href="https://developer.android.com/topic/performance/network-xfer.html" target="_blank" rel="external">https://developer.android.com/topic/performance/network-xfer.html</a></p>
+<h3 id="内容概要"><a href="#内容概要" class="headerlink" title="内容概要"></a><strong>内容概要</strong></h3><ol>
+<li><p>理解图片的格式 PNG JPG WebP</p>
+</li>
+<li><p>如何选择一种图片格式</p>
+</li>
+<li><p>确定准确质量值</p>
+</li>
+<li><p>服务端的尺寸大小</p>
+<p>​</p>
+</li>
+</ol>
+<h1 id="减小图像下载大小"><a href="#减小图像下载大小" class="headerlink" title="减小图像下载大小"></a>减小图像下载大小</h1><p>大多数流量传输都包含图像。 因此，你制作的下载的图片越小，就会为用户提供更好的网络体验。 本篇文章提供了让你的图像文件更小以及更加网络友好的指导。</p>
+<h2 id="理解图像的格式"><a href="#理解图像的格式" class="headerlink" title="理解图像的格式"></a>理解图像的格式</h2><p>Android应用通常使用以下某种或多种文件格式的图片：PNG，JPG和WebP。 对于每种格式，你都可以采取措施缩小图片大小。</p>
+<h3 id="PNG"><a href="#PNG" class="headerlink" title="PNG"></a>PNG</h3><p>缩小PNG文件的关键是减少构成图像的每行像素中使用的唯一颜色数。通过使用更少的颜色，可以提高在其它管道中的压缩能力。</p>
+<p>减少独唯一颜色的数量会取得显着效果的原因是，PNG压缩效果基于一个水平方向相邻像素颜色变化程度的函数。因此，减少PNG图像每行中唯一颜色数量可以减少文件大小。</p>
+<p>当决定是否采用这种策略时，你应该记住，减少唯一颜色的数量实际上等于对图像应用了有损编码。然而，编码工具可能不会判断一个细小的偏差导致多糟糕的视觉效果。因此，为了保证有效压缩和可接受的图像质量的平衡，你应该手动执行此工作，</p>
+<p>有两个特别有用的方法你可以采取：优化索引格式和应用矢量量化。</p>
+<h4 id="优化索引格式"><a href="#优化索引格式" class="headerlink" title="优化索引格式"></a>优化索引格式</h4><p>任何减少颜色的尝试都应该首先尝试优化颜色，以便将图像导出为PNG时可以使用INDEXED格式。 INDEXED颜色模式会选择最佳的256色彩，并用索引将所有像素值替换到调色板中。 结果是从1600万色彩减少到仅256色彩：等同于从每像素3（没有透明度）或4（具有透明度）字节减少到每像素1字节。这种变化向减少文件迈出了重大的一步。</p>
+<a id="more"></a>
+<p><img src="/img/android-optimize/indexed-image.png">    </p>
+<p>图片 1.一个图像在转换为INDEXED的前后对照</p>
+<p>Figure 2 展示了图像1中的调色板</p>
+<p><img src="/img/android-optimize/platte.png">  </p>
+<p>将图像表示为调色图像对于显着改善文件大小有很大帮助，因此，如果你的大多数图片都可以转换，可以好好研究一下。</p>
+<p>当然，并不是每个图像都可以用256种色彩准确表示。 例如，某些图像可能需要257,310,512或912种颜色才能正确显示。 在这种情况下，矢量化会可能会有帮助。</p>
+<h4 id="矢量化"><a href="#矢量化" class="headerlink" title="矢量化"></a>矢量化</h4><p>矢量化（VQ）也许是对创建索引图像的过程更好地描述。 VQ会对多维数进行舍入处理。 在此过程中，你图片中的所有颜色都将根据相似性进行分组。 对于给定的组，该组中的所有颜色都将被单个<em>中心点</em>值替换，这样可以最大程度地减少该单元格中的颜色错误（如果使用Voronoi术语，则为“site”）。 在图3中，绿色点表示输入颜色，而红色点是替换输入颜色的中心点。 每个单元格由蓝线界定。</p>
+<p><img src="/img/android-optimize/vector-quantization.gif">    </p>
+<p>图3 为图像中的颜色进行矢量化</p>
+<p>将VQ应用于图像会减少了唯一颜色的数量，用视觉质量上“相当接近”的单一颜色替换每组颜色。</p>
+<p>此技术也允许你为图像定义唯一颜色的最大数量。 例如，图4显示了1670万种颜色（每像素24位，或bpp）的鹦鹉头像，旁边是一个只使用16（3bpp）唯一颜色的版本。</p>
+<p><img src="/img/android-optimize/vq.png">   </p>
+<p>你可以明显看到有一些质量的损失; 大多数渐变颜色已经被替换，赋予图像带状效果。 因此该图片需要超过16种唯一的色彩。</p>
+<p>在管道中设置VQ的步骤可以帮助你对图像中使用的唯一色彩的真实数量有更好地了解，并且可以帮助你显著地减小它们。 有很多可用的工具来帮助你实现此技术。</p>
+<h3 id="JPG"><a href="#JPG" class="headerlink" title="JPG"></a>JPG</h3><p>如果你使用的是JPG图片，这里有几种只做很小的改变就可以显著节省文件大小的方法：</p>
+<ul>
+<li>通过不同的编码方法生成较小的文件（不影响质量）。</li>
+<li>稍微调整质量以得到更好的压缩。</li>
+</ul>
+<p>执行这些策略通常可以将文件大小减少高达25％。</p>
+<p>选择工具时，请记住照片导出工具会将不必要的元数据（如GPS信息）插入到图像中。为了最小化，你可以尝试利用现有工具删除这些信息。  </p>
+<h3 id="WebP"><a href="#WebP" class="headerlink" title="WebP"></a>WebP</h3><p>WebP是Android 4.2.1（API 17）支持的较新的图像格式。 这种格式为网络图像提供了卓越的无损和有损压缩。 使用WebP，开发人员可以创建更小，更丰富的图像。 WebP无损图像文件平均比PNG小 <a href="https://developers.google.com/speed/webp/docs/webp_lossless_alpha_study#conclusions" target="_blank" rel="external">26% </a>。 这些图像文件还支持透明度（也称为alpha通道），成本只有 <a href="https://developers.google.com/speed/webp/docs/webp_lossless_alpha_study#results" target="_blank" rel="external">22%</a> 的字节。</p>
+<p>WebP有损图像比同等 <a href="https://en.wikipedia.org/wiki/Structural_similarity" target="_blank" rel="external">SSIM</a> 质量指数下的JPG图像小 <a href="https://developers.google.com/speed/webp/docs/webp_study#experiment_1_webp_vs_jpeg_at_equal_ssim_index" target="_blank" rel="external">25-34%</a> 。 对于可接受有损RGB压缩的场景，有损WebP还能支持透明度，产生的文件大小通常比PNG小3倍。</p>
+<p>有关WebP的详细信息，请访问 <a href="https://developers.google.com/speed/webp/" target="_blank" rel="external">WebP</a>。</p>
+<h2 id="选择一种格式"><a href="#选择一种格式" class="headerlink" title="选择一种格式"></a>选择一种格式</h2><p>不同的图像格式适用于不同类型的图像。 JPG和PNG的压缩过程有很大差别，产生的效果差别也很大。</p>
+<p>决定使用PNG还是JPG，通常归结于图像本身的复杂性。图5显示了两个图像，由于开发者应用了不同的压缩方案而导致很大的差别。左侧的图像有许多小细节，因此使用JPG压缩效率更高。右侧的图像，很多区域具有相同颜色，使用PNG压缩更有效。  </p>
+<p><img src="/img/android-optimize/jpg-vs-png.png">  </p>
+<p>图5  JPG和PNG的适用场景</p>
+<p>WebP格式可以支持有损和无损模式，是PNG和JPG的理想替代品。唯一要记住的是，它只对运行Android 4.2.1（API 17）及更高版本的设备提供支持。不过幸运的是，<a href="https://developer.android.com/about/dashboards/index.html#Platform" target="_blank" rel="external">大多数设备</a>都满足这一要求。</p>
+<p>图6提供了一个简单的图示来帮助你决定使用哪种压缩方案。</p>
+<p><img src="/img/android-optimize/selector.png">  </p>
+<p>Figure 6. 如何决定一种压缩方案</p>
+<h2 id="确定最佳质量值"><a href="#确定最佳质量值" class="headerlink" title="确定最佳质量值"></a>确定最佳质量值</h2><p>有几种技术可以用来实现压缩和图像质量之间的正确权衡。有一种技术使用标量值，因此仅适用于JPG和WebP。另一种技术利用了Butteraugli库，并可用于所有图像格式。</p>
+<h3 id="标量值（仅限JPG和WebP）"><a href="#标量值（仅限JPG和WebP）" class="headerlink" title="标量值（仅限JPG和WebP）"></a>标量值（仅限JPG和WebP）</h3><p>JPG和WebP的强大来自于你可以使用标量值来平衡质量和文件大小。诀窍是找出图像的正确的质量值。太低的质量水平虽然产生文件小，但以牺牲图像质量为代价。太高的质量水平会增加文件大小，对用户不友好。</p>
+<p>最直接的解决方案是选择一些非最大值进行尝试。但是，请注意，质量值对每个图像的影响不同。例如，75％的质量在大多数图像上可能看起来很好，但在另一些图片上效果可能不好。你应该使用图像的代表性样本对选择的最大值进行测试。此外，要确保你是对原始图像执行所有测试，而不是压缩版本。</p>
+<p>对于每天上传和发送数百万个JPG的大型媒体应用程序来说，手动调整每个资源是不切实际的。你可以根据图像类别指定几个不同的质量级别来解决这个问题。例如，可以将缩略图的质量设置为35％，因为较小的图像隐藏了更多的压缩伪影（伪影不是很好理解）。</p>
+<h3 id="Butteraugli"><a href="#Butteraugli" class="headerlink" title="Butteraugli"></a>Butteraugli</h3><p>Butteraugli是一个库，用于测试图像的视觉误差阈值：观察者开始注意到图像质量下降的点。换句话说，这个项目试图将压缩图像的失真量化。</p>
+<p>Butteraugli允许你定义视觉质量的目标，然后运行PNG，JPG，WebP有损和WebP无损压缩。然后，你可以选择文件大小和Butteraugli级别之间效果最佳的图像。图7示出了在视觉失真以至于用户可以感知到之前，如何使用Butteraugli来找到最低的JPG质量水平;最终文件大小减少了大约65％。</p>
+<p><img src="/img/android-optimize/butteraugli.png">  </p>
+<p>图7.应用Butteraugli技术之前和之后的图像。</p>
+<p>Butteraugli允许你基于输出或输入进行处理。也就是说，你可以在用户感觉到图像出现明显失真之前找到最低的质量设置，或者你可以依次设置图像失真级别去观察对应的质量水平。</p>
+<h2 id="服务端的尺寸"><a href="#服务端的尺寸" class="headerlink" title="服务端的尺寸"></a>服务端的尺寸</h2><p>在服务器上仅存有一种分辨率的图像的方式是很便利的。当设备访问映像时，服务器直接返回给设备该分辨率的图片。</p>
+<p>虽然这个解决方案方便了开发者，但对用户来说可能很痛苦，因为这种方案迫使用户下载比实际需要更多的数据。你应该存储多个大小的图像，并根据合适的使用场景提供不同的图像。例如，对于缩略图，服务应该提供缩略图图像而不是全尺寸的版本，这样可以节省很多网络带宽。</p>
+<p>这种方法对于下载速度是有利的，并且降低了使用有限或按数据量收费用户的成本。图像在设备和主存储器上也会占用更少的空间。在大图像（例如4K图像）的情况下，这种方式还减少了设备在加载图像之前调整大小的时间。</p>
+<p>实现此方法需要有一个后端图像服务，以提供具有适当缓存的各种分辨率的图像。有几种现有的服务可以帮助你，例如，<a href="https://cloud.google.com/appengine/" target="_blank" rel="external">App Engine</a> 自带了调整图片大小的功能。</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，性能优化/"> #Android，性能优化 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/11/android-dex-plugin/">multidex与插件化</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/18/android-optimize-thread/">Android性能优化-线程性能优化</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/10/19/android-optimize-image-download-size/"
+               data-title="Android性能优化-减小图片下载大小" data-url="http://www.lightskystreet.com/2016/10/19/android-optimize-image-download-size/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#内容概要"><span class="nav-number">1.</span> <span class="nav-text">内容概要</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#减小图像下载大小"><span class="nav-number"></span> <span class="nav-text">减小图像下载大小</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#理解图像的格式"><span class="nav-number"></span> <span class="nav-text">理解图像的格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PNG"><span class="nav-number">1.</span> <span class="nav-text">PNG</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优化索引格式"><span class="nav-number">1.1.</span> <span class="nav-text">优化索引格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#矢量化"><span class="nav-number">1.2.</span> <span class="nav-text">矢量化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JPG"><span class="nav-number">2.</span> <span class="nav-text">JPG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WebP"><span class="nav-number">3.</span> <span class="nav-text">WebP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择一种格式"><span class="nav-number"></span> <span class="nav-text">选择一种格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#确定最佳质量值"><span class="nav-number"></span> <span class="nav-text">确定最佳质量值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标量值（仅限JPG和WebP）"><span class="nav-number">1.</span> <span class="nav-text">标量值（仅限JPG和WebP）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Butteraugli"><span class="nav-number">2.</span> <span class="nav-text">Butteraugli</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端的尺寸"><span class="nav-number"></span> <span class="nav-text">服务端的尺寸</span></a></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

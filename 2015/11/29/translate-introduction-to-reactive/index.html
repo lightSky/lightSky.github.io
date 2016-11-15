@@ -1,0 +1,1042 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Reactive," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> 译文 The introduction to Reactive Programming you've been missing // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              译文 The introduction to Reactive Programming you've been missing
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-11-28
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Reactive/">Reactive</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/11/29/translate-introduction-to-reactive/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/translate-introduction-to-reactive/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>原文 <a href="https://gist.github.com/staltz/868e7e9bc2a7b8c1f754" target="_blank" rel="external">The introduction to Reactive Programming you’ve been missing</a> </p>
+<p>Reactive编程就是异步数据流的编程。</p>
+<p>总的来说，这里没有什么新东西。事件总线或者典型的click事件就是一种异步事件流，你可以观察它们并做出一些响应。Reactive就是基于这种理论。你可以创建任何事物的数据流。流的代价很低而且很普遍，任何事物都可以是流：变量，用户输入，属性 ，缓存，数据结构等等。比如Twitter的消息源可以看作是相应点击事件的数据流。你可以监听它们并作出相应的响应。</p>
+<p>除此之外，它们提供了一个用于连接，创建，过滤任何流的函数库。不仅某个流可以用于另一个流的输入，多个流同样可以作为其它流的输入。你也可以合并两个流。如果你对某些事件感兴趣，也可以通过对一个流的过滤获得另一个目标流。也可以将一个流中的数据映射到一个新的数据流。</p>
+<p>可以看到流对Reactive来说有多重要，我们仔细来看一下它们，以我们熟悉的按钮点击事件流开始：</p>
+<a id="more"></a>
+<p><img src="/img/rx/btn_click_flow.png" width="570" height="400"></p>
+<p>一个流是将要发生的有序序列事件的一部分。它可以发出三种不同的事件：value，error或者completed。假想下“completed”事件的场景，比如window或者view中的关闭按钮点击的时候。</p>
+<p>我们所谈到的事件只会是异步的，通常会定义三个要执行的函数，一个在值输入的时候发生，一个在错误发生时执行，以及一个事件完成时执行。有时候后面两个会被省略，你只需要定义输入值的处理函数，对于流的监听被称作订阅。我们定义的函数被称作观察者。流（或者Observable）是被观察的对象。在观察者模式中写的很明确:<a href="https://en.wikipedia.org/wiki/Observer_pattern" target="_blank" rel="external">Observer Design Pattern</a>.</p>
+<p>一种转换的方式是通过ASCII图来表示，在本教程的多处地方我们都会用到：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">--a---b-c---d---X---|-&gt;</div><div class="line"></div><div class="line">a, b, c, d 代表分发的值</div><div class="line">X 代表错误</div><div class="line">| 代表事件完成信号</div><div class="line">---&gt; 代表时间线</div></pre></td></tr></table></figure>
+<p>既然我们对一些概念比较熟悉了，那咱么就尝试点新的东西：我们将创建一个新的点击事件流，该事件流由原始的点击事件流演化而来。</p>
+<!--more-->
+<p>首先，我们创建一个计数流，用于计算一个button点击了多少次。通常在Reactive库中，每一个流都附带很多函数，比如map，filter，scan等等。当你调用其中任意一个函数，比如clickStream.map(f)，会基于当前的click流返回个一个新的流。但不管怎样，它都不会修改原始的click流。这种特性称作不变性，这种不变性会把Reactive流组织在一起。这样做可以实现链式调用，比如：clickStream.map(f).scan(g)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">  clickStream: ---c----c--c----c------c--&gt;</div><div class="line">               vvvvv map(c becomes 1) vvvv</div><div class="line">               ---1----1--1----1------1--&gt;</div><div class="line">               vvvvvvvvv scan(+) vvvvvvvvv</div><div class="line">counterStream: ---1----2--3----4------5--&gt;</div></pre></td></tr></table></figure>
+<p>map(f) 函数替换了函数 f 分发的每一个值（到一个新的流中）。在这个例子中，我们将数字1映射到了每一个click事件上。scan(g)函数叠加了流上的所有值，通过 x = g(accumulated, current)得到x，g代表示例中的”+”函数。然后，counterStream会分发点击事件发生的总数。</p>
+<p>为了展示Reactive的强大，假设我们需要一个双击事件流。为了看起来更有趣，假设我们的新流能够考虑到类似双击多次的点击事件。考虑下如果通过传统的，不可避免的状态性方式来实现它。我打赌那样的实现方式看起来一定不爽，并且引入了一些用于保持状态和时间间隔的变量。</p>
+<p>在Reactive中实现起来是非常简洁的。这个逻辑只需要4行代码就可搞定。现在我们先暂时忽略代码。让我们来用图表来思考，不管你是初级还是专家，使用图标来思考都是最好的理解和构建流的方式。</p>
+<p><img src="/img/rx/btn_double_click_flow.png" width="570" height="760"></p>
+<p>灰色部分的函数将一个流转换成了另一个流。首先我们将列表中的clicks事件的间隔为250毫秒的事件计算并归类。先不考急着理解细节的实现，到现在我们只是展示了Reactive的使用。我们得到的结果是一个列表的流，从这个列表流中我们可以运用map()将每一个list中的length映射成一个integer。最终我们通过filter( x &gt;= 2 )函数过滤掉integer ＝ 1的值。结果有3个操作满足我们的意图流。然后我们可以通过subcribe订阅它并作出期望的响应。</p>
+<p>希望你喜欢这种形象的讲解方式。这个示例只是一个简单的引子，你可以将这种方式应用到任何种类的流中，比如在一个API响应的流中，或者其它可用的函数。</p>
+<h2 id=""><a href="#" class="headerlink" title=" "></a> </h2><p>#为什么我应该考虑采用Reactive 编程？<br>反应式编程提高了代码抽象的层次，你可以聚焦于定义了业务逻辑的事件依赖，而不是被大量的实现细节所困扰。Reactive编程会让代码更简洁。</p>
+<p>在如今的多UI事件与数据事件高度交互的webapp和移动app中，这种好处会更加的明显。10年前，与web界面的交互是通过向后台提交长表单并在前端进行简单的渲染。随着演变，App的响应更加实时：修改一个单独的表单字段可以自动的触发后台的保存，某些用户收藏的内容可以及时反映给其他相关的用户。</p>
+<p>如今的app拥有各种各样用于增强交互体验的实时事件。我们需要处理这种情景的工具，反应式编程就是很好的解决方案。</p>
+<h2 id="-1"><a href="#-1" class="headerlink" title=" "></a> </h2><p>#以RP的方式思考</p>
+<p>让我们来点干货。通过真实的例子一步步的探索如何以PR的方式思考问题。没有捏造的例子，没有模糊不清的概念。在教程的结尾我们会产出真实的代码，同时了解每一步的操作为什么这么做。</p>
+<p>我选用了JS和<a href="https://github.com/Reactive-Extensions/RxJS" target="_blank" rel="external">RxJs</a>作为工具。原因是JS是如今最常见的语言。并且<a href="http://reactivex.io/" target="_blank" rel="external">Rx library大家庭</a>可以广泛的适用于多种语言和平台 (.NET, Java, Scala, Clojure, JavaScript, Ruby, Python, C++, Objective-C/Cocoa, Groovy, etc)，因此不管你使用什么工具，你都可以从下面的教程中受益。</p>
+<h2 id="-2"><a href="#-2" class="headerlink" title=" "></a> </h2><p>#实现一个“Who to follow”建议模块</p>
+<p>在Twitter中，有一个模块提供了你可能感兴趣的建议用户</p>
+<p><img src="/img/rx/twitter_who_to_follow.png" width="500" height="680"></p>
+<p>我们将要关注该模块以下核心特性：</p>
+<ul>
+<li>当启动的时候，从API加载用户数据并展示3条建议</li>
+<li>点击“刷新”，更新三条新的用户建议</li>
+<li>点击“x”按钮，清理当前展示的那条用户建议</li>
+<li>每一行展示的用户头像和相应的twitter链接</li>
+</ul>
+<p>没有选择其它的特性和按钮是因为它们和我们的目的关系不是很紧密。但Twitter最近向未授权的第三方关闭了API，这里通过Github的following poeple的API来代替。这里是获取Github 用户的 <a href="https://developer.github.com/v3/users/#get-all-users" target="_blank" rel="external">API</a>  </p>
+<p>完整的代码已经有了: <a href="http://jsfiddle.net/staltz/8jFJH/48/" target="_blank" rel="external">http://jsfiddle.net/staltz/8jFJH/48/</a></p>
+<h2 id="-3"><a href="#-3" class="headerlink" title=" "></a> </h2><p>#请求和响应<br>如何使用Rx解决问题？首先你得明白，“一切皆流”，这是Rx的核心理念。回到一开始提到的特性：“启动的时候从API加载3个用户数据”。这个很简单，简单来说就三步：请求，获取结果，渲染结果。首先我们把请求作为一个流。乍一看感觉有点手足无措，但我们可以先从最基础的开始：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">--a------|-&gt;</div><div class="line"></div><div class="line">a 代表  string &apos;https://api.github.com/users&apos;</div></pre></td></tr></table></figure>
+<p>这个URL流是我们要去请求的。不管请求何时发生，它会告诉我们两件事：when和what。“when”当事件被分发时请求执行的时间。“what”就是请求要分发的值：一个包含URL的string。</p>
+<p>在Rx中创建这样只有一个值的流非常简单。在官方的术语中，流就是“Observable”，可以被观察的，但是我觉得这个名字很傻瓜（不够形象），所以我把它称作stream。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">var requestStream = Rx.Observable.just(<span class="string">'https://api.github.com/users'</span>);</div></pre></td></tr></table></figure>
+<p>现在，这里只是一个string流，还没有任何其它的操作。因此当值分发的时候，我们需要做一些处理，这些处理会被订阅到流中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">requestStream.subscribe(function(requestUrl) &#123;</div><div class="line">  <span class="comment">// execute the request</span></div><div class="line">  jQuery.getJSON(requestUrl, function(responseData) &#123;</div><div class="line">    <span class="comment">// ...</span></div><div class="line">  &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意到我们使用了一个jQuery Ajax回调处理这个异步请求操作。咦，Rx不就是处理异步数据流的么，难道请求的响应不能够看作是一个未来某个时间到达的包含数据的流么？哇，概念有了，接下来试试：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">requestStream.subscribe(function(requestUrl) &#123;</div><div class="line">  <span class="comment">// execute the request</span></div><div class="line">  var responseStream = Rx.Observable.create(function (observer) &#123;</div><div class="line">    jQuery.getJSON(requestUrl)</div><div class="line">    .done(function(response) &#123; </div><div class="line">        observer.onNext(response); </div><div class="line">    &#125;)</div><div class="line">    .fail(function(jqXHR, status, error) &#123; </div><div class="line">        observer.onError(error); </div><div class="line">    &#125;)</div><div class="line">    .always(function() &#123;</div><div class="line">        observer.onCompleted(); </div><div class="line">    &#125;);</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">  responseStream.subscribe(function(response) &#123;</div><div class="line">    <span class="comment">// do something with the response</span></div><div class="line">  &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Rx.Observable.create() 所做的就是创建一个自定义的流，这个流明确的把自己的数据处理(onNext())和错误处理(onError())告知了每一个观察者（或者叫“订阅者”）。我们做的仅仅就是包装jQuery Ajax预期发生的事件。顺便问下，这样做是否意味着一个Promise（这里对Promise不做翻译，是因为对JS中的概念不熟，暂且理解为“期望”吧）就是一个Observable？</p>
+<p>是的！<br>Observable就是Promise++。在Rx中，你可以通过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">var stream = Rx.Observable.fromPromise(promise)</div></pre></td></tr></table></figure></p>
+<p>简单的将一个Promis转换为一个Observable。唯一不同的区别就是Observables不是 Promises/A+，但概念并不冲突。一个Promise就是一个简单的带有分发值的Observable。但Rx流允许很多返回值，在这一点上，Rx要超过promises。</p>
+<p>真是太棒了。说明Observable至少和Promises一样强大。如果你对Promises很赞赏，那么你可以关注Rx Observables都适用于哪些部分。</p>
+<p>让我们回到之前的例子。你可能早就注意到，我们在另一个流中调用了subscribe(),一个被称作回调地狱的处理。当然，responseStream的创建依赖于requestStream。正如你之前看到的那样，Rx拥有简单的机制用于转换和创建流自身之外的流，这也是我们将要做的。</p>
+<p>到目前我们所知道的一个基础函数就只有 map(f) ，它获取了stream A的每一个值。通过应用 f( ) ，可以在stream B上产生一个值。如果要把这样的处理应用于我们的请求和响应流，我们可以把请求的URLs转换为响应的Promises（可以假想为流）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var responseMetastream = requestStream</div><div class="line">  .map(function(requestUrl) &#123;</div><div class="line">    <span class="keyword">return</span> Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+<p>接着我们将会创建一个称作“metstream”的东西：流中的一种，别慌张啊，一个metastream就是一个steam，只是它的每一个分发值是另一个流。你可以把它看作指针：每一个分发值就是一个指向其它stream的指针。在我们的例子中，每一个请求URL被映射到一个指向其它包含了响应的流指针。</p>
+<p><img src="/img/rx/meta_stream1.png" width="480" height="660">  </p>
+<p>响应的metastream可能会让人有点迷惑，看起来对我们一点帮助也没有。我们只是期望一个简单的响应stream，stream中每一个值是一个JSON对象，而不是一个Json对象的“Promise”。让我们来认识下Flatmap吧，Flatmap是map()的一种，它能够会“铺平“一个metastream，从干流上把流分发到每一个分支上。</p>
+<p>Flatmap不是一个修复，metastream当然也不是一个bug。它们只是Rx中处理异步流的工具。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var responseStream = requestStream</div><div class="line">  .flatMap(function(requestUrl) &#123;</div><div class="line">    <span class="keyword">return</span> Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+<p><img src="/img/rx/meta_stream2.png" width="570" height="660">  </p>
+<p>太棒了。同时因为响应流是根据请求流定义的，如果之后我们有更多事件发生在请求流中，也期望在响应流中作出相应的响应事件，比如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">requestStream:  --a-----b--c------------|-&gt;</div><div class="line"></div><div class="line">responseStream: -----A--------B-----C---|-&gt;</div><div class="line"></div><div class="line">小写字母是请求，大写字母是响应</div></pre></td></tr></table></figure></p>
+<p>现在我们拥有了一个响应流，可以渲染数据了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">responseStream.subscribe(function(response) &#123;</div><div class="line">  <span class="comment">// render `response` to the DOM however you wish</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>把所有的代码放一块是这样的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">var requestStream = Rx.Observable.just(<span class="string">'https://api.github.com/users'</span>);</div><div class="line"></div><div class="line">var responseStream = requestStream</div><div class="line">  .flatMap(function(requestUrl) &#123;</div><div class="line">    <span class="keyword">return</span> Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">responseStream.subscribe(function(response) &#123;</div><div class="line">  <span class="comment">// render `response` to the DOM however you wish</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<h2 id="-4"><a href="#-4" class="headerlink" title=" "></a> </h2><p>#刷新按钮部分<br>我还没注意到相应的Json列表中将然有100个用户数据。API只允许我们指定page offset，而不是page size，因此我们只使用3条数据对象，剩下的97条都浪费了。我们可以暂时忽略这部分，因为之后我们会缓存这个response。</p>
+<p>每次刷新按钮点击的时候，请求流会分发一个新的URL，因此我们会得到一个新的response。我们需要做两件事：一个刷新按钮的click事件流（一切皆流），我们需要将请求流转换为一个依赖于刷新事件流的流。RxJs提供了从事件监听者创建Observable的工具。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var refreshButton = document.querySelector(<span class="string">'.refresh'</span>);</div><div class="line">var refreshClickStream = Rx.Observable.fromEvent(refreshButton, <span class="string">'click'</span>);</div></pre></td></tr></table></figure>
+<p>由于刷新事件自己不含有任何API URL，我们需要将每一个click事件映射成一个实际的URL。现在我们把请求流转变成每一次都带有任意offset参数API的刷新点击流。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">var requestStream = refreshClickStream</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*<span class="number">500</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'https://api.github.com/users?since='</span> + randomOffset;</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+<p>因为我比较菜而且没有进行自测，我把之前要做的特性搞砸了。现在请求在启动之前不会发生，而只有点击刷新按钮的时候才发生。现在我需要满足这两种行为 ：刷新按钮点击的时候和web界面打开的时候。</p>
+<p>我们知道如何从上面两种情况分别构建一个独立的流：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">var requestOnRefreshStream = refreshClickStream</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*<span class="number">500</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'https://api.github.com/users?since='</span> + randomOffset;</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">var startupRequestStream = Rx.Observable.just(<span class="string">'https://api.github.com/users'</span>);</div></pre></td></tr></table></figure>
+<p>但是我们如何将它们“merge”成一个流呢？没错，就是merge方法，下面的图标中解释merge所做的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">stream A: ---a--------e-----o-----&gt;</div><div class="line">stream B: -----B---C-----D--------&gt;</div><div class="line">          vvvvvvvvv merge vvvvvvvvv</div><div class="line">          ---a-B---C--e--D--o-----&gt;</div></pre></td></tr></table></figure>
+<p>现在应该很简单了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">var requestOnRefreshStream = refreshClickStream</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*<span class="number">500</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'https://api.github.com/users?since='</span> + randomOffset;</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">var startupRequestStream = Rx.Observable.just(<span class="string">'https://api.github.com/users'</span>);</div><div class="line"></div><div class="line">var requestStream = Rx.Observable.merge(</div><div class="line">  requestOnRefreshStream, startupRequestStream</div><div class="line">);</div></pre></td></tr></table></figure></p>
+<p>一种更简洁，没有中间流的方式：  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var requestStream = refreshClickStream</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*<span class="number">500</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'https://api.github.com/users?since='</span> + randomOffset;</div><div class="line">  &#125;)</div><div class="line">  .merge(Rx.Observable.just(<span class="string">'https://api.github.com/users'</span>));</div></pre></td></tr></table></figure>
+<p>更简短，可读性更强的方式：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var requestStream = refreshClickStream</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*<span class="number">500</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'https://api.github.com/users?since='</span> + randomOffset;</div><div class="line">  &#125;)</div><div class="line">  .startWith(<span class="string">'https://api.github.com/users'</span>);</div></pre></td></tr></table></figure></p>
+<p>startWith()函数的作用正如你想的那样。不管输入流是怎样的，应用了startWith(x)的输出流结果都会以X开头。但是我还不够 <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself" target="_blank" rel="external">DRY</a> （Don’t Repeate Yourself），我这里重复了API string啊。一种改善的方式是通过移除refreshClickStream附近的startWith()方法，在方法开始的时候模拟一个刷新按钮的点击。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">var requestStream = refreshClickStream.startWith(<span class="string">'startup click'</span>)</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*<span class="number">500</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'https://api.github.com/users?since='</span> + randomOffset;</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+<p>很棒啊。如果你回过头来看我之前说的没有自测的部分，你可以看到后一种方式的唯一区别就是添加了startWith()方法。</p>
+<h2 id="-5"><a href="#-5" class="headerlink" title=" "></a> </h2><p>#通过streams构建3条建议的模型<br>直到现在，在响应流的subscribe()方法的渲染步骤中，我们只接触到了一个suggestion UI元素。现在的刷新按钮，存在一个问题：如果尽可能快的点击“refresh”，当前的3条建议还没来得及被清除掉，新的建议就已经会伴随新的请求结果出现了，但是为了让UI看起来更漂亮，当刷新的点击事件发生的时候，我们需要清理当前的建议。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">refreshClickStream.subscribe(function() &#123;</div><div class="line">  <span class="comment">// clear the 3 suggestion DOM elements</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>别急，其实这么做是不对的。因为现在有两个订阅者影响了suggesion节点元素（另一个通过responseStream.subscribe()订阅），并且看起来不那么的<a href="https://en.wikipedia.org/wiki/Separation_of_concerns" target="_blank" rel="external">Separation of concerns</a>（根据作者的意图来看，这里的意思是尽量让事件更独立和明确，这里把影响suggestion的两个订阅者分离开） 。还记得Reactive的准则么？  </p>
+<p><strong>一切皆流</strong>  </p>
+<p><img src="/img/rx/every_thing_stream.png" width="570" height="550">  </p>
+<p>我们把一条建议模型化为一个流，在这里每一个分发值是一个包含建议数据的JSON对象。我们将3条建议分开，下面是第一条建议流：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">var suggestion1Stream = responseStream</div><div class="line">  .map(function(listUsers) &#123;</div><div class="line">    // get one random user from the list</div><div class="line">    return listUsers[Math.floor(Math.random()*listUsers.length)];</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+<p>建议2，建议3的流可以简单的直接从上面copy。这不能称作DRY，但它能够让我们的教程示例更简单，当然考虑如何避免这样的重复操作会是一个不错的实践。</p>
+<p>要在response流的subscribe方法中进行渲染操作可以这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">suggestion1Stream.subscribe(function(suggestion) &#123;</div><div class="line">  // render the 1st suggestion to the DOM</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>回到之前的需求：“点击刷新，删除建议”，我们可以将点击刷新简单的映射成null数据的情况，并加入到suggestion1Stream中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">var suggestion1Stream = responseStream</div><div class="line">  .map(function(listUsers) &#123;</div><div class="line">    // get one random user from the list</div><div class="line">    return listUsers[Math.floor(Math.random()*listUsers.length)];</div><div class="line">  &#125;)</div><div class="line">  .merge(</div><div class="line">    refreshClickStream.map(function()&#123; return null; &#125;)</div><div class="line">  );</div></pre></td></tr></table></figure></p>
+<p>渲染的时候，可以把null作为没有数据处理，因此会隐藏对应的UI元素：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">suggestion1Stream.subscribe(function(suggestion) &#123;</div><div class="line">  if (suggestion === null) &#123;</div><div class="line">    // hide the first suggestion DOM element</div><div class="line">  &#125;</div><div class="line">  else &#123;</div><div class="line">    // show the first suggestion DOM element</div><div class="line">    // and render the data</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>用图表来表示整个过程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">refreshClickStream: ----------o--------o----&gt;</div><div class="line">     requestStream: -r--------r--------r----&gt;</div><div class="line">    responseStream: ----R---------R------R--&gt;</div><div class="line"> suggestion1Stream: ----s-----N---s----N-s--&gt;</div><div class="line"> suggestion2Stream: ----q-----N---q----N-q--&gt;</div><div class="line"></div><div class="line"> suggestion3Stream: ----t-----N---t----N-t--&gt;</div><div class="line"></div><div class="line">N代表null</div></pre></td></tr></table></figure></p>
+<p>有了上面的做法，我们同样可以在开始的时候渲染suggestion为empty的情况。通过添加startWith(null)到建议流中来实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">var suggestion1Stream = responseStream</div><div class="line">  .map(function(listUsers) &#123;</div><div class="line">    <span class="comment">// get one random user from the list</span></div><div class="line">    <span class="keyword">return</span> listUsers[Math.floor(Math.random()*listUsers.length)];</div><div class="line">  &#125;)</div><div class="line">  .merge(</div><div class="line">    refreshClickStream.map(function()&#123; <span class="keyword">return</span> <span class="keyword">null</span>; &#125;)</div><div class="line">  )</div><div class="line">  .startWith(<span class="keyword">null</span>);</div></pre></td></tr></table></figure></p>
+<p>最终的结果图示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">refreshClickStream: ----------o---------o----&gt;</div><div class="line">     requestStream: -r--------r---------r----&gt;</div><div class="line">    responseStream: ----R----------R------R--&gt;</div><div class="line"> suggestion1Stream: -N--s-----N----s----N-s--&gt;</div><div class="line"> suggestion2Stream: -N--q-----N----q----N-q--&gt;</div><div class="line"></div><div class="line"> suggestion3Stream: -N--t-----N----t----N-t--&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="-6"><a href="#-6" class="headerlink" title=" "></a> </h2><p>#关闭建议并使用请求缓存<br>还有一个需要待完成的特性：每一个建议都会有自己的关闭按钮，并且可以在相同地方加载另一条数据。乍一看，你可能认为当任何关闭按钮点击的时候，去创建一个新的请求的方式就能够满足需求了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">var close1Button = document.querySelector(&apos;.close1&apos;);</div><div class="line">var close1ClickStream = Rx.Observable.fromEvent(close1Button, &apos;click&apos;);</div><div class="line">// and the same for close2Button and close3Button</div><div class="line"></div><div class="line">var requestStream = refreshClickStream.startWith(&apos;startup click&apos;)</div><div class="line">  .merge(close1ClickStream) // we added this</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*500);</div><div class="line">    return &apos;https://api.github.com/users?since=&apos; + randomOffset;</div><div class="line">  &#125;);</div></pre></td></tr></table></figure></p>
+<p>然而这样并不能满足我们的需求，它会关闭并加载所有的建议，而不仅仅加载我们点击的那一条。有几种不同的方案解决这个问题，为了变得有趣些，我们可以通过重用之前的请求结果来解决。API的请求结果的大小是100条用户，而我们只需要三条，因此有大量的新的可用数据，而不需要再次请求。</p>
+<p>我们再以流的方式思考下。当第一个按钮点击事件发生时候，我们希望从responseStream最近一次分发的response列表中任意获取一条user数据，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">    requestStream: --r---------------&gt;</div><div class="line">   responseStream: ------R-----------&gt;</div><div class="line">close1ClickStream: ------------c-----&gt;</div><div class="line">suggestion1Stream: ------s-----s-----&gt;</div></pre></td></tr></table></figure>
+<p>在Rx中有一个叫combineLatest的组合函数，看起来正是我们需要的。它将A和B两个流作为输入，并且不管何时，只要其中一个流分发了一个值，combineLatest就会将两个流中最近分发的值a和值b合并在一起并输出一个值 c = f(x,y) ，函数f是由你定义的，最好通过图表来表示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">stream A: --a-----------e--------i--------&gt;</div><div class="line">stream B: -----b----c--------d-------q----&gt;</div><div class="line">          vvvvvvvv combineLatest(f) vvvvvvv</div><div class="line">          ----AB---AC--EC---ED--ID--IQ----&gt;</div><div class="line"></div><div class="line">f 代表大写函数</div></pre></td></tr></table></figure></p>
+<p>我们可以将combineLatest()应用于closeClickStream和responseStream，因此只要当第一个关闭按钮被点击了，我们就可以获取到最新的结果，该结果分发并产生个一个新的值提供给suggestion1Stream。另一方面，combineLatest方法是对称的：只要新的结果分发到responseStream，它就会将第一个关闭按钮的最近一次点击事件绑定起来并产生一个新的suggestion。这种对称性很有趣啊，因为它允许我们简化之前的suggestion1Stream代码，就像这样；<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">var suggestion1Stream = close1ClickStream</div><div class="line">  .combineLatest(responseStream,</div><div class="line">    function(click, listUsers) &#123;</div><div class="line">      <span class="keyword">return</span> listUsers[Math.floor(Math.random()*listUsers.length)];</div><div class="line">    &#125;</div><div class="line">  )</div><div class="line">  .merge(</div><div class="line">    refreshClickStream.map(function()&#123; <span class="keyword">return</span> <span class="keyword">null</span>; &#125;)</div><div class="line">  )</div><div class="line"></div><div class="line">  .startWith(<span class="keyword">null</span>);</div></pre></td></tr></table></figure></p>
+<p>还有一点一直让人很迷惑。combineLatest()使用了最近的两个数据源，但是如果其中一个数据源还没有分发任何值，那么combineLateset方法就不能够在输出流上产生新的数据事件。如果你看过上面的ASCII图表，你会明白当第一个流分发a值的时候并没有任何输出。只有当第二个流分发b值的时候，才会产生输出值。</p>
+<p>有几种不同的方式可以解决这个问题，我们采取最简单的方式，在启动的时候为第一个关闭按钮模拟一个点击事件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">var suggestion1Stream = close1ClickStream.startWith(&apos;startup click&apos;) // we added this</div><div class="line">  .combineLatest(responseStream,           </div><div class="line">    function(click, listUsers) &#123;l</div><div class="line">      return listUsers[Math.floor(Math.random()*listUsers.length)];</div><div class="line">    &#125;</div><div class="line">  )</div><div class="line">  .merge(</div><div class="line">    refreshClickStream.map(function()&#123; return null; &#125;)</div><div class="line">  )</div><div class="line">  .startWith(null);</div></pre></td></tr></table></figure>
+<h2 id="-7"><a href="#-7" class="headerlink" title=" "></a> </h2><p>#包装</p>
+<p>所有的细节都处理完后，完整的代码是这样的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">var refreshButton = document.querySelector(<span class="string">'.refresh'</span>);</div><div class="line">var refreshClickStream = Rx.Observable.fromEvent(refreshButton, <span class="string">'click'</span>);</div><div class="line"></div><div class="line">var closeButton1 = document.querySelector(<span class="string">'.close1'</span>);</div><div class="line">var close1ClickStream = Rx.Observable.fromEvent(closeButton1, <span class="string">'click'</span>);</div><div class="line"><span class="comment">// and the same logic for close2 and close3</span></div><div class="line"></div><div class="line">var requestStream = refreshClickStream.startWith(<span class="string">'startup click'</span>)</div><div class="line">  .map(function() &#123;</div><div class="line">    var randomOffset = Math.floor(Math.random()*<span class="number">500</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'https://api.github.com/users?since='</span> + randomOffset;</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">var responseStream = requestStream</div><div class="line">  .flatMap(function (requestUrl) &#123;</div><div class="line">    <span class="keyword">return</span> Rx.Observable.fromPromise($.ajax(&#123;url: requestUrl&#125;));</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">var suggestion1Stream = close1ClickStream.startWith(<span class="string">'startup click'</span>)</div><div class="line">  .combineLatest(responseStream,</div><div class="line">    function(click, listUsers) &#123;</div><div class="line">      <span class="keyword">return</span> listUsers[Math.floor(Math.random()*listUsers.length)];</div><div class="line">    &#125;</div><div class="line">  )</div><div class="line">  .merge(</div><div class="line">    refreshClickStream.map(function()&#123; <span class="keyword">return</span> <span class="keyword">null</span>; &#125;)</div><div class="line">  )</div><div class="line">  .startWith(<span class="keyword">null</span>);</div><div class="line"><span class="comment">// and the same logic for suggestion2Stream and suggestion3Stream</span></div><div class="line"></div><div class="line">suggestion1Stream.subscribe(function(suggestion) &#123;</div><div class="line">  <span class="keyword">if</span> (suggestion === <span class="keyword">null</span>) &#123;</div><div class="line">    <span class="comment">// hide the first suggestion DOM element</span></div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span> &#123;</div><div class="line">    <span class="comment">// show the first suggestion DOM element</span></div><div class="line">    <span class="comment">// and render the data</span></div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>你可以从这里看到可以运行的示例：<a href="http://jsfiddle.net/staltz/8jFJH/48/" target="_blank" rel="external">code</a></p>
+<p>代码很少，但含金量很高啊：它的特点是：通过恰当的关注点分离，对多个事件进行管理，甚至是结果的缓存。这个函数的风格让代码看起来更有解释性而不是冗余性：我们没有制定要执行的序列，只是通过定义流之间的关系来表明我们要做什么。比如，通过Rx我们告诉计算机，suggestion1Stream是一个从最新请求的结果绑定了一个user的”close 1”流，除此之外，在刷新发生或者程序启动的时候会被置为null。</p>
+<p>同时使我们印象深刻的是，没有像 if ，for while，这样的元素以及JS应用中典型的依赖回调的控制流。如果有必要的话，你甚至可以通过filter函数替代subscribe函数中的if和else。在Rx中，我们拥有像map,filter,scan,merge,combineLatest,startWith这样的流函数，和很多事件驱动编程的的流控制函数。这个工具集会让你用最少的代码拥有更强大的功能。</p>
+<h2 id="-8"><a href="#-8" class="headerlink" title=" "></a> </h2><p>#接下来<br>如果你更喜欢把Rx系列作为反应式编程的library，那么你可以花些时间研究这个函数列表：<a href="https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md" target="_blank" rel="external">transforming，combining，和Observables的创建</a>。如果你希望通过图表的方式理解它们，你可以看这里<a href="https://github.com/ReactiveX/RxJava/wiki/Creating-Observables" target="_blank" rel="external">RxJava’s very useful documentation with marble diagrams</a>。 当你准备沉下心做些事情的时候，将它们绘画成图表，思考它，然后再看一下长长的函数列表，再思考。这种方式在我的经验中证明是非常高效的。</p>
+<p>一旦你开始使用Rx进行编程，就需要完全的理解<a href="https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md#cold-vs-hot-observables" target="_blank" rel="external">Cold和Hot Observables</a>的概念。如果你现在忽略它，回头它会让踩不少坑。我可是警告过你喽！通过学习真正的函数式编程，你可以强大自己的技能库，并且了解Rx编程的负面影响。</p>
+<p>但是响应式编程不仅仅是Rx。这里提供的<a href="http://baconjs.github.io/" target="_blank" rel="external">Bacon.js</a> 你可以直接使用，省去了Rx中的一些生疏的概念。 <a href="http://elm-lang.org/" target="_blank" rel="external">Elm Language</a>有它自己的分类：反应式函数式编程，结合了JS＋HTML＋CSS，并且拥有一个<a href="http://debug.elm-lang.org/" target="_blank" rel="external">time travelling debugger</a>.相当完美。</p>
+<p>对于事件依赖过重的前端和app来说，Rx非常有效。但是并不只针对客户端，在后端以及数据库方面也能处理的很好。事实上，<a href="http://techblog.netflix.com/2013/02/rxjava-netflix-api.html" target="_blank" rel="external">RxJava在Netflix的API中是一个非常重要的处理服务器端并发性的组件</a>。Rx不是一个限制了特定类型应用和语言的框架。对于任何事件驱动的软件编程，它真的是一个可以参考的范例。</p>
+<p>希望此教程能够帮到你！</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Reactive/"> #Reactive </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/08/reactive-programming/">Reactive Programming 入门</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/29/translate-be-reactive/">译文Be Reactive</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/11/29/translate-introduction-to-reactive/"
+               data-title="译文 The introduction to Reactive Programming you've been missing" data-url="http://www.lightskystreet.com/2015/11/29/translate-introduction-to-reactive/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-1"><span class="nav-number">2.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-2"><span class="nav-number">3.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-3"><span class="nav-number">4.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-4"><span class="nav-number">5.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-5"><span class="nav-number">6.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-6"><span class="nav-number">7.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-7"><span class="nav-number">8.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-8"><span class="nav-number">9.</span> <span class="nav-text"> </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

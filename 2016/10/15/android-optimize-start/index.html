@@ -1,0 +1,1045 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，性能优化," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Android性能优化-App启动优化 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Android性能优化-App启动优化
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-10-14
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/性能优化/">性能优化</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/10/15/android-optimize-start/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/15/android-optimize-start/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>原文地址：<a href="https://developer.android.com/topic/performance/launch-time.html#common" target="_blank" rel="external">https://developer.android.com/topic/performance/launch-time.html#common</a>  </p>
+<p>通常用户期望app响应和加载速度越快越好。一个启动速度慢的app很可能会给用户留下不好的印象，除了导致用户在应用市场上的打分低之外，很有可能导致致用户直接卸载。</p>
+<p>这篇文章提供了优化app启动时间的方法。先解释了app进程启动的内部流程。然后讨论如何优化启动的性能。最后列出几个常见的启动问题和解决方案。</p>
+<h2 id="一-启动内幕"><a href="#一-启动内幕" class="headerlink" title="一 启动内幕"></a><strong>一 启动内幕</strong></h2><p>App启动可能发生在以下三种状态 之一，每一种都会影响到展现给用户的时间：冷启动、热启动和温启动（翻译的有点怪，介于冷和热之间吧）。</p>
+<p>冷启动下，app所做的事情不较多，其它两种情况，系统只需要将app从后台切到前台。建议你在冷启动的基础上做优化，这样也会提升热启动和温启动的性能。</p>
+<p>为了更好地优化app的启动，了解系统和app层做了什么以及如何相互影响很有必要。</p>
+<h3 id="1-1-冷启动"><a href="#1-1-冷启动" class="headerlink" title="1.1 冷启动"></a>1.1 冷启动</h3><p>冷启动指：在app启动之前，系统的进程还没有，直到app启动创建app的进程。冷启动会发生在device重启或者app被杀死的情况下。这种启动在优化启动时间上，有更大的挑战，因为相比其它两种启动方式，系统和app有更多的工作需要处理。</p>
+<p>冷启动之前，系统会执行以下三个task：</p>
+<p>1、加载并启动app</p>
+<p>2、在app启动后，立即展示空白的window</p>
+<p>3、创建app进程</p>
+<p>一旦系统创建了app进程，那么app进程就会执行以下步骤</p>
+<p>1、创建app对象</p>
+<p>2、启动main thread</p>
+<p>3、创建MainActivity</p>
+<p>4、Inflate view</p>
+<p>5、布置屏幕</p>
+<p>6、进行首次绘制</p>
+<a id="more"></a>
+<p>一旦app进程完成了第一次绘制，系统进程就会用main activity替换已经展示的background window。之后用户才可以使用app。</p>
+<p>下图展示了系统和app进程互相如何工作的，展示了app启动时期的几个重要部分，在创建app和main activity之间，我们可以提升性能问题</p>
+<p><img src="/img/android-optimize-app-start/app-launch-flow.png">  </p>
+<h4 id="Application的创建"><a href="#Application的创建" class="headerlink" title="Application的创建"></a>Application的创建</h4><p>当应用启动的时候，空白的window在app第一次完成绘制之前都会存在。在那之后，系统进程才会替换启动窗口，允许用户开始和app交互。</p>
+<p>如果你复写了  <code>Application.oncreate()</code> 方法，app启动的时候，会调用该方法。之后，app会孵化主线程（UI线程），并通过它来创建main activity。</p>
+<p>从这之后，系统和app级别的进程将会按照<a href="https://developer.android.com/topic/performance/%7BdocRoot%7Dguide/topics/processes/process-lifecycle.html" target="_blank" rel="external">app lifecycle stages</a> 执行。</p>
+<h4 id="Activity的创建"><a href="#Activity的创建" class="headerlink" title="Activity的创建"></a>Activity的创建</h4><p>在app进程创建了Activity之后，Activity将会执行以下操作</p>
+<p>1、初始化值</p>
+<p>2、调用构造函数</p>
+<p>3、调用毁掉方法，比如Activity.onCreate()。</p>
+<p>通常，onCreate方法会对加载时间有比较大的影响。因为它将执行繁重的工作：加载和填充view，并初始化Activity运行期间需要用的对象。</p>
+<h3 id="1-2-热启动"><a href="#1-2-热启动" class="headerlink" title="1.2 热启动"></a>1.2 热启动</h3><p>相对于冷启动，热启动会简单的多。如果app的所有Activities还存在内存中，那么系统需要做的就是将activity切换到前台。这样app会避免进行的对象初始化，布局填充和渲染。</p>
+<p>但是，如果一些内存在触发内存回调方法的时候被回收了，比如onTrimMemory()，那么这些对象就需要重新创建。</p>
+<p>热启动会和冷启动有相同的行为。系统也会展示一个空白的window，知道app完成Activity的渲染。</p>
+<h3 id="1-3-温启动"><a href="#1-3-温启动" class="headerlink" title="1.3 温启动"></a>1.3 温启动</h3><p>温启动做的工作介于冷热启动之间。这里列举几种可能被认为是温启动的状态：</p>
+<p>1、用户离开了app，然后重新启动它。这时进程还在继续运行，但是Activity被回收了，app需要重新创建activity。</p>
+<p>2、系统将你的app回收了，然后用户重新启动app。进程和Activity都需要重新启动，但它们可以从onCreate方法保存的bundle中恢复。</p>
+<h2 id="二-优化启动性能"><a href="#二-优化启动性能" class="headerlink" title="二 优化启动性能"></a>二 <strong>优化启动性能</strong></h2><p>为了确定启动时间的性能问题，我们需要先确定app启动花费了多少时间。</p>
+<h3 id="2-1-Time-to-initial-display"><a href="#2-1-Time-to-initial-display" class="headerlink" title="2.1 Time to initial display"></a>2.1 Time to initial display</h3><p>从4.4（API 19）开始，logcat会输出带有Displayed的log。该值代表从app启动进程到完成Activity第一次绘制的时间。该时间内完成了一下流程：</p>
+<ul>
+<li>启动进程</li>
+</ul>
+<ul>
+<li>初始化对象</li>
+</ul>
+<ul>
+<li>创建和初始化Activity</li>
+</ul>
+<ul>
+<li>填充布局</li>
+</ul>
+<ul>
+<li>第一次绘制app</li>
+</ul>
+<p>打出的log如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ActivityManager: Displayed com.android.myexample/.StartupTiming: +3s534ms</div></pre></td></tr></table></figure>
+<p>如果你从命令行或者终端跟踪log的话，可以比较直接的定位到该log。如果在AndroidStudio中，别忘记关闭filter。</p>
+<p><img src="/img/android-optimize-app-start/time-display.png">  </p>
+<p>Displayed值并没有捕获所有资源都被加载和展示的总时间。那些不在layout文件中或者创建app初始化所需要对象的时间不包含在内。因为这些资源是在一个内部进程中加载的，并且不会阻塞app的初始化展示。</p>
+<h3 id="2-2-Time-to-full-display"><a href="#2-2-Time-to-full-display" class="headerlink" title="2.2 Time to full display"></a>2.2 Time to full display</h3><p>你可以调用<a href="https://developer.android.com/reference/android/app/Activity.html#reportFullyDrawn(" target="_blank" rel="external">reportFullyDrawn()</a>)方法去测量从应用启动到所有资源和view层级都被绘制出来的时间。这对于app执行懒加载的情况很有用。在懒加载中，app不会阻塞window的初始化绘制，但同步进行资源加载和view的更新会阻塞。</p>
+<p>由于懒加载，app的初始化展示不会包含所有的资源。你可以考虑完全加载并展示所有资源和view的时候作为一个考量。比如，UI可能完全加载了，包括一些text的绘制，但是由于图片需要从网络获取，这时还没有展示。</p>
+<p>为了处理这种情况，你可以手动地调用reportFullyDrawn方法让系统知道你的activity已经通过懒加载完成了。但你是用该方法的时候，logcat展示的时间就包含从应用被创建到reportFullyDrawn方法被调用的时间。</p>
+<h4 id="定位瓶颈"><a href="#定位瓶颈" class="headerlink" title="定位瓶颈"></a><strong>定位瓶颈</strong></h4><p>两种方式可以帮助你定位问题：AndroidStudio中的Method Tracer和内嵌tracing代码的方式。更多可以参考<a href="https://developer.android.com/topic/performance/%7BdocRoot%7Dstudio/profile/am-methodtrace.html" target="_blank" rel="external">documentation</a>.</p>
+<p>如果无法使用Method Tracer Tool ，或者觉得trace的时机不够准确，那么你可以通过在app和Activity的onCreate方法中嵌入代码进行追踪，比如写下追踪代码。更多信息，可以参考<a href="https://developer.android.com/reference/android/os/Trace.html" target="_blank" rel="external">Trace</a> 、<a href="https://developer.android.com/topic/performance/%7BdocRoot%7Dstudio/profile/systrace-commandline.html" target="_blank" rel="external">Systrace</a></p>
+<h2 id="三-常见的问题"><a href="#三-常见的问题" class="headerlink" title="三 常见的问题"></a>三 <strong>常见的问题</strong></h2><h3 id="3-1-繁重的App初始化"><a href="#3-1-繁重的App初始化" class="headerlink" title="3.1 繁重的App初始化"></a>3.1 繁重的App初始化</h3><p>当你继承了Application对象，又在Application对象进行初始化的时候执行繁重的工作或者复杂的逻辑，那么就可能导致启动的性能问题。在启动的时候花一些时间去初始化一些子类可能完全没必要。</p>
+<p>在app初始化的时候，其它的挑战包括垃圾回收事件，繁重的操作，比如I/O，都有可能会阻塞进程的初始化。对于Dalvik运行环境来说，垃圾回收是一个需要特别考虑的点，Art运行环境会并发的执行垃圾回收，以便最小化垃圾回收产生的影响。</p>
+<h4 id="3-1-1-定位为题"><a href="#3-1-1-定位为题" class="headerlink" title="3.1.1 定位为题"></a>3.1.1 <strong>定位为题</strong></h4><p>使用method tracing或者内嵌代码来定位这个问题</p>
+<h5 id="Method-tracing"><a href="#Method-tracing" class="headerlink" title="Method tracing"></a>Method tracing</h5><p>Running the Method Tracer tool reveals that the <code>callApplicationOnCreate()</code> method eventually calls your<code>com.example.customApplication.onCreate</code> method. If the tool shows that these methods are taking a long time to finish executing, you should explore further to see what work is occurring there.</p>
+<h5 id="内嵌代码的方式"><a href="#内嵌代码的方式" class="headerlink" title="内嵌代码的方式"></a><strong>内嵌代码的方式</strong></h5><p>可以对以下代码进行追踪</p>
+<p>1、App的onCreate方法</p>
+<p>2、onCreate中初始化的所有全局单例对象</p>
+<p>3、所有I/O，反序列化，或者可能导致性能问题的循环</p>
+<h4 id="3-1-2-解决方案"><a href="#3-1-2-解决方案" class="headerlink" title="3.1.2 解决方案"></a><strong>3.1.2 解决方案</strong></h4><p>如果是由于不必要的初始化或者硬盘I/O操作导致的问题，解决方案就是懒初始化对象：只初始化立即需要的。而不是在一开始就创建全局的静态对象，可以将它们的初始化放在一个单例中，当app首次访问它们的时候再初始化对象。</p>
+<h2 id="3-2-繁重的Activity初始化"><a href="#3-2-繁重的Activity初始化" class="headerlink" title="3.2 繁重的Activity初始化"></a>3.2 <strong>繁重的Activity初始化</strong></h2><p>Activity的创建有时会承担大量的复杂操作。通常这里存在可以优化的点。常见的问题有：</p>
+<p>1、填充大量复杂的布局</p>
+<p>2、硬盘操作或者网络操作阻塞了绘制</p>
+<p>3、加载或者编码bitmap</p>
+<p>4、栅栏化VectorDrawable对象</p>
+<p>5、Activity中其它子系统的初始化</p>
+<h3 id="3-2-1-定位问题"><a href="#3-2-1-定位问题" class="headerlink" title="3.2.1 定位问题"></a>3.2.1 <strong>定位问题</strong></h3><p>和定位App启动问题类似，也是通过method tracing或者嵌入代码来定位。</p>
+<h5 id="Method-tracing-1"><a href="#Method-tracing-1" class="headerlink" title="Method tracing"></a>Method tracing</h5><p>当执行Method Tracer tool的时候，你应该关注继承于Application的子类的构造函数和onCreate方法。</p>
+<p>如果该工具表明代码中花了很长时间去执行，那么你就应该进一步查看这里的具体操作。</p>
+<p><strong>嵌入代码的方式</strong></p>
+<p>追踪的部分可能是以下代码块（和App初始化一样）</p>
+<p>1、App的onCreate方法</p>
+<p>2、启动时初始化的所有全局单例对象</p>
+<p>3、所有I/O，反序列化，或者可能导致性能问题的循环</p>
+<h3 id="3-2-2-解决方案"><a href="#3-2-2-解决方案" class="headerlink" title="3.2.2 解决方案"></a><strong>3.2.2 解决方案</strong></h3><p>上面可能有很多潜在的问题，这列举两种通用的问题和解决方案：</p>
+<ul>
+<li><p>view的层级越庞大，app就会花越多的时间去填充它</p>
+<p>   减少多余的或者嵌套的布局</p>
+<p>   不填充哪些不需要在启动时就需要展示的view。可通过ViewStub来实现，在需要的时候再填充</p>
+</li>
+<li><p>在main thread中做资源的初始化也会减慢启动速度。可以通过下面来解决</p>
+<p>   延迟所有的资源初始化或者放在其它线程中去做</p>
+<p>   允许app先加载和展示view，那些依赖于bitmap或者其它资源之后再去更新</p>
+</li>
+</ul>
+<h2 id="三-主题化的启动屏幕"><a href="#三-主题化的启动屏幕" class="headerlink" title="三 主题化的启动屏幕"></a><strong>三 主题化的启动屏幕</strong></h2><p>我们可以通过主题化app的启动屏幕来改善启动体验。这样整个app的启动和接下来的操作会显得更加连贯。但这样只是将Activity的慢启动问题隐藏了。</p>
+<p>一种常用的方式实现主题启动屏幕的方式是使用 <code>windowDisablePreview</code>主题属性关闭系统进程在app启动时绘制的初始化空白屏幕。但是，这种方式会导致更长时间。同样的，这样也会迫使用户等到Activity启动后才会得到反馈，会让用户产生app本身是否有问题的困惑。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>建议你不应该禁止预览窗口，你应该遵循 <a href="http://www.google.com/design/spec/patterns/launch-screens.html#" target="_blank" rel="external">Material Design</a> 标准。使用Activity的windowBackground主题属性来为启动的Activity提供一个简单的drawable。</p>
+<p><strong>布局文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;layer-list xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:opacity=&quot;opaque&quot;&gt;</div><div class="line">  &lt;!-- The background color, preferably the same as your normal theme --&gt;</div><div class="line">  &lt;item android:drawable=&quot;@android:color/white&quot;/&gt;</div><div class="line">  &lt;!-- Your product logo - 144dp color version of your app icon --&gt;</div><div class="line">  &lt;item&gt;</div><div class="line">    &lt;bitmap</div><div class="line">      android:src=&quot;@drawable/product_logo_144dp&quot;</div><div class="line">      android:gravity=&quot;center&quot;/&gt;</div><div class="line">  &lt;/item&gt;</div><div class="line">&lt;/layer-list&gt;</div></pre></td></tr></table></figure>
+<p><strong>Manifest file:</strong>     </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;activity ...</div><div class="line">android:theme=&quot;@style/AppTheme.Launcher&quot; /&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li>​</li>
+</ul>
+<p>然后在代码中将主题切换回app的主题，最简单的方式是在<code>super.onCreate()</code> 和<code>setContentView()方法之前</code>调用 <code>setTheme(R.style.AppTheme)</code> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class MyMainActivity extends AppCompatActivity &#123;</div><div class="line">  @Override</div><div class="line">  protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">    // Make sure this is before calling super.onCreate</div><div class="line">    setTheme(R.style.Theme_MyApp);</div><div class="line">    super.onCreate(savedInstanceState);</div><div class="line">    // ...</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，性能优化/"> #Android，性能优化 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/16/android-optimize-memory/">Android性能优化-内存优化</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/16/js-str-arr/">JS学习-字符串和数组</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/10/15/android-optimize-start/"
+               data-title="Android性能优化-App启动优化" data-url="http://www.lightskystreet.com/2016/10/15/android-optimize-start/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-启动内幕"><span class="nav-number">1.</span> <span class="nav-text">一 启动内幕</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-冷启动"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 冷启动</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Application的创建"><span class="nav-number">1.1.1.</span> <span class="nav-text">Application的创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Activity的创建"><span class="nav-number">1.1.2.</span> <span class="nav-text">Activity的创建</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-热启动"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 热启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-温启动"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 温启动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-优化启动性能"><span class="nav-number">2.</span> <span class="nav-text">二 优化启动性能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Time-to-initial-display"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Time to initial display</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Time-to-full-display"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Time to full display</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#定位瓶颈"><span class="nav-number">2.2.1.</span> <span class="nav-text">定位瓶颈</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-常见的问题"><span class="nav-number">3.</span> <span class="nav-text">三 常见的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-繁重的App初始化"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 繁重的App初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-定位为题"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 定位为题</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Method-tracing"><span class="nav-number">3.1.1.1.</span> <span class="nav-text">Method tracing</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内嵌代码的方式"><span class="nav-number">3.1.1.2.</span> <span class="nav-text">内嵌代码的方式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-解决方案"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 解决方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-繁重的Activity初始化"><span class="nav-number">4.</span> <span class="nav-text">3.2 繁重的Activity初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-定位问题"><span class="nav-number">4.1.</span> <span class="nav-text">3.2.1 定位问题</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Method-tracing-1"><span class="nav-number">4.1.0.1.</span> <span class="nav-text">Method tracing</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-解决方案"><span class="nav-number">4.2.</span> <span class="nav-text">3.2.2 解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-主题化的启动屏幕"><span class="nav-number">5.</span> <span class="nav-text">三 主题化的启动屏幕</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">5.1.</span> <span class="nav-text">解决方案</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

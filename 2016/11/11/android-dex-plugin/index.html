@@ -1,0 +1,1018 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，编译," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> multidex与插件化 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              multidex与插件化
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-11-10
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/编译/">编译</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/11/11/android-dex-plugin/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/11/android-dex-plugin/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>随着应用越来越大，很多大型应用都会遇到方法数的爆棚以及方法信息存储区的问题，该篇文章主要以这两种问题为背景，介绍dex拆分、加载以及插件化方案的一些技术点。</p>
+<h3 id="65536-与-INSTALL-FAILED-DEXOPT"><a href="#65536-与-INSTALL-FAILED-DEXOPT" class="headerlink" title="65536 与 INSTALL_FAILED_DEXOPT"></a>65536 与 INSTALL_FAILED_DEXOPT</h3><ol>
+<li><p>生成的apk在android 2.3或之前的机器上无法安装，提示<code>INSTALL_FAILED_DEXOPT</code></p>
+</li>
+<li><p>方法数量过多，编译时出错，提示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Conversion to Dalvik format failed:Unable to execute dex: method ID not in [0, 0xffff]: 65536</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>Android 2.3 INSTALL_FAILED_DEXOPT 的问题</strong></p>
+<p>该问题由dexopt的LinearAlloc限制引起的， 在Gingerbread或者以下系统LinearAllocHdr分配空间只有5M大小的。</p>
+<blockquote>
+<p>Dalvik linearAlloc是一个固定大小的缓冲区。在应用的安装过程中，系统会运行一个名为dexopt的程序为该应用在当前机型中运行做准备。dexopt使用LinearAlloc来存储应用的方法信息。当方法数量过多导致超出缓冲区大小时，会造成dexopt崩溃。 目前Android 4.x提高到了8MB或16MB，在很大程度上解决了这个问题。</p>
+</blockquote>
+<p><strong>超过最大方法数限制的问题</strong></p>
+<p>该问题是由DEX文件格式限制。一个DEX文件中method个数采用使用原生类型short来索引文件中的方法，也就是4个字节共计最多表达65536个method，field/class的个数也均有此限制。对于DEX文件，则是将工程所需全部class文件合并且压缩到一个DEX文件期间，也就是Android打包的DEX过程中， 单个DEX文件可被引用的方法总数（自己开发的代码以及所引用的Android框架、类库的代码）被限制为65536；</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a><strong>解决方案</strong></h3><ul>
+<li>Android系统的LinearAlloc空间大小，在高版本上已经提升了，所以在一定程度上，不会出现这个问题，Facebook则采用了一种hack的方式，直接修改虚拟机的LinearAlloc空间大小：<a href="https://www.facebook.com/notes/facebook-engineering/under-the-hood-dalvik-patch-for-facebook-for-android/10151345597798920/" target="_blank" rel="external">Dalvik patch for Facebook for Android</a></li>
+<li>拆分Dex，官方有提供方案<a href="https://developer.android.com/tools/building/multidex.html" target="_blank" rel="external">Google Multidex</a>，让一个apk里支持多个.dex文件，这样就可以突破65536的限制，但该方案有一定的弊端，下面会提到</li>
+<li>插件化，将整个工程的划分为Host+多个插件的形式，这样就可以将方法分散到各个插件中，按需加载各个模块。从软件工程的角度来看，这种方案会更好，动态部署，并行开发，更高的编译效率，但这种方案对已有的大项目来讲，重构起来影响非常大，实现成本也相对较高</li>
+<li>使用ProGuard等其它优化工具清除项目中无用方法，第三方库中的方法进行清除处理，这个可以作为优化的手段，但对于大型应用上，并不能从根本上解决方法数的问题</li>
+</ul>
+<p>上面也提到，在高版本上，LinearAlloc方法区的空间已经扩大了很多，所以LinearAlloc的问题很少会再出现。采用dex的拆分以及插件化后并按需加载，对避免LinearAlloc的问题也更有益。</p>
+<a id="more"></a>
+<h3 id="各个公司所采取的方案"><a href="#各个公司所采取的方案" class="headerlink" title="各个公司所采取的方案"></a><strong>各个公司所采取的方案</strong></h3><ul>
+<li>美团点评、手Q、微信采用dex拆分方案</li>
+</ul>
+<ul>
+<li>携程采用插件化方案</li>
+</ul>
+<ul>
+<li>手淘近期发布的Atlas，采用了容器化的概念，所有业务的bundle运行在一个容器中，按需加载，也可以看做是一种高级的插件化</li>
+</ul>
+<p>下面主要介绍一下dex方案和插件化的主要方案流程和遇到的问题</p>
+<h2 id="Dex方案"><a href="#Dex方案" class="headerlink" title="Dex方案"></a>Dex方案</h2><h3 id="如何拆分Dex"><a href="#如何拆分Dex" class="headerlink" title="如何拆分Dex"></a><strong>如何拆分Dex</strong></h3><p>官方已经推出<a href="https://developer.android.com/tools/building/multidex.html" target="_blank" rel="external">Google Multidex</a>方，但官方的问题在于：如果DEX文件过大时，处理时间就会越长，很容易引发ANR。因此通常会采取动态加载dex的方式，并尽量保持首次加载的mainDex中的类尽量少。</p>
+<p><strong>mainDex</strong>：主要是一些Android的基础组件和类，比如<code>Application</code>、<code>ContentProvider</code>、<code>Service</code>、<code>Receiver</code>以及必要的<code>Activity</code>和其依赖集。如果mainDex还包括应用的首页等界面，那么也要将相关的依赖都放到mainDex中。</p>
+<h3 id="如何动态加载Dex"><a href="#如何动态加载Dex" class="headerlink" title="如何动态加载Dex"></a><strong>如何动态加载Dex</strong></h3><p>dex拆分完了，也解决了首次加载mainDex的问题，那么如何动态加载其它dex呢？比如，加入我们在mainDex中放入了首页，这时候，点击某一个入口，而该入口的业务放在了其它的Dex中，这时候如何加载呢？</p>
+<p>通常的处理肯定都是先判断是否已经加载过，如果没加载就先展示一个友好的loading界面然后去加载。思路确实是这样，具体的实现因人而异。</p>
+<p><strong>微信、QQ空间的方案</strong></p>
+<p>在app进入首页之前，在异步线程中加载</p>
+<p>加载逻辑这边主要判断是否已经dexopt，若已经dexopt，即放在attachBaseContext加载，反之放于地球中用线程加载。怎么判断？其实很低级，因为在微信中，若判断revision改变，即将dex以及dexopt目录清空。只需简单判断两个目录dex名称、数量是否与配置文件的一致。</p>
+<p><strong>美团点评的方案</strong></p>
+<p>按需加载</p>
+<p>在Activity的启动过程，修改Instrumentation中的逻辑，因为Instrumentation有关Activity启动相关的方法大概有：execStartActivity、newActivity等等，在这些方法中添加代码逻辑进行判断这个Class是否加载了，如果加载则直接启动这个Activity，如果没有加载完成则启动一个等待的Activity显示给用户，然后在这个Activity中等待后台Secondary DEX加载完成，完成后自动跳转到用户实际要跳转的Activity。</p>
+<h2 id="插件化方案"><a href="#插件化方案" class="headerlink" title="插件化方案"></a><strong>插件化方案</strong></h2><p>携程采用了这种方案，个人觉得从开发的角度来看，该方案其实是一种比较干净的方案。每个业务团队开发独立的apk，互不干涉，较高的编译效率。因此，解决的不仅仅是方法数和LinearAlloc的问题，插件化的难点在于资源的编译和加载，最终也会涉及到multidex。下面就简单介绍一下这种方案的一些关键技术点。</p>
+<p>我们知道一个Android应用主要以APK方式安装，每一个APK主要的部分为代码和资源，如何编译进去，以及如何加载它们是关键的两个问题，所以插件化主要会涉及到两个阶段的问题：</p>
+<ul>
+<li>编译期：资源和代码的编译</li>
+<li>运行时：资源和代码的加载</li>
+</ul>
+<h3 id="编译期"><a href="#编译期" class="headerlink" title="编译期"></a>编译期</h3><h4 id="资源的编译"><a href="#资源的编译" class="headerlink" title="资源的编译"></a>资源的编译</h4><p>采用AAPT（资源编译依赖一个强大的命令行工具）对资源的编译流程进行改造。</p>
+<ul>
+<li>可以对一个已存在的apk包作为依赖资源参与编译，解决资源编译问题</li>
+</ul>
+<ul>
+<li>通过aapt可以给每个子apk中的资源分配不同头字节PackageID，解决多个项目的资源冲突问题</li>
+</ul>
+<h4 id="代码的编译"><a href="#代码的编译" class="headerlink" title="代码的编译"></a>代码的编译</h4><p>对Java代码的编译大家比较熟悉，只需要注意以下几个问题即可：</p>
+<ul>
+<li><p>classpath</p>
+<p>Java源码编译中需要找齐所有依赖项，classpath就是用来指定去哪些目录、文件、jar包中寻找依赖。</p>
+</li>
+<li><p>混淆</p>
+<p>安全需要，Android工程通常都会被混淆，混淆的原理和配置可参考Proguard手册。</p>
+</li>
+</ul>
+<h3 id="运行期"><a href="#运行期" class="headerlink" title="运行期"></a><strong>运行期</strong></h3><h4 id="资源加载"><a href="#资源加载" class="headerlink" title="资源加载"></a>资源加载</h4><p>平时使用到的资源都是通过AssetManager类和Resources类来访问的。获取它们的方法位于Context类中，因此复写这两个方法即可达到访问指定资源的目的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private final Resources mResources;</div><div class="line"></div><div class="line">@Override</div><div class="line">public AssetManager getAssets() &#123;</div><div class="line">   return getResources().getAssets();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Override</div><div class="line">public Resources getResources() &#123;</div><div class="line">   return mResources;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>另外通过要需要接管所有Activity、Service等组件的创建（以便对Resources类进行替换）。具体可以通过篡改<code>mInstrumentation</code>为自己的<code>InstrumentationHook</code>，<code>mInstrumentation</code>是负责创建<code>Activity</code>等组件的类，每次创建Activity的时候把它的mResources类替换为DelegateResources。更多关于Activity的创建过程可以搜索相关资料，需要对Activity的创建和启动进行定制的时候，都会涉及到该部分的知识。</p>
+<h4 id="代码加载"><a href="#代码加载" class="headerlink" title="代码加载"></a><strong>代码加载</strong></h4><p>这部分其实就是上面的dex装载方案，就不多介绍了</p>
+<h3 id="插件化的好处"><a href="#插件化的好处" class="headerlink" title="插件化的好处"></a>插件化的好处</h3><ul>
+<li>各业务的代码和项目控制上做到了高内聚低耦合，极大降低了沟通成本，提高了工作效率</li>
+<li>解决了方法数的问题</li>
+<li>大大提高编译速度</li>
+<li>按需加载，启动速度优化，告别黑屏和启动ANR</li>
+<li>可以作为hotFix方案，不仅支持class，也支持资源fix</li>
+</ul>
+<p>携程的插件化方案也已经开源：<a href="https://github.com/CtripMobile/DynamicAPK" target="_blank" rel="external">https://github.com/CtripMobile/DynamicAPK</a></p>
+<p>其它的插件化方案也有多种，具体的可以参考Trinea的文章<a href="http://www.trinea.cn/android/android-plugin/" target="_blank" rel="external">Android 插件化 动态升级</a></p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>简单的总结下，这里介绍了一些中大型应用会遇到的空间和LinearAlloc空间的问题，最难的是资源的处理和装载，需要利用android提供的一些编译工具对编译流程进行改造。绕不过的是multidex，也会涉及到Activity等组件的初始化流程，Activity的启动过程这块的知识也是比较重要。本篇文章只是对目前插件化和dex的实现方案做了简要的概述，更细节的部分还是建议看各个公司发布的相关文章。</p>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p><a href="http://tech.meituan.com/mt-android-auto-split-dex.html" target="_blank" rel="external">美团Android DEX自动拆包及动态加载简介</a></p>
+<p><a href="http://mp.weixin.qq.com/s?__biz=MzAwMTcwNTE0NA==&amp;mid=400217391&amp;idx=1&amp;sn=86181541ce0164156dfab135ed99bb5c&amp;scene=0&amp;key=b410d3164f5f798e61a5d4afb759fa38371c8b119384c6163a30c28163b4d4d5f59399f2400800ec842f1d0e0ffb84af&amp;ascene=0&amp;uin=MjExMjQ&amp;pass_ticket=Nt5Jaa28jjFxcQO9o%2BvQiXX%2B0iXG5DlZlHNW97Fk1Ew%3D" target="_blank" rel="external">携程插件化和动态加载实践</a></p>
+<p><a href="http://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&amp;mid=207151651&amp;idx=1&amp;sn=9eab282711f4eb2b4daf2fbae5a5ca9a&amp;scene=4#wechat_redirect" target="_blank" rel="external">Android拆分与加载Dex的多种方案对比</a></p>
+<p><a href="http://www.trinea.cn/android/android-plugin/" target="_blank" rel="external">Android 插件化 动态升级</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，编译/"> #Android，编译 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/19/android-optimize-image-download-size/">Android性能优化-减小图片下载大小</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/11/11/android-dex-plugin/"
+               data-title="multidex与插件化" data-url="http://www.lightskystreet.com/2016/11/11/android-dex-plugin/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#65536-与-INSTALL-FAILED-DEXOPT"><span class="nav-number">2.</span> <span class="nav-text">65536 与 INSTALL_FAILED_DEXOPT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#各个公司所采取的方案"><span class="nav-number">4.</span> <span class="nav-text">各个公司所采取的方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dex方案"><span class="nav-number"></span> <span class="nav-text">Dex方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何拆分Dex"><span class="nav-number">1.</span> <span class="nav-text">如何拆分Dex</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何动态加载Dex"><span class="nav-number">2.</span> <span class="nav-text">如何动态加载Dex</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插件化方案"><span class="nav-number"></span> <span class="nav-text">插件化方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编译期"><span class="nav-number">1.</span> <span class="nav-text">编译期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#资源的编译"><span class="nav-number">1.1.</span> <span class="nav-text">资源的编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码的编译"><span class="nav-number">1.2.</span> <span class="nav-text">代码的编译</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行期"><span class="nav-number">2.</span> <span class="nav-text">运行期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#资源加载"><span class="nav-number">2.1.</span> <span class="nav-text">资源加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码加载"><span class="nav-number">2.2.</span> <span class="nav-text">代码加载</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插件化的好处"><span class="nav-number">3.</span> <span class="nav-text">插件化的好处</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后"><span class="nav-number">4.</span> <span class="nav-text">最后</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#参考"><span class="nav-number">4.1.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

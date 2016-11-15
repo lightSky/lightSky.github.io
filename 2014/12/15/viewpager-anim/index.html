@@ -1,0 +1,1011 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Anim,ViewPager," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> 动画系列 - ViewPager动画 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              动画系列 - ViewPager动画
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2014-12-14
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/Android动画/">Android动画</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2014/12/15/viewpager-anim/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2014/12/15/viewpager-anim/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>#前言#<br>前两天看到鲍永章分享的<a href="https://medium.com/@BashaChris/the-android-viewpager-has-become-a-fairly-popular-component-among-android-apps-its-simple-6bca403b16d4" target="_blank" rel="external">Great animations with PageTransformer</a>以及农民伯伯分享的<a href="http://andraskindler.com/2013/06/27/create-viewpager-transitions-a-pagertransformer-example/" target="_blank" rel="external">Create ViewPager transitions</a> 文章，都是通过ViewPager来实现酷炫的动画，而现在的App中ViewPager的动画使用也非常的广泛。正好最近一直研究动画，那么就趁热打铁，分析一下相关的开源库吧。  </p>
+<p>本篇文章介绍的ViewPager动画，可以分为两类，第一类是针对于ViewPager的界面滑动动画(这个是PageTransformer的真正用途)，分析并比较了AndroidImageSlider和JazzyViewPager两种实现，第二类是对ViewPager中的内容进行动画处理，这个是这个是PageTransformer的巧妙应用，处理好了可以达到很棒的交互效果，示例是Yahoo天气的视差效果。<br><a id="more"></a></p>
+<p>#ViewPager动画的实现原理#<br>从3.0开始，ViewPager开始支持自定义切换动画，暴露的接口为PageTransformer，因此只要实现PageTransformer接口和其唯一的方法transformPage(View view, float position)即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">   * A PageTransformer is invoked whenever a visible/attached page is scrolled.</div><div class="line">   * This offers an opportunity for the application to apply a custom transformation</div><div class="line">   * to the page views using animation properties.</div><div class="line">   *</div><div class="line">   * &lt;p&gt;As property animation is only supported as of Android 3.0 and forward,</div><div class="line">   * setting a PageTransformer on a ViewPager on earlier platform versions will</div><div class="line">   * be ignored.&lt;/p&gt;</div><div class="line">   */</div><div class="line">  public interface PageTransformer &#123;</div><div class="line">      /**</div><div class="line">       * Apply a property transformation to the given page.</div><div class="line">       *</div><div class="line">       * @param page Apply the transformation to this page</div><div class="line">       * @param position Position of page relative to the current front-and-center</div><div class="line">       *                 position of the pager. 0 is front and center. 1 is one full</div><div class="line">       *                 page position to the right, and -1 is one page position to the left.</div><div class="line">       */</div><div class="line">      public void transformPage(View page, float position);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>参数position<br>给定界面的位置相对于屏幕中心的偏移量。在用户滑动界面的时候，是动态变化的。那么我们可以将position的值应用于setAlpha(), setTranslationX(), or setScaleY()方法，从而实现自定义的动画效果。<br>另外在ViewPager滑动时，内存中存活的Page都会执行transformPage方法，在滑动过程中涉及到两个Page，当前页和下一页，而它们的position值是相反的（因为是相对运动,一个滑入一个滑出），比如，页面A向右滑动到屏幕一半，页面B也正好处于一半的位置，那么A和B的position为：0.5 和 -0.5<br>position ==  0 ：当前界面位于屏幕中心的时候<br>position ==  1 ：当前Page刚好滑出屏幕右侧<br>position == -1 ：当前Page刚好滑出屏幕左侧</li>
+</ul>
+<p>#AndroidImageSlider动画库解析#<br>要说到动画库，肯定会想到代码家，没错，代码家也开源了一个ViewPager效果的库：<a href="https://github.com/daimajia/AndroidImageSlider" target="_blank" rel="external">AndroidImageSlider</a> ，我们就来分析下这个库的实现。AndroidImageSlider除了基本的page动画外，也支持用户为Page内容添加自定义的动画，比如下面描述框的动画。</p>
+<p><img src="/img/viewpager-anim/AndroidImageSlider.gif" height="280" width="180/">   </p>
+<p>AndroidImageSlider兼容性的实现原理：<br>因为API 11才开始支持PagerTransformer. 这里面修改了Android系统的ViewPager，名为ViewPagerEx，ViewPager里面有一段if逻辑判断是否在3.0以上使用PagerTransformer。因为PagerTransformer动画效果的实现依赖了PropertyViewAnim。但代码家的这个库使用NineOldAndroids实现了向3.0之前的兼容。因此就把这个if条件去掉了，其它部分都没变。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @author daimajia : I just remove the if condition in setPageTransformer() to make it compatiable with Android 2.0+</div><div class="line"> * of course, with the help of the NineOldDroid.</div><div class="line"> * Thanks to JakeWharton.</div><div class="line"> * http://github.com/JakeWharton/NineOldAndroids</div><div class="line"> */</div></pre></td></tr></table></figure>
+<p>##AndroidImageSlider的总体设计##</p>
+<ul>
+<li><p>BaseTransformer<br>所有Transformer的基类，实现了ViewPagerEx.PageTransformer接口以及transformPage方法，并提供了onPreTransform(View view, float position)、onPostTransform(View view, float position)、onTransform(View view, float position);<br>分别在transformPage前后调用，用来处理为每一次的执行动画前的准备和结束动作，比如还原所有的动画状态。</p>
+</li>
+<li><p>BaseAnimationInterface:<br>ViewPagerEx执行Transformer动画的时候注入一些自己的动画。你需要实现该接口，然后实现以下4个方法，获取SlideView中的View，实现自己的动画。比如底部的DescriptionText动画<a href="https://github.com/daimajia/AndroidImageSlider/blob/master/library/src/main/java/com/daimajia/slider/library/Animations/DescriptionAnimation.java" target="_blank" rel="external">DescriptionAnimation</a> 出现时的动画就是onNextItemAppear中添加的,你可以点入，看下源码<br>onPrepareCurrentItemLeaveScreen(View current)<br>onPrepareNextItemShowInScreen(View next)<br>onCurrentItemDisappear(View view)<br>onNextItemAppear(View view)</p>
+</li>
+</ul>
+<p>而这4个方法的调用是在BaseTransformer中。BaseTransformer统一管理了Page滑动时的所有动画。为了获取这4个方法的调用时机，也是煞费苦心啊，先说下思路：<br>因为ViewPager滑动的时候transformPage方法是实时调用的，这里获取最初两次调用时传入的position进行比较。通过一个HashMap<view, arraylist<float="">&gt;来维护不同pageView的多个position。但这里为了优化，只取前两个position做比较。<br>先判断起始滑动的方向，然后再判断下一次滑动的方向，两次结果作差来判断到底哪个page要离开界面还是进入界面。</view,></p>
+<p>确定2个界面的4种临界状态：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(mCustomAnimationInterface != <span class="keyword">null</span>)&#123;</div><div class="line">            <span class="keyword">if</span>(h.containsKey(view) == <span class="keyword">false</span> || h.get(view).size() == <span class="number">1</span>)&#123;</div><div class="line">                <span class="keyword">if</span>(position &gt; -<span class="number">1</span> &amp;&amp; position &lt; <span class="number">1</span>)&#123;</div><div class="line">                    <span class="keyword">if</span>(h.get(view) == <span class="keyword">null</span>)&#123;</div><div class="line">                        h.put(view,<span class="keyword">new</span> ArrayList&lt;Float&gt;());<span class="comment">//为每个View创建一个List，来存储偏移分数position</span></div><div class="line">                    &#125;</div><div class="line">                    h.get(view).add(position);<span class="comment">//向指定的View中添加偏移分数</span></div><div class="line">                    <span class="keyword">if</span>(h.get(view).size() == <span class="number">2</span>)&#123;</div><div class="line">                        <span class="keyword">float</span> zero = h.get(view).get(<span class="number">0</span>);</div><div class="line">                        <span class="keyword">float</span> cha = h.get(view).get(<span class="number">1</span>) - h.get(view).get(<span class="number">0</span>);<span class="comment">//当前滑动的位移偏移量分数差： newfraction - oldfraction</span></div><div class="line">                        <span class="keyword">if</span>(zero &gt; <span class="number">0</span>)&#123;<span class="comment">//起始时，向左滑动，当前Page中心位于屏幕中心左侧</span></div><div class="line">                            <span class="comment">//判断滑动趋势，如果继续向左侧滑动，position从0到1越来越大 newfraction &gt;　oldfraction</span></div><div class="line">                            <span class="keyword">if</span>(cha &gt; -<span class="number">1</span> &amp;&amp; cha &lt; <span class="number">0</span>)&#123;<span class="comment">//向右侧滑动</span></div><div class="line">                                <span class="comment">//in</span></div><div class="line">                                mCustomAnimationInterface.onPrepareNextItemShowInScreen(view);<span class="comment">//下一个Page将要进入屏幕</span></div><div class="line">                            &#125;<span class="keyword">else</span>&#123;<span class="comment">//cha &gt; 0 继续向左侧滑动</span></div><div class="line">                                <span class="comment">//out</span></div><div class="line">                                mCustomAnimationInterface.onPrepareCurrentItemLeaveScreen(view);<span class="comment">//当前Page将要离开屏幕</span></div><div class="line">                            &#125;</div><div class="line">                        &#125;<span class="keyword">else</span>&#123;<span class="comment">//起始时，向右滑动，当前Page中心位于屏幕中心右侧</span></div><div class="line">                            <span class="comment">//判断滑动趋势，如果继续向右侧滑动，position从0到-1越来越小 newfraction &lt;　oldfraction</span></div><div class="line">                            <span class="keyword">if</span>(cha &gt; -<span class="number">1</span> &amp;&amp; cha &lt; <span class="number">0</span>)&#123;<span class="comment">//负值，继续向右滑动，因此当前page将要滑出屏幕</span></div><div class="line">                                <span class="comment">//out</span></div><div class="line">                                mCustomAnimationInterface.onPrepareCurrentItemLeaveScreen(view);<span class="comment">//当前Page将要离开屏幕</span></div><div class="line">                            &#125;<span class="keyword">else</span>&#123;<span class="comment">//向左滑动</span></div><div class="line">                                <span class="comment">//in</span></div><div class="line">                                mCustomAnimationInterface.onPrepareNextItemShowInScreen(view);<span class="comment">//下一个Page将要离开屏幕</span></div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line"></div><div class="line"> <span class="keyword">boolean</span> isApp,isDis;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Called each &#123;<span class="doctag">@link</span> #transformPage(View, float)&#125; call after &#123;<span class="doctag">@link</span> #onTransform(View, float)&#125; is finished.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> view</div><div class="line">     * <span class="doctag">@param</span> position</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostTransform</span><span class="params">(View view, <span class="keyword">float</span> position)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span>(mCustomAnimationInterface != <span class="keyword">null</span>)&#123;</div><div class="line">            <span class="keyword">if</span>(position == -<span class="number">1</span> || position == <span class="number">1</span>)&#123;<span class="comment">//当前界面刚好完全移除界面</span></div><div class="line">                mCustomAnimationInterface.onCurrentItemDisappear(view);</div><div class="line">                isApp = <span class="keyword">true</span>;</div><div class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(position == <span class="number">0</span>)&#123;</div><div class="line">                mCustomAnimationInterface.onNextItemAppear(view);<span class="comment">//下一个Page刚好完全显示</span></div><div class="line">                isDis = <span class="keyword">true</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span>(isApp &amp;&amp; isDis)&#123;</div><div class="line">                h.clear();</div><div class="line">                isApp = <span class="keyword">false</span>;</div><div class="line">                isDis = <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>BaseSliderView：<br>该类就是SlideView的基类，持有SlideView的一些公共方法，比如设置SliderView的image资源的方法image(File file)，图片加载异常和失败的处理，empty(URL)用于展示，errorDisappear(boolean disappear)。这种思想和一个EmptyView有些类似，在我公司的项目也是使用了这种方式，比如通常一个ListView的界面，会有一个包装后的progressbar（包含各种情况的处理）来显示进度，当加载失败的时候，或者无数据的时候，可以调用该progressbar身上的方法，去决定显示何种布局。使用起来很方便。当然如果你的SliderView更复杂，你可以通过实现BaseSliderView,然后实现自己的SliderView。</li>
+</ul>
+<p>下面两个类就是切换的View：<br>DefaultSliderView：实现了BaseSliderView，该View默认就是一张图片<br>TextSliderView：带有图片和描述性文字的View</p>
+<ul>
+<li>Sliderlayout:<br>  一个控制中心，将InfiniteViewPager，PageIndicator，粘合在一起，控制动画的样式，ViewPager轮循的播放。</li>
+</ul>
+<p>addSlider:向ViewPager中添加一个SlideView<br>startAutoCycle：启动轮播<br>pauseAutoCycle：停止轮播<br>setDuration： 轮播间隔<br>setPagerTransformer 为ViewPager设置自定义的PageTransformer<br>onInterceptTouchEvent 在用户手势按下的时候，就停止轮循</p>
+<p>Note:<br>这里在onInterceptTouchEvent中处理而不能再onTouchEvent中处理。因为SlideView会消费掉点击事件，事件被消费了，没法返回给SlideLayout的onTouchEvent中。</p>
+<p>OK，总体设计弄清楚后，剩下来就是动画中最核心的部分了，就是动画效果的实现,这里只简单的介绍Accordion动画的实现，其它的大家可以自己分析。关于PropertyView动画的使用，可以参考我的另一篇文章：<a href="http://www.lightskystreet.com/2014/12/10/propertyview-anim-practice/">PropertyAnim实际应用</a></p>
+<p>Accordion<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccordionTransformer</span> <span class="keyword">extends</span> <span class="title">BaseTransformer</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onTransform</span><span class="params">(View view, <span class="keyword">float</span> position)</span> </span>&#123;</div><div class="line">        ViewHelper.setPivotX(view,position &lt; <span class="number">0</span> ? <span class="number">0</span> : view.getWidth());</div><div class="line">        ViewHelper.setScaleX(view,position &lt; <span class="number">0</span> ? <span class="number">1f</span> + position : <span class="number">1f</span> - position);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>代码家在README中注明了Thanks JazzyViewPager，开始没注意，后来看JazzyViewPager的源码时候偶然发现AndroidImageSlider的一些实现的灵感是来自JazzyViewPager项目。不过JazzyViewPager的实现方式略显复杂，没有使用PageTransformer接口，而是使用了OnPageChangeListener接口的onPageScrolled方法。<br>下面简单的看下JazzyViewPager库的动画实现，它将positionOffset作为参数控制。由于positionOffset的值为[0,1),所以就需要分别处理正负的情况。另外JazzyViewPager是通过维护一个LinkedHashMap<integer, object="">来持有Page的引用。在Adapter添加界面的时候，会调用JazzyViewPager的 setObjectForPosition(Object obj, int position) 方法存入到集合中去。然后在onPageScrolled方法中再根据position获取当前Page的前一个mLeft和后一个mRight界面，分别对前后两个界面添加动画。</integer,></p>
+<p>##两种方式的关键参数区别##</p>
+<p>onPageScrolled(int position, float positionOffset, int positionOffsetPixels)方法的参数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line">         * This method will be invoked when the current page is scrolled, either as part</div><div class="line">         * of a programmatically initiated smooth scroll or a user initiated touch scroll.</div><div class="line">         *</div><div class="line">         * <span class="doctag">@param</span> position Position index of the first page currently being displayed.</div><div class="line">         *                 Page position+1 will be visible if positionOffset is nonzero.</div><div class="line">         * <span class="doctag">@param</span> positionOffset Value from [0, 1) indicating the offset from the page at position.</div><div class="line">         * <span class="doctag">@param</span> positionOffsetPixels Value in pixels indicating the offset from position.</div><div class="line">         */</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageScrolled</span><span class="params">(<span class="keyword">int</span> position, <span class="keyword">float</span> positionOffset, <span class="keyword">int</span> positionOffsetPixels)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>下面是打印的PageTransformer接口的transformPage时position的值：相邻两界面的绝对值的和为1.而正负则表示了滑入和滑出状态<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.025</span>    I/System.out﹕ transformPage----------------------    -<span class="number">0.43611112</span></div><div class="line">       <span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.025</span>    I/System.out﹕ transformPage----------------------    <span class="number">0.5638889</span></div><div class="line">       </div><div class="line"><span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.045</span>    I/System.out﹕ transformPage----------------------    -<span class="number">0.38055557</span></div><div class="line">       <span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.045</span>    I/System.out﹕ transformPage----------------------    <span class="number">0.61944443</span></div><div class="line">       </div><div class="line"><span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.045</span>    I/System.out﹕ transformPage----------------------    -<span class="number">0.37777779</span></div><div class="line">       <span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.045</span>    I/System.out﹕ transformPage----------------------    <span class="number">0.62222224</span></div><div class="line">       </div><div class="line"><span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.055</span>    I/System.out﹕ transformPage----------------------    -<span class="number">0.32916668</span></div><div class="line">       <span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.055</span>    I/System.out﹕ transformPage----------------------    <span class="number">0.67083335</span></div><div class="line">       </div><div class="line"><span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.065</span>    I/System.out﹕ transformPage----------------------    -<span class="number">0.32222223</span></div><div class="line">       <span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.065</span>    I/System.out﹕ transformPage----------------------    <span class="number">0.67777777</span></div><div class="line">       </div><div class="line"><span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.075</span>    I/System.out﹕ transformPage----------------------    -<span class="number">0.27916667</span></div><div class="line">       <span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.075</span>    I/System.out﹕ transformPage----------------------    <span class="number">0.72083336</span></div></pre></td></tr></table></figure></p>
+<p>onPageScrolled方法的positionOffset的值为 [0, 1) ，而PageTransformer接口的transformPage(View page, float position) 已经标好了正负值（滑入和滑出），如果你的动画正好是相对的，那么用transfromPage就简单的多。</p>
+<p>我们取同一种动画效果Cube来比较一下JazzyViewPager和AndroidImageSlider两者的实现:</p>
+<p><strong>JazzyViewPager部分源码</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageScrolled</span><span class="params">(<span class="keyword">int</span> position, <span class="keyword">float</span> positionOffset, <span class="keyword">int</span> positionOffsetPixels)</span> </span>&#123;</div><div class="line">		</div><div class="line">		...</div><div class="line"></div><div class="line">		<span class="keyword">float</span> effectOffset = isSmall(positionOffset) ? <span class="number">0</span> : positionOffset;</div><div class="line">		mLeft = findViewFromObject(position);</div><div class="line">		mRight = findViewFromObject(position+<span class="number">1</span>);</div><div class="line"></div><div class="line">		<span class="keyword">switch</span> (mEffect) &#123;</div><div class="line">			<span class="keyword">case</span> Standard:</div><div class="line">				<span class="keyword">break</span>;</div><div class="line">			...</div><div class="line">			<span class="keyword">case</span> animateCube:</div><div class="line">				animateCube(mLeft, mRight, effectOffset);</div><div class="line">				<span class="keyword">break</span>;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	...</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">animateCube</span><span class="params">(View left, View right, <span class="keyword">float</span> positionOffset, <span class="keyword">boolean</span> in)</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (mState != State.IDLE) &#123;</div><div class="line">			<span class="keyword">if</span> (left != <span class="keyword">null</span>) &#123;</div><div class="line">				manageLayer(left, <span class="keyword">true</span>);</div><div class="line">				mRot = (in ? <span class="number">90.0f</span> : -<span class="number">90.0f</span>) * positionOffset;</div><div class="line">				ViewHelper.setPivotX(left, left.getMeasuredWidth());</div><div class="line">				ViewHelper.setPivotY(left, left.getMeasuredHeight()*<span class="number">0.5f</span>);</div><div class="line">				ViewHelper.setRotationY(left, mRot);</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">if</span> (right != <span class="keyword">null</span>) &#123;</div><div class="line">				manageLayer(right, <span class="keyword">true</span>);</div><div class="line">				mRot = -(in ? <span class="number">90.0f</span> : -<span class="number">90.0f</span>) * (<span class="number">1</span>-positionOffset);</div><div class="line">				ViewHelper.setPivotX(right, <span class="number">0</span>);</div><div class="line">				ViewHelper.setPivotY(right, right.getMeasuredHeight()*<span class="number">0.5f</span>);</div><div class="line">				ViewHelper.setRotationY(right, mRot);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setObjectForPosition</span><span class="params">(Object obj, <span class="keyword">int</span> position)</span> </span>&#123;<span class="comment">//每次Adapter实例化View的时候，调用该方法，将实例化的View存入集合</span></div><div class="line">			mObjs.put(Integer.valueOf(position), obj);</div><div class="line">		&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> View <span class="title">findViewFromObject</span><span class="params">(<span class="keyword">int</span> position)</span> </span>&#123;<span class="comment">//根据position从集合中获取到对应的View</span></div><div class="line">			Object o = mObjs.get(Integer.valueOf(position));</div><div class="line">			<span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</div><div class="line">				<span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">			&#125;</div><div class="line">			PagerAdapter a = getAdapter();</div><div class="line">			View v;</div><div class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; getChildCount(); i++) &#123;</div><div class="line">				v = getChildAt(i);</div><div class="line">				<span class="keyword">if</span> (a.isViewFromObject(v, o))</div><div class="line">					<span class="keyword">return</span> v;</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">	....</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>AndroidIamgeSlider中的CubeIn:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class CubeInTransformer extends BaseTransformer &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected void onTransform(View view, float position) &#123;</div><div class="line">		// Rotate the fragment on the left or right edge</div><div class="line">        ViewHelper.setPivotX(view,position &gt; 0 ? 0 : view.getWidth());</div><div class="line">        ViewHelper.setPivotY(view,0);</div><div class="line">        ViewHelper.setRotation(view,-90f * position);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>JazzyViewPager：CubeIn上面代码中已经贴出：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (left != <span class="keyword">null</span>) &#123;</div><div class="line">	...</div><div class="line">	mRot = (in ? <span class="number">90.0f</span> : -<span class="number">90.0f</span>) * positionOffset;</div><div class="line">	...</div><div class="line">	&#125;</div><div class="line"></div><div class="line"><span class="keyword">if</span> (right != <span class="keyword">null</span>) &#123;</div><div class="line">	mRot = -(in ? <span class="number">90.0f</span> : -<span class="number">90.0f</span>) * (<span class="number">1</span>-positionOffset);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以精简为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">positionOffset * value</div><div class="line">-(1-positionOffset) * value</div></pre></td></tr></table></figure></p>
+<p>与从上面的transformPage打印的position的值再比较下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.075</span>    I/System.out﹕ transformPage----------------------    -<span class="number">0.27916667</span></div><div class="line">       <span class="number">12</span>-<span class="number">15</span> <span class="number">21</span>:<span class="number">03</span>:<span class="number">13.075</span>    I/System.out﹕ transformPage----------------------    <span class="number">0.72083336</span></div></pre></td></tr></table></figure></p>
+<p><strong>结论：</strong><br>发现transformPage已经帮我们处理好了一切，直接用。我们可以根据正负符号来判断滑入和滑出的View（不用像JazzyViewPager那样去维护一个集合了），从而针对滑入滑出做出不同或相对的的动画。最简单的，两个界面如果是简单的相对动画（滑入对滑出），则什么都不用处理，直接用就行了，就像下面介绍的Yahoo视差的实现一样，具体可以看下面的讲解。</p>
+<p>大家仔细看下相同的动画效果的处理方式，CubeInTransformer不用单独处理上一个和下一个界面，而只管根据position的正负判断当前Page和下一个Page去自定义不同的动画即可。<br>所以可以把AndroidImageSlider中的一些动画效果看做是JazzyViewPager的精简版本。</p>
+<p>对于ViewPager如何帮我们处理View的呢？可以看下源码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPageScrolled</span><span class="params">(<span class="keyword">int</span> position, <span class="keyword">float</span> offset, <span class="keyword">int</span> offsetPixels)</span> </span>&#123;</div><div class="line">...</div><div class="line"><span class="keyword">if</span> (mPageTransformer != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> scrollX = getScrollX();</div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> childCount = getChildCount();</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; childCount; i++) &#123;</div><div class="line">                <span class="keyword">final</span> View child = getChildAt(i);</div><div class="line">                <span class="keyword">final</span> LayoutParams lp = (LayoutParams) child.getLayoutParams();</div><div class="line"></div><div class="line">                <span class="keyword">if</span> (lp.isDecor) <span class="keyword">continue</span>;</div><div class="line"></div><div class="line">                <span class="keyword">final</span> <span class="keyword">float</span> transformPos = (<span class="keyword">float</span>) (child.getLeft() - scrollX) / getClientWidth();</div><div class="line">                mPageTransformer.transformPage(child, transformPos);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">...</div><div class="line"></div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p>##小结##<br>上面主要介绍了ViewPager的Page的滑动动画，两种实现方式：<br>PageTransformer.transformPage方式：在执行onPageScrolled方法的时候，会遍历ViewPager的所有View，并执行其transformPage方法。position是已经处理好的（方向和值）<br>onPageScrolled方式：略显复杂，因为没法拿到View，还要自己去维护一个View集合，并且positionOffset的限制，需要自己去处理不同View的position :  PageA：position , PageB：-(1-position)。</p>
+<p>#为ViewPager的Page内容添加动画，实现炫酷的交互效果#</p>
+<p>##Tholotis##</p>
+<p><img src="/img/viewpager-anim/viewpaer-anim-a.gif">   </p>
+<p>##实现原理：##<br>为Page内部的View处理不同的平移速度，达到视差的效果,作者的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transformPage</span><span class="params">(View view, <span class="keyword">float</span> position)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> pageWidth = view.getWidth();</div><div class="line">        </div><div class="line">    <span class="keyword">if</span> (position &lt; -<span class="number">1</span>) &#123; <span class="comment">// [-Infinity,-1)</span></div><div class="line">        <span class="comment">// This page is way off-screen to the left.</span></div><div class="line">        view.setAlpha(<span class="number">0</span>);</div><div class="line"> </div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (position &lt;= <span class="number">1</span>) &#123; <span class="comment">// [-1,1]</span></div><div class="line">          </div><div class="line">        mBlur.setTranslationX((<span class="keyword">float</span>) (-(<span class="number">1</span> - position) * <span class="number">0.5</span> * pageWidth));</div><div class="line">		mBlurLabel.setTranslationX((<span class="keyword">float</span>) (-(<span class="number">1</span> - position) * <span class="number">0.5</span> * pageWidth));</div><div class="line"> </div><div class="line">		mDim.setTranslationX((<span class="keyword">float</span>) (-(<span class="number">1</span> - position) * pageWidth));</div><div class="line">		mDimLabel.setTranslationX((<span class="keyword">float</span>) (-(<span class="number">1</span> - position) * pageWidth));</div><div class="line"> </div><div class="line">		mCheck.setTranslationX((<span class="keyword">float</span>) (-(<span class="number">1</span> - position) * <span class="number">1.5</span> * pageWidth));</div><div class="line">		mDoneButton.setTranslationX((<span class="keyword">float</span>) (-(<span class="number">1</span> - position) * <span class="number">1.7</span> * pageWidth)); </div><div class="line">		<span class="comment">// The 0.5, 1.5, 1.7 values you see here are what makes the view move in a different speed.</span></div><div class="line">		<span class="comment">// The bigger the number, the faster the view will translate.</span></div><div class="line">		<span class="comment">// The result float is preceded by a minus because the views travel in the opposite direction of the movement.</span></div><div class="line"> </div><div class="line">		mFirstColor.setTranslationX((position) * (pageWidth / <span class="number">4</span>));</div><div class="line"> </div><div class="line">		mSecondColor.setTranslationX((position) * (pageWidth / <span class="number">1</span>));</div><div class="line"> </div><div class="line">		mTint.setTranslationX((position) * (pageWidth / <span class="number">2</span>));</div><div class="line"> </div><div class="line">		mDesaturate.setTranslationX((position) * (pageWidth / <span class="number">1</span>));</div><div class="line">		<span class="comment">// This is another way to do it</span></div><div class="line">		  </div><div class="line">		  </div><div class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// (1,+Infinity]</span></div><div class="line">        <span class="comment">// This page is way off-screen to the right.</span></div><div class="line">        view.setAlpha(<span class="number">0</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>GitHub上类似的效果还有：<br><a href="https://github.com/prolificinteractive/ParallaxPager" target="_blank" rel="external">https://github.com/prolificinteractive/ParallaxPager</a></p>
+<p><img src="/img/viewpager-anim/ParallaxPager.gif" height="280" width="180/">   </p>
+<p><a href="https://github.com/flavienlaurent/discrollview" target="_blank" rel="external">https://github.com/flavienlaurent/discrollview</a></p>
+<p><img src="/img/viewpager-anim/discrollview.gif" height="280" width="180/">   </p>
+<p>这两个项目都封装成了库，使用的时候也简单，但一般我们可以通过ViewPager.PageTransformer来实现这样的效果，从上面AndroidImageSlider与JazzyViewPager的对比中也能看到，PageTransformer的实现方式更简单。而且ViewPager的动画库也很多，比如上面的JazzyViewPager。你只需把某一个动画效果的transformPage方法的逻辑拿来就可用，当然如果你的需求更复杂，或者ViewPager实现起来较麻烦，你可以考虑上面的两个项目，扩展自己的思维。</p>
+<p>JazzyViewPager:<br><a href="https://github.com/jfeinstein10/JazzyViewPager/blob/master/lib/src/com/jfeinstein/jazzyviewpager/JazzyViewPager.java" target="_blank" rel="external">https://github.com/jfeinstein10/JazzyViewPager/blob/master/lib/src/com/jfeinstein/jazzyviewpager/JazzyViewPager.java</a><br><a href="https://github.com/prolificinteractive/ParallaxPager" target="_blank" rel="external">https://github.com/prolificinteractive/ParallaxPager</a><br><a href="https://github.com/flavienlaurent/discrollview" target="_blank" rel="external">https://github.com/flavienlaurent/discrollview</a></p>
+<p>##Yahoo天气##<br><img src="/img/viewpager-anim/yahoo.gif">   </p>
+<p>原理很简单，只是这次处理的动画对象是背景图片，减慢其平移的速度，而ViewPager的内容正常移动，从而达到视差的效果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ParallaxPageTransformer</span> <span class="keyword">implements</span> <span class="title">ViewPager</span>.<span class="title">PageTransformer</span> </span>&#123;</div><div class="line">	</div><div class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transformPage</span><span class="params">(View view, <span class="keyword">float</span> position)</span> </span>&#123;</div><div class="line">		</div><div class="line">			<span class="keyword">int</span> pageWidth = view.getWidth();</div><div class="line">			</div><div class="line"> </div><div class="line">			 <span class="keyword">if</span> (position &lt; -<span class="number">1</span>) &#123; <span class="comment">// [-Infinity,-1)</span></div><div class="line">		            <span class="comment">// This page is way off-screen to the left.</span></div><div class="line">		            view.setAlpha(<span class="number">1</span>);</div><div class="line"> </div><div class="line">		        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (position &lt;= <span class="number">1</span>) &#123; <span class="comment">// [-1,1]</span></div><div class="line">		            </div><div class="line">		        	dummyImageView.setTranslationX(-position * (pageWidth / <span class="number">2</span>)); <span class="comment">//Half the normal speed</span></div><div class="line">		            </div><div class="line">		        &#125; <span class="keyword">else</span> &#123; <span class="comment">// (1,+Infinity]</span></div><div class="line">		            <span class="comment">// This page is way off-screen to the right.</span></div><div class="line">		            view.setAlpha(<span class="number">1</span>);</div><div class="line">				&#125;</div><div class="line">		    </div><div class="line"> </div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>OK，本来想自己写，但刚巧在GitHub上发现了一个：<a href="https://github.com/xgc1986/ParallaxPagerTransformer" target="_blank" rel="external">ParallaxPagerTransformer</a> ，并提供了<a href="https://github.com/xgc1986/ParallaxPagerTransformer/blob/master/parallaxDemo.apk" target="_blank" rel="external">APK</a> ，实现了Yahoo天气的效果，但多了一些缩放的效果，将缩放的代码注释掉就和Yahoo天气的效果完全一样了。另外想clone到本地的朋友注意了，由于作者的AndroidStudio版本太老，导入的时候你需要做一些处理。<br>作者把该Transformer抽取出来，做为了一个lib，就一个类，核心代码很简单，说明ViewPager.PageTransformer接口很强大啊：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transformPage</span><span class="params">(View view, <span class="keyword">float</span> position)</span> </span>&#123;</div><div class="line"></div><div class="line">      View parallaxView = view.findViewById(id);</div><div class="line"></div><div class="line">      <span class="keyword">if</span> (parallaxView != <span class="keyword">null</span>) &#123;</div><div class="line">          <span class="keyword">if</span> (position &gt; -<span class="number">1</span> &amp;&amp; position &lt; <span class="number">1</span>) &#123;</div><div class="line">              <span class="keyword">float</span> width = parallaxView.getWidth();</div><div class="line">              parallaxView.setTranslationX(-(position * width * speed));</div><div class="line">              <span class="keyword">float</span> sc = ((<span class="keyword">float</span>)view.getWidth() - border)/ view.getWidth();</div><div class="line">              <span class="keyword">if</span> (position == <span class="number">0</span>) &#123;<span class="comment">//这里处理了缩放的效果，去掉即和Yahoo天气的效果一样</span></div><div class="line">                  view.setScaleX(<span class="number">1</span>);</div><div class="line">                  view.setScaleY(<span class="number">1</span>);</div><div class="line">              &#125; <span class="keyword">else</span> &#123;</div><div class="line">                  view.setScaleX(sc);</div><div class="line">                  view.setScaleY(sc);</div><div class="line">              &#125;</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>看了上面的实现，大家应该知道如何去实现类似的交互动画了，而且现在的App导航页中，也越来越多的使用到了这样的交互，作者在文章还列举了News Digest的导航页,有了思路，实现起来应该就不难了，第一、三页的动画上面已经介绍过，对于第二页，其实就是一个旋转动画。实时的旋转可以通过实时变化的position来处理。<br><img src="/img/viewpager-anim/newsdigest.gif" height="280" width="180/">   </p>
+<p>类似的项目：<br><a href="https://github.com/andraskindler/parallaxviewpager" target="_blank" rel="external">https://github.com/andraskindler/parallaxviewpager</a><br><img src="/img/viewpager-anim/parallaxviewpager.gif" height="280" width="180/">   </p>
+<p>#总结：#<br>整篇文章介绍的东西其实很简单，只是以前没有研究过ViewPager.PageTransformer,使用简单，但功能强大，position参数在动画处理中相当重要，因为是实时的百分比，所以省去了自己不少计算，如果你需要为ViewPager自定义动画，那么选择PageTransformer，对于本文的第二类巧妙动画效果的介绍，看具体情况决定是否使用PageTransformer，如果position能很方便帮助动画的计算，那是最好的，如果不是那么你完全可以使用onPageScrolled来处理，源码中也可看到，PageTransformer就是在onPageScroll中调用的。<br>使用时要注意，它只支持3.0以上的系统。如果要兼容，可以参考上面AndroidImageSlider的兼容实现。在文章中也插入了不少ViewPager动画项目的链接，也许不是使用PageTransformer，但也是一种思路的扩展，供大家参考。下一篇文章，我会介绍Fragment的动画，大家敬请期待。</p>
+<p>参考文献：<br><a href="http://developer.android.com/training/animation/screen-slide.html#pagetransformer" target="_blank" rel="external">官方文档</a><br><a href="https://medium.com/@BashaChris/the-android-viewpager-has-become-a-fairly-popular-component-among-android-apps-its-simple-6bca403b16d4" target="_blank" rel="external">Great animations with PageTransformer</a><br><a href="http://andraskindler.com/2013/06/27/create-viewpager-transitions-a-pagertransformer-example/" target="_blank" rel="external">Create ViewPager transitions</a> </p>
+<p>#GitHub上相关的ViewPager动画的项目#<br><a href="https://github.com/daimajia/AndroidImageSlider" target="_blank" rel="external">https://github.com/daimajia/AndroidImageSlider</a><br><a href="https://github.com/inovex/ViewPager3D" target="_blank" rel="external">https://github.com/inovex/ViewPager3D</a></p>
+<p>轮循的ViewPager<br><a href="https://github.com/antonyt/InfiniteViewPager" target="_blank" rel="external">https://github.com/antonyt/InfiniteViewPager</a><br><a href="https://github.com/JakeWharton/salvage" target="_blank" rel="external">https://github.com/JakeWharton/salvage</a><br><a href="https://github.com/Trinea/android-auto-scroll-view-pager" target="_blank" rel="external">https://github.com/Trinea/android-auto-scroll-view-pager</a></p>
+<p>VerticalViewPager<br><a href="https://github.com/JakeWharton/Android-DirectionalViewPager" target="_blank" rel="external">https://github.com/JakeWharton/Android-DirectionalViewPager</a><br><a href="https://github.com/LambergaR/VerticalViewPager" target="_blank" rel="external">https://github.com/LambergaR/VerticalViewPager</a><br><a href="https://github.com/VenomVendor/AutoNotifyViewPager" target="_blank" rel="external">https://github.com/VenomVendor/AutoNotifyViewPager</a></p>
+<p><a href="https://github.com/Dreddik/AndroidTouchGallery" target="_blank" rel="external">https://github.com/Dreddik/AndroidTouchGallery</a></p>
+<p>特效的ViewPager<br><a href="https://github.com/kmshack/Android-ParallaxHeaderViewPager" target="_blank" rel="external">https://github.com/kmshack/Android-ParallaxHeaderViewPager</a><br><a href="https://github.com/andraskindler/parallaxviewpager" target="_blank" rel="external">https://github.com/andraskindler/parallaxviewpager</a><br><a href="https://github.com/MoshDev/BackgroundViewPager" target="_blank" rel="external">https://github.com/MoshDev/BackgroundViewPager</a></p>
+<p>与ViewPager一起使用的导航：<br><a href="https://github.com/astuetz/PagerSlidingTabStrip" target="_blank" rel="external">https://github.com/astuetz/PagerSlidingTabStrip</a> （不支持TextView颜色的变化）<br><a href="https://github.com/jpardogo/PagerSlidingTabStrip" target="_blank" rel="external">https://github.com/jpardogo/PagerSlidingTabStrip</a> (支持TextView颜色变化)<br><a href="https://github.com/DSofter/SmoothTabIndicator" target="_blank" rel="external">https://github.com/DSofter/SmoothTabIndicator</a> </p>
+<p>FragmentAnim<br><a href="https://github.com/DesarrolloAntonio/FragmentTransactionExtended" target="_blank" rel="external">https://github.com/DesarrolloAntonio/FragmentTransactionExtended</a></p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Anim/"> #Anim </a>
+          
+            <a href="/tags/ViewPager/"> #ViewPager </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/01/17/android-code-optimize-tips/">Android代码优化小技巧</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/14/new-blog-site/">搬家了</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2014/12/15/viewpager-anim/"
+               data-title="动画系列 - ViewPager动画" data-url="http://www.lightskystreet.com/2014/12/15/viewpager-anim/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

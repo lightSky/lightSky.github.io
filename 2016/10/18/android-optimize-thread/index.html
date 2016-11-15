@@ -1,0 +1,987 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+  <meta name="keywords" content="Android，性能优化," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Android性能优化-线程性能优化 // lightSky'Blog </title>
+</head>
+
+<body>
+<!--[if lte IE 8]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'> <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari." style='margin-left:auto;margin-right:auto;display: block;'/></a></div> <![endif]-->
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">lightSky'Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-commonweal">
+        <a href="/404.html">
+          <i class="menu-item-icon icon-commonweal"></i> <br />
+          公益404
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Android性能优化-线程性能优化
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2016-10-17
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Android/">Android</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/Android/性能优化/">性能优化</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2016/10/18/android-optimize-thread/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/18/android-optimize-thread/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <p>原文链接：<a href="https://developer.android.com/topic/performance/threads.html" target="_blank" rel="external">Better Performance through Threading</a>  </p>
+<h1 id="线程的性能"><a href="#线程的性能" class="headerlink" title="线程的性能"></a>线程的性能</h1><p>熟练使用Android上的线程可以帮助你提高应用程序的性能。 本篇文章讨论了使用线程的几个方面：使用UI或主线程; 应用程序生命周期和线程优先级之间的关系; 以及平台提供的帮助管理线程复杂性的方法。 在每一部分，本篇都描述了潜在的陷阱以及如何避免它们的策略。</p>
+<h2 id="主线程"><a href="#主线程" class="headerlink" title="主线程"></a>主线程</h2><p>当用户启动你的应用程序时，Android会创建一个新的 <a href="https://developer.android.com/guide/components/fundamentals.html" target="_blank" rel="external">Linux process</a> 以及一个执行线程。 这个main线程，也称为UI线程，负责屏幕上发生的一切。 了解其工作原理可以帮助你使用主线程设计你的应用程序以获得最佳性能。</p>
+<h3 id="内部细节"><a href="#内部细节" class="headerlink" title="内部细节"></a>内部细节</h3><p>主线程具有非常简单的设计：它的唯一工作就是从线程安全的工作队列中取出并执行工作块，直到应用程序被终止。 框架从各个地方生成一些这些工作块。 这些地方包括与生命周期信息，用户事件（如输入）或来自其他应用程序和进程的事件相关联的回调。 此外，应用程序还可以在不使用框架的情况下显式地将工作块加入队列。</p>
+<p>应用程序执行的<a href="https://www.youtube.com/watch?v=qk5F6Bxqhr4&amp;index=1&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE" target="_blank" rel="external">任何代码块</a>都会被绑定到一个事件回调上，例如输入，布局填充或绘制。 当某个时间触发一个事件时，事件发生的所在线程会将事件加入到主线程的消息队列。 之后主线程可以处理该事件。</p>
+<p>当发生动画或屏幕更新时，系统试图每16ms左右执行一个工作块（负责绘制屏幕），以便以<a href="https://www.youtube.com/watch?v=CaMTIgxCSqU&amp;index=62&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE" target="_blank" rel="external">每秒60帧</a>的速度平滑地渲染。 为了让系统达到这个目标，一些操作必须发生在主线程上。 但是，当主线程的消息队列包含太多或太耗时的任务，为了让主线程能够在16ms内完成工作，你应将这些任务移到工作线程中去。 如果主线程不能在16ms内完成执行的代码块，则用户可能感觉到卡顿或UI响应较慢。 如果主线程阻塞大约5秒钟，系统将显示“<a href="https://developer.android.com/training/articles/perf-anr.html" target="_blank" rel="external">（ANR）</a>”对话框，允许用户直接关闭应用程序。</p>
+<p>从主线程移除多个或耗时的任务，以便它们不会干扰到平滑渲染和对用户输入的快速响应，是你在应用程序中采用线程的最大原因。</p>
+<h2 id="线程和UI对象的引用"><a href="#线程和UI对象的引用" class="headerlink" title="线程和UI对象的引用"></a>线程和UI对象的引用</h2><p>按照设计，<a href="https://www.youtube.com/watch?v=tBHPmQQNiS8&amp;index=3&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE" target="_blank" rel="external">Android UI对象不是线程安全的</a>。 应用程序应该在主线程上创建，使用和销毁UI对象。 如果尝试修改或甚至引用除主线程之外的线程中的UI对象，结果可能是异常，静默失败，崩溃和其他未定义的错误行为。</p>
+<p>UI对象引用导致的问题可以划分为两种：显式引用和隐式引用。</p>
+<a id="more"></a>
+<h3 id="显示引用"><a href="#显示引用" class="headerlink" title="显示引用"></a>显示引用</h3><p>许多非主线程上的任务在最后都会更新UI对象。 但是，如果某一个线程访问视图层级中的对象，可能会导致应用的不稳定性：如果工作线程修改了同时被任何其他线程引用的对象属性（这里都是指UI对象），则结果是不可预测的。</p>
+<p>假设一个应用程序在工作线程上直接引用UI对象。 这个UI对象可能包含对一个<code>View</code>的引用; 但在工作完成之前，该View被从视图层次结构中删除了。 如果该引用将View对象保留在内存中并对其设置属性，用户并不会看到此对象，因为一旦对象的引用消失，应用程序就会删除该对象。</p>
+<p>再举另一个例子，View对象（被工作线程引用）持有包含它们的Activity的引用。 如果该Activity被销毁了，但仍有一个工作的线程直接或间接引用它 - 垃圾收集器将不会回收Activity，直到该工作线程执行完成。</p>
+<p>在某些Activity生命周期事件（如屏幕旋转）发生时，某些线程工作可能正在运行。 系统将无法执行垃圾回收，直到正在进行的工作完成。 因此，在内存中可能会有两个Activity对象，直到垃圾回收发生。</p>
+<p>考虑到以上场景，我们建议你的应用程序的工作线程中不应该包含对UI对象的显式引用。 避免此类引用可帮助你避免这些类型的内存泄漏，同时避免线程竞争。</p>
+<p>在所有情况下，应用程序应该只在主线程上更新UI对象。 如果有多个任务希望更新实际的UI，你应该制定一个策略，允许多个线程交互，最终将结果返回到主线程。</p>
+<h3 id="隐式引用"><a href="#隐式引用" class="headerlink" title="隐式引用"></a>隐式引用</h3><p>在以下代码片段中可以看到带有线程对象代码的常见设计缺陷：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class MainActivity extends Activity &#123;</div><div class="line">  // …...</div><div class="line">  public class MyAsyncTask extends AsyncTask   &#123;</div><div class="line">    @Override protected String doInBackground(Void... params) &#123;...&#125;</div><div class="line">    @Override protected void onPostExecute(String result) &#123;...&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这段代码的缺陷是将线程对象MyAsyncTask声明为一些Activity的内部类。 这种声明创建一个对Activity对象隐式引用。 因此，该对象持有对Activity的引用，直到线程工作完成，这样会导致所引用的Activity延迟销毁。 这种延迟会给内存带来更大的压力。</p>
+<p>解决该问题的直接解决方案是在自己的文件中定义重载类实例，从而移除对Activity的隐式引用。</p>
+<p>另一个解决方案是将AsyncTask声明为静态内部类。 这样做也可以消除隐式引用问题，因为静态内部类与普通内部类不同：普通内部类实例需要外部类的实例才可以实例化，并且可以直接访问其包含的方法和字段。 相比之下，静态内部类不需要引用外部类实例，因此它不包含对外部类成员的引用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class MainActivity extends Activity &#123;</div><div class="line">  // …...</div><div class="line">  Static public class MyAsyncTask extends AsyncTask   &#123;</div><div class="line">    @Override protected String doInBackground(Void... params) &#123;...&#125;</div><div class="line">    @Override protected void onPostExecute(String result) &#123;...&#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="线程和应用程序以及Activity的生命周期"><a href="#线程和应用程序以及Activity的生命周期" class="headerlink" title="线程和应用程序以及Activity的生命周期"></a>线程和应用程序以及Activity的生命周期</h2><p>应用程序生命周期会对应用程序中线程的工作产生影响。 在Activity被销毁后，你可能需要决定一个线程是否应该持久化。 还应该注意线程优先级和Activity是否在前台或后台运行之间的关系。</p>
+<h3 id="持久化的线程"><a href="#持久化的线程" class="headerlink" title="持久化的线程"></a>持久化的线程</h3><p>线程的生命周期大于生成它们的Activity的生命周期。 不管Activity的创建或销毁，线程继续执行，不会被打断。 在一些情况下，这种持久性是不期望的。</p>
+<p>考虑一种情况，某个Activity发起了一组线程工作任务，但在工作线程执行完之前该Activity被销毁了。 应用程序应该如何处理那些还在执行的任务？</p>
+<p>如果这些任务将来会去更新不再存在的UI，那么这些任务就不应该继续工作。例如，如果该任务是从数据库加载用户信息并更新视图，那么该线程就是不需要的。</p>
+<p>相比之下，如果任务组不是完全和UI相关的，还是很有用的。例如，任务组可能在等待下载图片，并将其缓存到磁盘，然后去更新相关的<code>View</code>对象。尽管View对象不再存在，下载和缓存图像的行为仍然是有帮助的，因为用户有可能还会回到这个被销毁的Activity。</p>
+<p>手动管理所有线程对象的生命周期可能非常复杂。如果你不能正确地管理它们，你的应用程序可能会遭受内存竞争和性能问题。 <a href="https://developer.android.com/guide/components/loaders.html" target="_blank" rel="external">Loaders</a> 是解决这个问题的一种方案。 <a href="https://developer.android.com/guide/components/loaders.html" target="_blank" rel="external">Loaders</a> 有助于异步加载数据，当configuration变化时仍旧会持久化信息。</p>
+<h3 id="线程的优先级"><a href="#线程的优先级" class="headerlink" title="线程的优先级"></a>线程的优先级</h3><p>如<a href="https://developer.android.com/guide/topics/processes/process-lifecycle.html" target="_blank" rel="external">进程和应用生命周期</a>中所述，应用程序线程接收的优先级部分取决于应用在其生命周期所处的阶段。 在应用程序中创建和管理线程时，设置其优先级很重要，这样可以让线程在正确的时间获得正确的优先级。 如果设置太高，你的线程可能会打断UI线程和渲染线程，导致你的应用程序丢帧。 如果设置太低，可能会导致你的异步任务（如图像加载）比它们实际需要的慢。</p>
+<p>每次你创建一个线程，你应该调用 <code>setThreadPriority()</code>方法。 系统的线程调度器程会优先选择优先级较高的线程，并根据需要权衡这些优先级，最终完成所有的工作。 通常，<a href="https://www.youtube.com/watch?v=NwFXVsM15Co&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE&amp;index=9" target="_blank" rel="external">前台组线程大约占用来设备总执行时间的95％</a>，而后台组大约占5％。</p>
+<p>系统也会通过Process类为每个线程分配其自己的优先级值。</p>
+<p>默认情况下，系统将线程的优先级设置为与创建它的线程相同的优先级和组成员资格。 但是，你可以通过使用<code>setThreadPriority()</code>明确调整线程优先级。</p>
+<p> <code>Process</code>类通过提供一组常量来帮助你降低分配优先级的复杂性，你可以使用这些常量来设置线程优先级。 例如，<a href="https://developer.android.com/reference/android/os/Process.html#THREAD_PRIORITY_DEFAULT" target="_blank" rel="external">THREAD_PRIORITY_DEFAULT</a> 表示线程的默认值。 对于不那么紧急执行的工作线程，你应将其优先级设置为<a href="https://developer.android.com/reference/android/os/Process.html#THREAD_PRIORITY_BACKGROUND" target="_blank" rel="external">THREAD_PRIORITY_BACKGROUND</a> 。</p>
+<p>你也可以使用 <a href="https://developer.android.com/reference/android/os/Process.html#THREAD_PRIORITY_LESS_FAVORABLE" target="_blank" rel="external">THREAD_PRIORITY_LESS_FAVORABLE</a> 和 <a href="https://developer.android.com/reference/android/os/Process.html#THREAD_PRIORITY_MORE_FAVORABLE" target="_blank" rel="external">THREAD_PRIORITY_MORE_FAVORABLE</a> 常量作为增量值来设定相对优先顺序。 所有这些枚举状态和修饰符的列表出现在<code>THREAD_PRIORITY_AUDIO</code> 类的参考文档中。 有关管理线程的更多信息，请参阅有 <code>Thread</code> and <code>Process</code> 的参考文档。</p>
+<p><a href="https://developer.android.com/reference/android/os/Process.html#THREAD_PRIORITY_AUDIO" target="_blank" rel="external">https://developer.android.com/reference/android/os/Process.html#THREAD_PRIORITY_AUDIO</a></p>
+<h2 id="线程的帮助类"><a href="#线程的帮助类" class="headerlink" title="线程的帮助类"></a>线程的帮助类</h2><p>框架为线程提供了和java相同的类和原始类，例如<code>Thread</code> 和<code>Runnable</code> 类。 为了帮助减少与开发Android线程应用程序相关的门槛，框架提供了一组帮助类。 每个助手类在性能上都有一些细微差别，以便去处理特定的线程问题。 对错误的场景使用了错误的类可能会导致性能问题。</p>
+<h3 id="AsyncTask-类"><a href="#AsyncTask-类" class="headerlink" title="AsyncTask 类"></a>AsyncTask 类</h3><p><code>AsyncTask</code>类是一个简单，有用的原始类，可以帮你快速将工作从主线程移动到工作线程。 例如，输入事件可能会触发需要加载bitmap的UI更新。<code>AsyncTask</code>对象可以将bitmap加载和解码任务放到备用线程; 一旦处理完成，<code>AsyncTask</code>对象会返回到主线程上去更新UI。</p>
+<p>当使用<code>AsyncTask</code>时，有几个重要的性能方面的问题要记住。 首先，默认情况下，应用程序将其创建的所有<code>AsyncTask</code>对象推送到单个线程中。 因此，它们以串行方式执行，和主线程类似，特别耗时的工作组会阻塞队列。 因此，我们建议你只使用<code>AsyncTask</code>处理持续时间短于5ms的任务。</p>
+<p><code>AsyncTask</code>对象也会导致常见的隐式引用问题。 而且，<code>AsyncTask</code>对象也存在显式引用的风险，但通常这种问题比较容易解决。 例如，AsyncTask可能需要对UI对象的引用，以便在<code>AsyncTask</code>回调到主线程时更新UI对象。 在这种情况下，可以使用<code>WeakReference</code>存储对所需UI对象的引用，在<code>AsyncTask</code>回调到主线程时先访问一次该UI对象。 但你需要注意，持有某个对象的<code>WeakReference</code>并不会使该对象变为线程安全的; <code>WeakReference</code>只提供了一个处理显式引用和垃圾回收问题的方法。</p>
+<h3 id="HandlerThread-类"><a href="#HandlerThread-类" class="headerlink" title="HandlerThread 类"></a>HandlerThread 类</h3><p>虽然<code>AsyncTask</code>很有用，但对于你的线程问题，它可能<a href="https://www.youtube.com/watch?v=adPLIAnx9og&amp;index=5&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE" target="_blank" rel="external">不会总是正确的解决方案</a>。相反，你可能需要一种更传统的方法来在长时间运行的线程上执行一个工作块，并且有一些能力来手动管理该工作流。</p>
+<p>我们考虑从Camera对象获取预览帧的场景。当你注册了相机预览事件，将会在<code>onPreviewFrame()</code>回调中收到它们，该回调会在调用它的事件线程上触发。如果这个回调在UI线程上触发，处理大量像素数组的任务将干扰渲染和事件处理工作。<code>AsyncTask</code>也会有同样的问题，<code>AsyncTask</code>会串行地执行任务，容易受阻塞（这个高版本已经使用线程池了）。</p>
+<p>这种情况使用<code>HandlerThread</code>更合适：<code>HandlerThread</code>实际上是一个长时间运行的线程，它从队列中抓取工作，并对其进行操作。在这个例子中，当你的应用程序将<code>Camera.open()</code>命令委托给HandlerThread上的一个工作块时，相关的<code>onPreviewFrame()</code>回调会落在HandlerThread上，而不是UI或AsyncTask线程。所以，如果你要对像素进行长时间的操作，这可能是一个更好的解决方案。</p>
+<p>当你的应用程序使用<code>HandlerThread</code>创建一个线程时，不要忘记<a href="https://www.youtube.com/watch?v=NwFXVsM15Co&amp;index=9&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE" target="_blank" rel="external">根据工作类型设置线程的优先级</a>。 记住，CPU只能并行处理少数线程。当所有其他线程都在争取资源时， 设置优先级有助于系统知道如何正确的调度这项工作。</p>
+<h3 id="ThreadPoolExecutor-类"><a href="#ThreadPoolExecutor-类" class="headerlink" title="ThreadPoolExecutor 类"></a>ThreadPoolExecutor 类</h3><p>有些类型的工作是高度并行，分布式的。例如，为8百万像素图像的每个8×8块计算滤波。创建这种量级的工作，AsyncTask和HandlerThread都不合适。 AsyncTask的单线程性质将所有线程池工作转换为线性系统。另一方面，使用HandlerThread类将需要程序员手动管理一组线程之间的负载平衡。</p>
+<p>这种情况，使用<code>ThreadPoolExecutor</code>类来处理会更容易。该类可以管理一组线程的创建，优先级设置，并权衡分配到这些线程的任务如何处理。随着工作负载增加或减少，该类会自动启动或销毁线程来适应工作负载。</p>
+<p>此类还可以帮助你的应用程序创建最佳线程数。当在构造一个<code>ThreadPoolExecutor</code>对象时，可以设置最小和最大线程数。随着<code>ThreadPoolExecutor</code>的负载增加，该类将考虑初始化的最小和最大线程数，并考虑待处理的工作量。基于这些因素，<code>ThreadPoolExecutor</code>决定在任何给定时间应该有多少线程存活。</p>
+<h4 id="你应该创建多少线程？"><a href="#你应该创建多少线程？" class="headerlink" title="你应该创建多少线程？"></a>你应该创建多少线程？</h4><p>虽然从软件层面来看，你的代码有能力创建数百个线程，但这样做可能会造成性能问题。 CPU只有并行处理少量线程的能力;以上提到的都会遇到<a href="https://www.youtube.com/watch?v=NwFXVsM15Co&amp;list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE&amp;index=9" target="_blank" rel="external">优先级和调度问题</a>。因此，只创建与你的工作负载需要的线程是很重要的。</p>
+<p>实际上，许多因素都会对优先级和调度有影响，但你可以选择一个值（比如初始值设为4），并通过 <a href="https://developer.android.com/topic/performance/%E2%80%9D/studio/profile/systrace-commandline.html%E2%80%9D" target="_blank" rel="external">Systrace</a> 进行测试。通过试错的方式来确定可以使用而又不会产生问题的最小线程数。</p>
+<p>你需要考虑创建多少线程的另一个原因是线程不是免费的：它们占用内存。每个线程最少消耗64k内存。如果设备上安装了许多应用，该值就会快速添加，特别是在调用栈显著增长的情况下。</p>
+<p>许多系统进程和第三方库经常调度自己的线程池。如果你的应用程序可以重用现有的线程池，则此重用能够减少内存和处理资源的竞争来帮助提高性能。</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android，性能优化/"> #Android，性能优化 </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/19/android-optimize-image-download-size/">Android性能优化-减小图片下载大小</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/17/android-optimize-apk/">Android性能优化-减小APK大小</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2016/10/18/android-optimize-thread/"
+               data-title="Android性能优化-线程性能优化" data-url="http://www.lightskystreet.com/2016/10/18/android-optimize-thread/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lightSky" />
+          <p class="site-author-name">lightSky</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/lightSky" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/lightSkyStreet" target="_blank">weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/lightSkyStreet" target="_blank">twitter</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/lightSkyStreet" target="_blank">zhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#线程的性能"><span class="nav-number">1.</span> <span class="nav-text">线程的性能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主线程"><span class="nav-number">1.1.</span> <span class="nav-text">主线程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内部细节"><span class="nav-number">1.1.1.</span> <span class="nav-text">内部细节</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程和UI对象的引用"><span class="nav-number">1.2.</span> <span class="nav-text">线程和UI对象的引用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#显示引用"><span class="nav-number">1.2.1.</span> <span class="nav-text">显示引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐式引用"><span class="nav-number">1.2.2.</span> <span class="nav-text">隐式引用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程和应用程序以及Activity的生命周期"><span class="nav-number">1.3.</span> <span class="nav-text">线程和应用程序以及Activity的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#持久化的线程"><span class="nav-number">1.3.1.</span> <span class="nav-text">持久化的线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程的优先级"><span class="nav-number">1.3.2.</span> <span class="nav-text">线程的优先级</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程的帮助类"><span class="nav-number">1.4.</span> <span class="nav-text">线程的帮助类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AsyncTask-类"><span class="nav-number">1.4.1.</span> <span class="nav-text">AsyncTask 类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerThread-类"><span class="nav-number">1.4.2.</span> <span class="nav-text">HandlerThread 类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ThreadPoolExecutor-类"><span class="nav-number">1.4.3.</span> <span class="nav-text">ThreadPoolExecutor 类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#你应该创建多少线程？"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">你应该创建多少线程？</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">lightSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+
+  function displaySidebar () {
+    setTimeout(function () {
+      $('.sidebar-toggle').trigger('click');
+    }, 800);
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebarToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebarToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+     // if (isDesktop() && HEXO_SIDEBAR_CONFIGURATION === 'post') {
+       // displaySidebar();
+      //}
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    var HEXO_SIDEBAR_CONFIGURATION = 'post';
+    $(document).ready(function () {
+      if (HEXO_SIDEBAR_CONFIGURATION === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lightSky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-57428802-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>
